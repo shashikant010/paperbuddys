@@ -219,7 +219,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-3">
-            <img src={appLogo} alt="PaperBuddy Logo" className="h-10 w-10 rounded-lg object-contain" />
+            {/* Alt text updated for SEO */}
+            <img src={appLogo} alt="Paper Buddy AI Logo" className="h-10 w-10 rounded-lg object-contain" />
             <div className="text-2xl font-bold bg-gradient-to-r from-white to-accent-purple bg-clip-text text-transparent">
               Paper<span className="text-accent-purple">Buddy</span>
             </div>
@@ -275,11 +276,12 @@ const Hero = () => {
             animate="visible"
             variants={containerVariants}
           >
+            {/* SEO Keyword insertion: Paper Buddy */}
             <motion.h1 variants={textFadeUp} className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
-              Generate Exam Papers in <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-blue-500">Seconds</span> with AI
+              Paper Buddy Generate Exam Papers in <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-blue-500">Seconds</span>
             </motion.h1>
             <motion.p variants={textFadeUp} className="text-lg text-slate-300 mb-8 max-w-lg drop-shadow-md">
-              Simply enter the subject, topic, and time. PaperBuddy handles the rest. Experience the future of assessment creation.
+              The ultimate AI tool for teachers and coaching institutes. Simply enter the subject, and PaperBuddy handles the rest. Experience the future of assessment.
             </motion.p>
             <motion.div variants={textFadeUp} className="flex flex-col sm:flex-row gap-4">
               <a 
@@ -302,7 +304,8 @@ const Hero = () => {
                <div className="absolute inset-0 bg-accent-purple/30 blur-3xl rounded-full transform scale-90"></div>
                <img 
                  src={heroImage} 
-                 alt="PaperBuddy App Interface" 
+                 /* IMPORTANT: Alt text helps Google Image Search */
+                 alt="Paper Buddy Mobile App Interface showing exam generation" 
                  className="relative w-full max-w-md mx-auto drop-shadow-2xl animate-float"
                />
              </div>
