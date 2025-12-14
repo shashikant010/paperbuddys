@@ -281,7 +281,7 @@ const Hero = () => {
               Paper Buddy Generate Exam Papers in <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-blue-500">Seconds</span>
             </motion.h1>
             <motion.p variants={textFadeUp} className="text-lg text-slate-300 mb-8 max-w-lg drop-shadow-md">
-              The ultimate AI tool for teachers and coaching institutes. Simply enter the subject, and PaperBuddy handles the rest. Experience the future of assessment.
+              The ultimate AI tool for teachers and coaching institutes. Simply enter the subject, and Paper Buddy handles the rest. Experience the future of assessment.
             </motion.p>
             <motion.div variants={textFadeUp} className="flex flex-col sm:flex-row gap-4">
               <a 
