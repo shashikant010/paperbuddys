@@ -5,7 +5,7 @@ import {
   Download, FileText, Cpu, Share2, CheckCircle2, Menu, X, 
   BrainCircuit, Layers, BookOpen, Linkedin, Zap, Users, School,
   Star, Quote, Calendar, CreditCard, TrendingUp, ShieldCheck,
-  MessageCircle, BarChart3, Smartphone
+  MessageCircle, BarChart3, Smartphone, AlertTriangle, Trash2
 } from 'lucide-react';
 
 // --- IMAGE IMPORTS ---
@@ -520,6 +520,80 @@ const PrivacyPolicyPage = () => {
   );
 };
 
+const AccountDeletionPage = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Simulate API call or form submission here
+    setIsSubmitted(true);
+    setUsername('');
+    setPassword('');
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="pt-32 pb-20 max-w-md mx-auto px-6 relative z-10 min-h-screen flex flex-col justify-center">
+      <div className="bg-navy-800/90 backdrop-blur-sm p-8 rounded-2xl border border-red-500/20 shadow-2xl shadow-red-900/10">
+        
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-3 bg-red-500/10 rounded-full text-red-500">
+            <AlertTriangle size={24} />
+          </div>
+          <h1 className="text-2xl font-bold text-white">Delete Account</h1>
+        </div>
+        
+        <p className="mb-8 text-sm text-slate-400">
+          Warning: Deleting your account is a permanent action. All your saved data, attendance records, and history will be permanently erased.
+        </p>
+
+        {isSubmitted ? (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-green-500/10 border border-green-500/30 p-4 rounded-xl text-center">
+            <CheckCircle2 className="mx-auto text-green-500 mb-2" size={32} />
+            <h3 className="text-green-400 font-bold mb-1">Request Received</h3>
+            <p className="text-sm text-slate-300">Your account deletion request has been submitted. It will be processed within 7 business days.</p>
+          </motion.div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Username or Email</label>
+              <input 
+                type="text" 
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full bg-navy-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all placeholder:text-slate-600"
+                placeholder="Enter your registered email"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+              <input 
+                type="password" 
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-navy-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all placeholder:text-slate-600"
+                placeholder="Confirm your password"
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-3 mt-2 rounded-lg font-bold transition-all shadow-lg shadow-red-600/20 active:scale-95"
+            >
+              <Trash2 size={18} />
+              Request Deletion
+            </button>
+          </form>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
 // --- MAIN APP COMPONENT ---
 
 function App() {
@@ -533,6 +607,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/account-deletion" element={<AccountDeletionPage />} />
           </Routes>
         </AnimatePresence>
         <Footer />
