@@ -6,7 +6,7 @@
   "homepage": "https://paperbuddy.in",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cd dist && copy index.html 404.html",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
