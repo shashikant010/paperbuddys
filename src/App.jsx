@@ -1,23 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Download, FileText, Cpu, Share2, CheckCircle2, Menu, X, 
   BrainCircuit, Layers, BookOpen, Linkedin, Zap, Users, School,
   Star, Quote, Calendar, CreditCard, TrendingUp, ShieldCheck,
-  MessageCircle, BarChart3, Smartphone, AlertTriangle, Trash2
+  MessageCircle, BarChart3, Smartphone, AlertTriangle, Trash2,
+  Mail, MapPin
 } from 'lucide-react';
 
 // --- IMAGE IMPORTS ---
 import appLogo from './assets/app_logo.png';
 import heroImage from './assets/hero_image.png'; 
-import sachinSnImg from './assets/sachin_shriniwas.png';
 import shashiImg from './assets/shashikant.png';
 import sachinImg from './assets/sachin.png';
 import vikasImg from './assets/vikas.png';
+import teamGroupImg from './assets/team.png';
 
 // --- CONFIGURATION ---
-const APK_DOWNLOAD_LINK = "https://github.com/Sachshri/paper-buddy-/releases/download/v1.0.0/paper_buddy.apk";
+const APK_DOWNLOAD_LINK = "https://play.google.com/store/apps/details?id=com.paperbuddy.students";
 const CONTACT_EMAIL = "support@paperbuddy.in";
 
 // --- ANIMATION VARIANTS ---
@@ -69,32 +70,24 @@ const appEcosystem = [
 
 const teamMembers = [
   {
-    name: "Sachin Shri Niwas",
-    role: "Lead Backend & iOS Developer",
-    bio: "Architecting the secure cloud infrastructure that powers our real-time school data synchronization.",
-    color: "from-blue-500 to-cyan-500",
-    image: sachinSnImg,
-    linkedin: "https://www.linkedin.com/in/sachin-shri-niwas/"
-  },
-  {
     name: "Shashi Kant",
-    role: "Backend & Android Developer",
+    role: "Founder & Head of Product",
     bio: "Building the robust Android ecosystem ensuring smooth performance across thousands of devices.",
     color: "from-green-500 to-emerald-500",
     image: shashiImg,
     linkedin: null 
   },
   {
-    name: "Sachin Kumar",
-    role: "UI/UX & Module Integration",
+    name: "Sachin",
+    role: "Co-Founder & Head of Operations",
     bio: "Crafting the intuitive interfaces that make complex ERP tasks feel simple for teachers and parents.",
-    color: "from-purple-500 to-pink-500",
+    color: "from-blue-500 to-cyan-500",
     image: sachinImg,
     linkedin: null
   },
   {
-    name: "Vikas Bamnia",
-    role: "Marketing & Research",
+    name: "Vikash Kumar",
+    role: "Co-Founder & Head of Marketing",
     bio: "Bridging the gap between technology and real-world school administrative needs.",
     color: "from-orange-500 to-red-500",
     image: vikasImg,
@@ -138,7 +131,7 @@ const SpaceBackground = () => {
     const setSize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
     setSize();
     window.addEventListener('resize', setSize);
-    const stars = Array.from({ length: 200 }, () => ({
+    const stars = Array.from({ length: 120 }, () => ({
       x: Math.random() * canvas.width, y: Math.random() * canvas.height,
       radius: Math.random() * 1.5, speed: Math.random() * 0.5 + 0.1, alpha: Math.random()
     }));
@@ -190,7 +183,7 @@ const Navbar = () => {
   return (
     <motion.nav 
       initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 0.6 }}
-      className="fixed w-full z-50 bg-navy-900/90 backdrop-blur-md border-b border-white/10"
+      className="fixed w-full z-50 bg-navy-900/80 backdrop-blur-lg border-b border-white/10 shadow-lg shadow-black/20"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
@@ -206,9 +199,10 @@ const Navbar = () => {
                 <button 
                   key={item} 
                   onClick={() => item === 'Home' ? navigate('/') : handleNavClick(item.toLowerCase())}
-                  className="text-slate-300 hover:text-accent-cyan transition-colors px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-slate-300 hover:text-accent-cyan transition-colors px-3 py-2 rounded-md text-sm font-medium relative group"
                 >
                   {item}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-cyan transition-all group-hover:w-full"></span>
                 </button>
               ))}
               <Link 
@@ -217,7 +211,7 @@ const Navbar = () => {
               >
                 Privacy Policy
               </Link>
-              <a href={APK_DOWNLOAD_LINK} className="bg-accent-purple hover:bg-purple-600 text-white px-5 py-2 rounded-full font-semibold transition-all shadow-lg shadow-purple-500/30 inline-block hover:shadow-purple-500/50">
+              <a href={APK_DOWNLOAD_LINK} target="_blank" rel="noreferrer" className="bg-gradient-to-r from-accent-purple to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] inline-block transform hover:-translate-y-0.5">
                 Download App
               </a>
             </div>
@@ -230,16 +224,16 @@ const Navbar = () => {
         </div>
       </div>
       {isOpen && (
-        <div className="md:hidden bg-navy-800 px-2 pt-2 pb-3 space-y-1 sm:px-3 border-b border-white/10">
+        <div className="md:hidden bg-navy-800 px-2 pt-2 pb-3 space-y-1 sm:px-3 border-b border-white/10 shadow-2xl">
            {['Home', 'Ecosystem', 'Features', 'Team'].map((item) => (
-             <button key={item} onClick={() => item === 'Home' ? navigate('/') : handleNavClick(item.toLowerCase())} className="text-slate-300 block px-3 py-2 rounded-md text-base font-medium w-full text-left">
+             <button key={item} onClick={() => item === 'Home' ? navigate('/') : handleNavClick(item.toLowerCase())} className="text-slate-300 block px-3 py-2 rounded-md text-base font-medium w-full text-left hover:bg-white/5">
                {item}
              </button>
            ))}
-           <Link to="/privacy-policy" onClick={() => setIsOpen(false)} className="text-slate-300 block px-3 py-2 rounded-md text-base font-medium w-full text-left">
+           <Link to="/privacy-policy" onClick={() => setIsOpen(false)} className="text-slate-300 block px-3 py-2 rounded-md text-base font-medium w-full text-left hover:bg-white/5">
                Privacy Policy
            </Link>
-           <a href={APK_DOWNLOAD_LINK} className="block w-full text-center bg-accent-purple text-white px-5 py-3 mt-4 rounded-lg font-bold">
+           <a href={APK_DOWNLOAD_LINK} target="_blank" rel="noreferrer" className="block w-full text-center bg-gradient-to-r from-accent-purple to-blue-600 text-white px-5 py-3 mt-4 rounded-lg font-bold">
              Download App
            </a>
         </div>
@@ -249,7 +243,6 @@ const Navbar = () => {
 };
 
 const Footer = () => {
-  const navigate = useNavigate();
   return (
     <footer className="bg-navy-950 border-t border-white/10 pt-16 pb-8 relative z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -266,16 +259,16 @@ const Footer = () => {
           <div>
             <h3 className="text-white font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li><Link to="/" className="hover:text-accent-cyan">Home</Link></li>
-              <li><Link to="/privacy-policy" className="hover:text-accent-cyan">Privacy Policy</Link></li>
-              <li><a href={APK_DOWNLOAD_LINK} className="hover:text-accent-cyan">Download</a></li>
+              <li><Link to="/" className="hover:text-accent-cyan transition-colors">Home</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-accent-cyan transition-colors">Privacy Policy</Link></li>
+              <li><a href={APK_DOWNLOAD_LINK} target="_blank" rel="noreferrer" className="hover:text-accent-cyan transition-colors">Download App</a></li>
             </ul>
           </div>
           <div className="lg:col-span-2">
             <h3 className="text-white font-bold mb-4">Contact</h3>
             <div className="text-sm text-slate-400 space-y-2">
-               <p>{CONTACT_EMAIL}</p>
-               <p>Gurugram, Haryana, India</p>
+               <p className="flex items-center gap-2"><Mail size={16}/> {CONTACT_EMAIL}</p>
+               <p className="flex items-center gap-2"><MapPin size={16}/> Gurugram, Haryana, India</p>
             </div>
           </div>
         </div>
@@ -292,14 +285,12 @@ const Footer = () => {
 const HomePage = () => {
   const location = useLocation();
 
-  // Handle scrolling when navigating back from Privacy Policy
   useEffect(() => {
     if (location.state && location.state.scrollTo) {
       const element = document.getElementById(location.state.scrollTo);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
-      // Clear state to prevent scroll on refresh
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -307,132 +298,215 @@ const HomePage = () => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       {/* HERO SECTION */}
-      <section id="home" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 min-h-screen flex items-center">
+      <section id="home" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 min-h-screen flex items-center overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-1/4 left-10 w-72 h-72 bg-accent-purple/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px] pointer-events-none"></div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div initial="hidden" animate="visible" variants={containerVariants}>
-              <motion.div variants={textFadeUp} className="inline-block px-4 py-1.5 mb-6 rounded-full bg-accent-purple/20 border border-accent-purple/50 text-accent-cyan text-sm font-semibold">
-                  🚀 Complete School ERP
+              <motion.div variants={textFadeUp} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-white/5 border border-white/10 text-accent-cyan text-sm font-semibold shadow-[0_0_15px_rgba(34,211,238,0.15)] backdrop-blur-sm">
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-cyan opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-accent-cyan"></span>
+                  </span>
+                  Complete School ERP is Live
               </motion.div>
               <motion.h1 variants={textFadeUp} className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
                 One Platform to Manage Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-blue-500">Entire Institute</span>
               </motion.h1>
-              <motion.p variants={textFadeUp} className="text-lg text-slate-300 mb-8 max-w-lg">
-                From automated attendance and fees to AI-powered exam generation. Empower your Teachers, Students, and Admin.
+              <motion.p variants={textFadeUp} className="text-lg text-slate-300 mb-10 max-w-lg leading-relaxed">
+                From automated attendance and fee collection to AI-powered exam generation. Empower your Teachers, Students, and Admin in one unified ecosystem.
               </motion.p>
-              <motion.div variants={textFadeUp}>
-                <a href={APK_DOWNLOAD_LINK} className="flex items-center justify-center gap-2 bg-gradient-to-r from-accent-purple to-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-purple-500/20 w-fit">
-                  <Download size={20} /> Get the App
+              <motion.div variants={textFadeUp} className="flex flex-wrap gap-4">
+                <a href={APK_DOWNLOAD_LINK} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-gradient-to-r from-accent-purple to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all shadow-[0_0_30px_rgba(168,85,247,0.3)] w-fit">
+                  <Download size={20} /> Download for Android
                 </a>
               </motion.div>
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.2 }}
-              className="relative flex justify-center"
+              className="relative flex justify-center lg:justify-end"
             >
-               <div className="relative z-10">
-                 <div className="absolute inset-0 bg-accent-purple/30 blur-3xl rounded-full transform scale-90"></div>
-                 <img src={heroImage} alt="ERP Interface" className="relative w-full max-w-md mx-auto drop-shadow-2xl animate-float" />
+               <div className="relative z-10 w-full max-w-md">
+                 <div className="absolute inset-0 bg-gradient-to-tr from-accent-purple/30 to-blue-500/30 rounded-full blur-[80px] transform scale-110"></div>
+                 <img src={heroImage} alt="ERP Interface" className="relative w-full mx-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-float" />
                </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* STATS */}
-      <section className="py-10 bg-navy-800 border-y border-white/5 relative z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {stats.map((stat) => (
-            <motion.div key={stat.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex items-center justify-center gap-4">
-              <div className="p-3 bg-navy-900 rounded-full text-accent-cyan border border-white/10">{stat.icon}</div>
-              <div>
-                <h4 className="text-3xl font-bold text-white">{stat.value}</h4>
-                <p className="text-sm text-slate-400 uppercase tracking-wide">{stat.label}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* COMPARISON */}
-      <section className="py-24 bg-navy-800/50">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">Why Upgrade to PaperBuddy ERP?</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-6 bg-navy-900 rounded-xl border border-white/10">
-              <h3 className="text-xl font-bold text-red-400 mb-4">Fragmented Systems</h3>
-              <ul className="space-y-3 text-slate-400">
-                <li className="flex items-center gap-2">❌ Separate apps for attendance & fees</li>
-                <li className="flex items-center gap-2">❌ Manual Excel sheets</li>
-                <li className="flex items-center gap-2">❌ Hours spent typing tests</li>
-              </ul>
-            </div>
-            <div className="p-6 bg-navy-900 rounded-xl border border-accent-cyan/30 shadow-lg shadow-accent-cyan/10">
-              <h3 className="text-xl font-bold text-accent-cyan mb-4">PaperBuddy Ecosystem</h3>
-              <ul className="space-y-3 text-slate-300">
-                <li className="flex items-center gap-2"><span className="text-accent-cyan">✔</span> All-in-one School OS</li>
-                <li className="flex items-center gap-2"><span className="text-accent-cyan">✔</span> Automated Fee Receipts & Dues</li>
-                <li className="flex items-center gap-2"><span className="text-accent-cyan">✔</span> AI Paper Generator built-in</li>
-              </ul>
-            </div>
+      {/* STATS - Hidden for now */}
+      {false && (
+        <section className="py-10 bg-navy-800 border-y border-white/5 relative z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            {stats.map((stat) => (
+              <motion.div key={stat.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex items-center justify-center gap-4">
+                <div className="p-3 bg-navy-900 rounded-full text-accent-cyan border border-white/10">{stat.icon}</div>
+                <div>
+                  <h4 className="text-3xl font-bold text-white">{stat.value}</h4>
+                  <p className="text-sm text-slate-400 uppercase tracking-wide">{stat.label}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* ECOSYSTEM */}
-      <section id="ecosystem" className="py-24 bg-navy-800/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* COMPARISON - Added subtle gradient background */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-navy-900 via-navy-800 to-navy-900 pointer-events-none"></div>
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">The Complete Ecosystem</h2>
-            <p className="text-slate-400">Dedicated applications for every stakeholder.</p>
+            <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-4">Why Upgrade to PaperBuddy?</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-accent-cyan to-blue-500 mx-auto rounded-full"></div>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Old Way Card */}
+            <div className="p-8 bg-black/20 backdrop-blur-md rounded-2xl border border-red-500/20 relative group hover:border-red-500/40 transition-colors">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-bl-full pointer-events-none"></div>
+              <h3 className="text-2xl font-bold text-red-400 mb-6 flex items-center gap-3">
+                <span className="p-2 bg-red-500/10 rounded-lg"><AlertTriangle size={24} /></span>
+                The Old Way
+              </h3>
+              <ul className="space-y-5 text-slate-400">
+                <li className="flex items-start gap-3">
+                  <X className="text-red-500 shrink-0 mt-0.5" size={20}/>
+                  <span>Juggling separate, disconnected apps for attendance, fees, and results.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <X className="text-red-500 shrink-0 mt-0.5" size={20}/>
+                  <span>Endless hours spent manually updating Excel sheets.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <X className="text-red-500 shrink-0 mt-0.5" size={20}/>
+                  <span>Typing out question papers and assignments by hand.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* PaperBuddy Way Card */}
+            <div className="p-8 bg-gradient-to-br from-navy-800 to-navy-900 rounded-2xl border border-accent-cyan/30 shadow-[0_0_30px_rgba(34,211,238,0.1)] relative overflow-hidden transform md:scale-105">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent-cyan/10 rounded-full blur-2xl pointer-events-none"></div>
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent-purple/10 rounded-full blur-2xl pointer-events-none"></div>
+              
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3 relative z-10">
+                <span className="p-2 bg-gradient-to-r from-accent-cyan to-blue-500 text-white rounded-lg shadow-lg"><CheckCircle2 size={24} /></span>
+                The PaperBuddy Way
+              </h3>
+              <ul className="space-y-5 text-slate-300 relative z-10">
+                <li className="flex items-start gap-3 font-medium">
+                  <div className="mt-1 w-5 h-5 rounded-full bg-accent-cyan/20 flex items-center justify-center shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-accent-cyan"></div>
+                  </div>
+                  <span>One unified School OS connecting admins, teachers, and parents.</span>
+                </li>
+                <li className="flex items-start gap-3 font-medium">
+                  <div className="mt-1 w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                  </div>
+                  <span>Automated fee receipts, due reminders, and detailed financial reports.</span>
+                </li>
+                <li className="flex items-start gap-3 font-medium">
+                  <div className="mt-1 w-5 h-5 rounded-full bg-accent-purple/20 flex items-center justify-center shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-accent-purple"></div>
+                  </div>
+                  <span>Built-in AI engine generates standard exam papers in seconds.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ECOSYSTEM - Added subtle glowing background blobs */}
+      <section id="ecosystem" className="py-24 relative border-t border-white/5">
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent-purple/50 to-transparent"></div>
+        <div className="absolute left-0 top-1/2 w-96 h-96 bg-accent-purple/10 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">The Complete Ecosystem</h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">Four dedicated applications working seamlessly together in real-time.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {appEcosystem.map((step) => (
-              <div key={step.id} className="bg-navy-900 p-8 rounded-2xl border border-white/5 hover:border-accent-purple/50 transition-colors group">
-                <div className="w-14 h-14 bg-navy-800 rounded-xl flex items-center justify-center text-accent-cyan mb-6 group-hover:bg-accent-purple group-hover:text-white transition-colors">
+              <div key={step.id} className="bg-white/[0.02] backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:border-accent-cyan/50 hover:bg-white/[0.04] transition-all duration-300 group hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(34,211,238,0.1)]">
+                <div className="w-16 h-16 bg-gradient-to-br from-navy-800 to-navy-900 rounded-xl flex items-center justify-center text-accent-cyan mb-6 group-hover:scale-110 group-hover:text-white group-hover:from-accent-cyan group-hover:to-blue-600 transition-all duration-300 shadow-inner border border-white/5">
                   {step.icon}
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
-                <p className="text-slate-400 text-sm">{step.desc}</p>
+                <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section id="features" className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-32">
+      {/* FEATURES - Made cards more "glassmorphic" */}
+      <section id="features" className="py-24 relative">
+        <div className="absolute right-0 top-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">Powerful Features</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-accent-purple mx-auto rounded-full"></div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             {features.map((feature, idx) => (
-              <motion.div key={idx} variants={cardVariants} whileHover={{ scale: 1.05 }} className="p-6 bg-gradient-to-br from-navy-800 to-navy-900 border border-white/5 rounded-xl hover:shadow-lg hover:shadow-accent-cyan/10">
-                <div className="text-accent-purple mb-4">{feature.icon}</div>
+              <motion.div key={idx} variants={cardVariants} whileHover={{ scale: 1.03 }} className="p-6 bg-gradient-to-b from-white/[0.05] to-transparent backdrop-blur-md border border-white/10 rounded-xl hover:border-accent-purple/50 transition-all group">
+                <div className="text-accent-purple mb-5 p-3 bg-accent-purple/10 w-fit rounded-lg group-hover:bg-accent-purple group-hover:text-white transition-colors">
+                  {feature.icon}
+                </div>
                 <h4 className="text-lg font-bold text-white mb-2">{feature.title}</h4>
-                <p className="text-slate-400 text-sm">{feature.desc}</p>
+                <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* TEAM */}
-      <section id="team" className="py-20 bg-navy-800/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* TEAM - Enhanced background and image display */}
+      <section id="team" className="py-24 relative border-t border-white/5 overflow-hidden">
+        <div className="absolute inset-0 bg-navy-950 pointer-events-none"></div>
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-cyan/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white mb-4">Meet The Team</h2>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-4 tracking-tight">Meet The Founders</h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">The engineering and business minds behind the unified education ecosystem.</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+          {/* Group Image Integration - Enhanced framing */}
+          <div className="flex justify-center mb-24 relative">
+             <div className="absolute inset-0 bg-gradient-to-r from-accent-purple to-accent-cyan blur-[60px] opacity-20 transform scale-90"></div>
+             <div className="relative p-1.5 bg-gradient-to-br from-white/20 to-white/5 rounded-[2rem] shadow-2xl backdrop-blur-sm border border-white/10">
+               <img src={teamGroupImg} alt="PaperBuddy Founders" className="max-w-3xl w-full rounded-[1.75rem] border-8 border-navy-900 object-cover" />
+             </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto relative">
             {teamMembers.map((member, index) => (
-              <div key={index} className="bg-navy-900 rounded-2xl overflow-hidden border border-white/5 shadow-lg">
-                <div className={`h-2 bg-gradient-to-r ${member.color}`}></div>
-                <div className="p-6 flex flex-col items-center">
-                  <div className={`w-28 h-28 rounded-full p-1 bg-gradient-to-br ${member.color} mb-4`}>
+              <div key={index} className="bg-navy-900/80 backdrop-blur-lg rounded-2xl overflow-hidden border border-white/10 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
+                <div className={`h-1.5 w-full bg-gradient-to-r ${member.color}`}></div>
+                <div className="p-8 flex flex-col items-center relative">
+                  <div className={`w-32 h-32 rounded-full p-1 bg-gradient-to-br ${member.color} mb-6 shadow-lg group-hover:scale-105 transition-transform`}>
                      <img src={member.image} alt={member.name} className="w-full h-full object-cover rounded-full border-4 border-navy-900"/>
                   </div>
-                  <h3 className="text-xl font-bold text-white text-center mb-1">{member.name}</h3>
-                  <p className="text-accent-cyan text-xs font-semibold uppercase mb-4">{member.role}</p>
-                  <p className="text-slate-400 text-sm text-center mb-4">{member.bio}</p>
-                  {member.linkedin && <a href={member.linkedin} className="text-slate-400 hover:text-white"><Linkedin size={16} /></a>}
+                  <h3 className="text-2xl font-bold text-white text-center mb-1">{member.name}</h3>
+                  <p className="text-accent-cyan text-sm font-bold uppercase tracking-wider mb-4 text-center">{member.role}</p>
+                  <p className="text-slate-400 text-sm text-center mb-6 leading-relaxed flex-grow">{member.bio}</p>
+                  {member.linkedin && (
+                    <a href={member.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-white/5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
+                      <Linkedin size={18} />
+                    </a>
+                  )}
                 </div>
               </div>
             ))}
@@ -440,29 +514,31 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section className="py-24 bg-navy-900 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white mb-4">Trusted by Institutes</h2>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8">
-            {testimonials.map((t, i) => (
-              <div key={i} className="bg-navy-800/50 p-8 rounded-2xl border border-white/5 relative">
-                <Quote className="absolute top-6 right-6 text-white/5 w-16 h-16" />
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, idx) => <Star key={idx} size={16} className={idx < t.rating ? "text-yellow-400 fill-yellow-400" : "text-slate-600"} />)}
+      {/* TESTIMONIALS - Hidden for now */}
+      {false && (
+        <section className="py-24 bg-navy-900 border-t border-white/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-white mb-4">Trusted by Institutes</h2>
+            </div>
+            <div className="grid md:grid-cols-2 gap-8">
+              {testimonials.map((t, i) => (
+                <div key={i} className="bg-navy-800/50 p-8 rounded-2xl border border-white/5 relative">
+                  <Quote className="absolute top-6 right-6 text-white/5 w-16 h-16" />
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, idx) => <Star key={idx} size={16} className={idx < t.rating ? "text-yellow-400 fill-yellow-400" : "text-slate-600"} />)}
+                  </div>
+                  <p className="text-slate-300 text-lg mb-6 italic">"{t.content}"</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-purple to-blue-500 flex items-center justify-center font-bold text-white">{t.name.charAt(0)}</div>
+                    <div><h4 className="text-white font-bold">{t.name}</h4><p className="text-accent-cyan text-xs uppercase">{t.role}</p></div>
+                  </div>
                 </div>
-                <p className="text-slate-300 text-lg mb-6 italic">"{t.content}"</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-purple to-blue-500 flex items-center justify-center font-bold text-white">{t.name.charAt(0)}</div>
-                  <div><h4 className="text-white font-bold">{t.name}</h4><p className="text-accent-cyan text-xs uppercase">{t.role}</p></div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </motion.div>
   );
 };
@@ -472,7 +548,7 @@ const PrivacyPolicyPage = () => {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="pt-32 pb-20 max-w-4xl mx-auto px-6 relative z-10 min-h-screen">
         <div className="bg-navy-800/80 backdrop-blur-sm p-8 md:p-12 rounded-2xl border border-white/10 text-slate-300 shadow-2xl">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Privacy Policy</h1>
-            <p className="mb-8 text-slate-400">Last updated: February 2026</p>
+            <p className="mb-8 text-slate-400">Last updated: March 2026</p>
             
             <div className="space-y-8">
                 <section>
@@ -527,7 +603,6 @@ const AccountDeletionPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Simulate API call or form submission here
     setIsSubmitted(true);
     setUsername('');
     setPassword('');
