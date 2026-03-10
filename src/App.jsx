@@ -15,7 +15,7 @@ import heroImage from './assets/hero_image.png';
 import shashiImg from './assets/shashikant.png';
 import sachinImg from './assets/sachin.png';
 import vikasImg from './assets/vikas.png';
-import teamGroupImg from './assets/team.png';
+import teamGroupImg from './assets/team.webp';
 
 // --- CONFIGURATION ---
 const APK_DOWNLOAD_LINK = "https://play.google.com/store/apps/details?id=com.paperbuddy.students";
