@@ -206,7 +206,7 @@ const Navbar = () => {
                 </button>
               ))}
               <Link 
-                to="/privacy-policy"
+                to="/privacy"
                 className={`transition-colors px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/privacy-policy' ? 'text-accent-cyan' : 'text-slate-300 hover:text-accent-cyan'}`}
               >
                 Privacy Policy
@@ -890,7 +890,7 @@ function App() {
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/account-deletion" element={<AccountDeletionPage />} />
           </Routes>
         </AnimatePresence>
