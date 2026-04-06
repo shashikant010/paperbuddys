@@ -1,5 +1,5 @@
 import React from "react";
-import {  } from "framer-motion";
+import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
 
 const PrivacyPolicy = () => {
@@ -70,10 +70,75 @@ const PrivacyPolicy = () => {
             </ul>
           </div>
 
+          {/* APP PERMISSIONS */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              2. App Permissions & Usage
+            </h2>
+            <p className="mb-4">
+              To provide core ERP functionalities, the PaperBuddy app requests the following device permissions. We strictly use these permissions for the stated purposes:
+            </p>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-white font-semibold">Location & Background Location Services</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION, FOREGROUND_SERVICE, FOREGROUND_SERVICE_LOCATION)
+                </p>
+                <p>
+                  We require access to your device's precise and coarse location, including tracking location in the background via foreground services. This is utilized exclusively for:
+                </p>
+                <ul className="list-disc list-inside space-y-1 mt-2">
+                  <li><strong>Location-Based Attendance:</strong> To verify that staff or students are within the designated school geofence when marking attendance.</li>
+                  <li><strong>Driver Location Tracking:</strong> To provide parents and administrators with real-time school bus tracking. <em>Note: Driver location is continuously tracked in the background even when the app is closed or not in use to ensure student safety during transit.</em></li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold">Storage Access</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+                </p>
+                <p>
+                  Used to read and write files to your device. This allows users to upload profile photos, submit homework assignments, and download study materials, report cards, and fee receipts.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold">Internet & Network Access</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (INTERNET)
+                </p>
+                <p>
+                  Essential for the application to communicate with our secure cloud servers, allowing real-time synchronization of attendance, results, messages, and overall app functionality.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold">Push Notifications</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (POST_NOTIFICATIONS)
+                </p>
+                <p>
+                  Required to send real-time alerts and updates regarding student attendance, fee reminders, new assignments, and critical school announcements.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold">Device Wake Lock</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (WAKE_LOCK)
+                </p>
+                <p>
+                  Used temporarily to prevent the device processor from sleeping during critical background tasks, ensuring uninterrupted live location updates for school buses and stable downloads for large educational files.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* HOW WE USE */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              2. How We Use Your Information
+              3. How We Use Your Information
             </h2>
             <ul className="list-disc list-inside space-y-1">
               <li>Provide and maintain ERP services</li>
@@ -88,7 +153,7 @@ const PrivacyPolicy = () => {
           {/* DATA SHARING */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              3. Data Sharing & Disclosure
+              4. Data Sharing & Disclosure
             </h2>
             <p>
               We do <strong>not sell personal data</strong>. Data may be shared only with:
@@ -103,7 +168,7 @@ const PrivacyPolicy = () => {
           {/* DATA SECURITY */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              4. Data Security
+              5. Data Security
             </h2>
             <p>
               We implement industry-standard security measures including:
@@ -119,7 +184,7 @@ const PrivacyPolicy = () => {
           {/* DATA RETENTION */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              5. Data Retention
+              6. Data Retention
             </h2>
             <p>
               We retain user data only as long as necessary to provide services
@@ -131,7 +196,7 @@ const PrivacyPolicy = () => {
           {/* CHILDREN PRIVACY */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              6. Children's Privacy
+              7. Children's Privacy
             </h2>
             <p>
               PaperBuddy ERP is designed for educational institutions and may be
@@ -143,7 +208,7 @@ const PrivacyPolicy = () => {
           {/* USER RIGHTS */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              7. Your Rights
+              8. Your Rights
             </h2>
             <ul className="list-disc list-inside space-y-1">
               <li>Access your data</li>
@@ -156,7 +221,7 @@ const PrivacyPolicy = () => {
           {/* THIRD PARTY */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              8. Third-Party Services
+              9. Third-Party Services
             </h2>
             <p>
               We may use trusted third-party services such as cloud hosting and
@@ -168,7 +233,7 @@ const PrivacyPolicy = () => {
           {/* POLICY CHANGES */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              9. Changes to This Policy
+              10. Changes to This Policy
             </h2>
             <p>
               We may update this Privacy Policy from time to time. Updates will
@@ -179,7 +244,7 @@ const PrivacyPolicy = () => {
           {/* CONTACT */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              10. Contact Us
+              11. Contact Us
             </h2>
             <p>If you have questions about this Privacy Policy:</p>
             <ul className="list-none mt-2 space-y-1">
@@ -201,4 +266,3 @@ const PrivacyPolicy = () => {
 };
 
 export default PrivacyPolicy;
-

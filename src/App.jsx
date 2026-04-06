@@ -545,57 +545,266 @@ const HomePage = () => {
 
 const PrivacyPolicyPage = () => {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="pt-32 pb-20 max-w-4xl mx-auto px-6 relative z-10 min-h-screen">
-        <div className="bg-navy-800/80 backdrop-blur-sm p-8 md:p-12 rounded-2xl border border-white/10 text-slate-300 shadow-2xl">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Privacy Policy</h1>
-            <p className="mb-8 text-slate-400">Last updated: March 2026</p>
-            
-            <div className="space-y-8">
-                <section>
-                    <h2 className="text-xl font-bold text-white mb-3">1. Introduction</h2>
-                    <p>Welcome to Paper Buddy ("we," "our," or "us"). We are committed to protecting your personal information and your right to privacy. This Privacy Policy applies to our mobile application (Paper Buddy - School ERP) and our website. By using our services, you agree to the collection and use of information in accordance with this policy.</p>
-                </section>
-                <section>
-                    <h2 className="text-xl font-bold text-white mb-3">2. Information We Collect</h2>
-                    <ul className="list-disc pl-5 space-y-2">
-                        <li><strong>Personal Data:</strong> We collect personally identifiable information such as Name, Email address, Phone number, Student Roll Number, and Institute details to facilitate the ERP functions (Attendance, Fees, Results).</li>
-                        <li><strong>Device Information:</strong> We may collect information about your device, including model, operating system version, and unique device identifiers to ensure app compatibility and security.</li>
-                        <li><strong>Usage Data:</strong> We collect data on how the Service is accessed and used (e.g., features used, time spent) to improve user experience.</li>
-                    </ul>
-                </section>
-                <section>
-                    <h2 className="text-xl font-bold text-white mb-3">3. How We Use Your Information</h2>
-                    <p>We use the collected data for the following purposes:</p>
-                    <ul className="list-disc pl-5 space-y-2 mt-2">
-                        <li>To provide and maintain our School ERP services.</li>
-                        <li>To notify you about changes to our service or academic updates.</li>
-                        <li>To allow you to participate in interactive features (Student Community, Quizzes).</li>
-                        <li>To provide customer support and detect technical issues.</li>
-                    </ul>
-                </section>
-                <section>
-                    <h2 className="text-xl font-bold text-white mb-3">4. Third-Party Services</h2>
-                    <p>We may employ third-party companies and services to facilitate our Service. Specifically, we use:</p>
-                    <ul className="list-disc pl-5 space-y-2 mt-2">
-                        <li><strong>Google Firebase:</strong> For authentication, database management, and analytics.</li>
-                        <li><strong>Payment Gateways:</strong> For processing fee payments (if applicable). We do not store your complete banking details on our servers.</li>
-                    </ul>
-                </section>
-                <section>
-                    <h2 className="text-xl font-bold text-white mb-3">5. Data Security</h2>
-                    <p>The security of your data is important to us. We implement industry-standard security measures to protect your personal information. However, please remember that no method of transmission over the Internet is 100% secure.</p>
-                </section>
-                <section>
-                    <h2 className="text-xl font-bold text-white mb-3">6. Contact Us</h2>
-                    <p>If you have any questions about this Privacy Policy, please contact us at:</p>
-                    <p className="mt-2 text-accent-cyan font-semibold">{CONTACT_EMAIL}</p>
-                </section>
+    <div className="min-h-screen bg-navy-900 text-slate-300">
+      
+      {/* HEADER */}
+      <section className="pt-32 pb-16 text-center border-b border-white/10 bg-navy-900/80">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto px-6"
+        >
+          <div className="flex justify-center mb-4">
+            <ShieldCheck className="text-accent-cyan" size={40} />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Privacy Policy
+          </h1>
+          <p className="text-slate-400">
+            Effective Date: 1 March 2026
+          </p>
+        </motion.div>
+      </section>
+
+      {/* CONTENT */}
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-6 space-y-10 leading-relaxed">
+
+          {/* INTRO */}
+          <div>
+            <p>
+              PaperBuddy ERP ("we", "our", or "us") operates the PaperBuddy School ERP
+              applications for Students, Teachers, Administrators, and Parents.
+              We are committed to protecting your privacy and ensuring transparency
+              in how we collect, use, and safeguard your data.
+            </p>
+          </div>
+
+          {/* INFO WE COLLECT */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              1. Information We Collect
+            </h2>
+
+            <h3 className="text-white font-semibold mb-2">Personal Information</h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Name</li>
+              <li>Email address</li>
+              <li>Phone number</li>
+              <li>Profile photo (optional)</li>
+              <li>School and class details</li>
+            </ul>
+
+            <h3 className="text-white font-semibold mt-4 mb-2">Academic Data</h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Attendance records</li>
+              <li>Marks and results</li>
+              <li>Assignments and submissions</li>
+              <li>Performance analytics</li>
+            </ul>
+
+            <h3 className="text-white font-semibold mt-4 mb-2">Device & Usage Data</h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Device type and OS version</li>
+              <li>App usage logs</li>
+              <li>Crash reports for performance improvement</li>
+            </ul>
+          </div>
+
+          {/* APP PERMISSIONS */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              2. App Permissions & Usage
+            </h2>
+            <p className="mb-4">
+              To provide core ERP functionalities, the PaperBuddy app requests the following device permissions. We strictly use these permissions for the stated purposes:
+            </p>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-white font-semibold">Location & Background Location Services</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION, FOREGROUND_SERVICE, FOREGROUND_SERVICE_LOCATION)
+                </p>
+                <p>
+                  We require access to your device's precise and coarse location, including tracking location in the background via foreground services. This is utilized exclusively for:
+                </p>
+                <ul className="list-disc list-inside space-y-1 mt-2">
+                  <li><strong>Location-Based Attendance:</strong> To verify that staff or students are within the designated school geofence when marking attendance.</li>
+                  <li><strong>Driver Location Tracking:</strong> To provide parents and administrators with real-time school bus tracking. <em>Note: Driver location is continuously tracked in the background even when the app is closed or not in use to ensure student safety during transit.</em></li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold">Storage Access</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+                </p>
+                <p>
+                  Used to read and write files to your device. This allows users to upload profile photos, submit homework assignments, and download study materials, report cards, and fee receipts.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold">Internet & Network Access</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (INTERNET)
+                </p>
+                <p>
+                  Essential for the application to communicate with our secure cloud servers, allowing real-time synchronization of attendance, results, messages, and overall app functionality.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold">Push Notifications</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (POST_NOTIFICATIONS)
+                </p>
+                <p>
+                  Required to send real-time alerts and updates regarding student attendance, fee reminders, new assignments, and critical school announcements.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold">Device Wake Lock</h3>
+                <p className="text-sm text-slate-400 font-mono mb-1">
+                  (WAKE_LOCK)
+                </p>
+                <p>
+                  Used temporarily to prevent the device processor from sleeping during critical background tasks, ensuring uninterrupted live location updates for school buses and stable downloads for large educational files.
+                </p>
+              </div>
             </div>
+          </div>
+
+          {/* HOW WE USE */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              3. How We Use Your Information
+            </h2>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Provide and maintain ERP services</li>
+              <li>Manage attendance, results, and academic records</li>
+              <li>Enable communication between schools and users</li>
+              <li>Improve app performance and user experience</li>
+              <li>Provide customer support</li>
+              <li>Ensure security and prevent misuse</li>
+            </ul>
+          </div>
+
+          {/* DATA SHARING */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              4. Data Sharing & Disclosure
+            </h2>
+            <p>
+              We do <strong>not sell personal data</strong>. Data may be shared only with:
+            </p>
+            <ul className="list-disc list-inside space-y-1 mt-2">
+              <li>Authorized school administrators and teachers</li>
+              <li>Service providers for hosting and analytics (under confidentiality)</li>
+              <li>Legal authorities if required by law</li>
+            </ul>
+          </div>
+
+          {/* DATA SECURITY */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              5. Data Security
+            </h2>
+            <p>
+              We implement industry-standard security measures including:
+            </p>
+            <ul className="list-disc list-inside space-y-1 mt-2">
+              <li>Encrypted data transmission (HTTPS)</li>
+              <li>Secure cloud storage</li>
+              <li>Role-based access control</li>
+              <li>Regular security monitoring</li>
+            </ul>
+          </div>
+
+          {/* DATA RETENTION */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              6. Data Retention
+            </h2>
+            <p>
+              We retain user data only as long as necessary to provide services
+              or comply with legal obligations. Schools control student record
+              retention policies.
+            </p>
+          </div>
+
+          {/* CHILDREN PRIVACY */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              7. Children's Privacy
+            </h2>
+            <p>
+              PaperBuddy ERP is designed for educational institutions and may be
+              used by students under 18. Data is collected only through schools
+              and managed by authorized administrators.
+            </p>
+          </div>
+
+          {/* USER RIGHTS */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              8. Your Rights
+            </h2>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Access your data</li>
+              <li>Request corrections</li>
+              <li>Request deletion through your school</li>
+              <li>Withdraw consent where applicable</li>
+            </ul>
+          </div>
+
+          {/* THIRD PARTY */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              9. Third-Party Services
+            </h2>
+            <p>
+              We may use trusted third-party services such as cloud hosting and
+              analytics providers. These services follow strict data protection
+              standards.
+            </p>
+          </div>
+
+          {/* POLICY CHANGES */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              10. Changes to This Policy
+            </h2>
+            <p>
+              We may update this Privacy Policy from time to time. Updates will
+              be posted on this page with a revised effective date.
+            </p>
+          </div>
+
+          {/* CONTACT */}
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              11. Contact Us
+            </h2>
+            <p>If you have questions about this Privacy Policy:</p>
+            <ul className="list-none mt-2 space-y-1">
+              <li>Email: support@paperbuddy.in</li>
+              <li>Phone: +91 97182 03533</li>
+              <li>Location: Gurugram, Haryana, India</li>
+            </ul>
+          </div>
+
         </div>
-    </motion.div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-white/10 py-6 text-center text-slate-500 text-sm">
+        © 2026 PaperBuddy ERP. All rights reserved.
+      </footer>
+    </div>
   );
 };
-
 const AccountDeletionPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
