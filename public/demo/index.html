@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy - Secure Student Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="mesh-gradient-bg"></div>
+
+    <div class="login-page-container">
+        
+        <div class="app-mockup-section">
+            <div class="phone-frame glassmorphic floating-animation">
+                <div class="phone-screen shimmering-animation">
+                    <div class="app-login-screen">
+                        <img src="assets/paper_buddy_logo.png" alt="Paper Buddy Logo" class="app-logo">
+                        <h2>Welcome Back</h2>
+                        <form class="app-form">
+                            <input type="text" placeholder="Student ID" class="app-input">
+                            <div class="app-password-wrapper">
+                                <input type="password" placeholder="Password" class="app-input" id="app-password">
+                                <i class="fas fa-eye-slash toggle-app-password" onclick="togglePasswordVisibility('app-password')"></i>
+                            </div>
+                            <button type="submit" class="app-login-btn">Sign In</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="phone-speaker"></div>
+                <div class="phone-button"></div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="features-header staggered-entry">
+                <h1>Paper Buddy</h1>
+                <p>Securely managing your student life.</p>
+            </div>
+
+            <div class="features-grid staggered-entry">
+                <div class="feature-card glassmorphic tilting-card" data-tilt>
+                    <i class="fas fa-id-card-alt icon-3d"></i>
+                    <h3>Secure ID Auth</h3>
+                    <p>Log in using your verified student School ID for maximum security.</p>
+                </div>
+                <div class="feature-card glassmorphic tilting-card" data-tilt>
+                    <i class="fas fa-magic icon-3d"></i>
+                    <h3>Modern UX</h3>
+                    <p>Experience a breathtaking glassmorphic interface designed for students.</p>
+                </div>
+                <div class="feature-card glassmorphic tilting-card" data-tilt>
+                    <i class="fas fa-eye icon-3d"></i>
+                    <h3>Visual Feedback</h3>
+                    <p>Micro-interactions on every element provide instant visual response.</p>
+                </div>
+            </div>
+            
+            <div class="padlock-animation-container staggered-entry">
+                <div id="padlock" class="padlock">
+                    <div class="padlock-body"></div>
+                    <div class="padlock-shackle"></div>
+                </div>
+                <p class="padlock-status">Hover feature cards to unlock access</p>
+            </div>
+        </div>
+    </div>
+
+    <a href="dashboard.html" class="next-page-btn pulsing-glass reflection-effect staggered-entry">
+        Next Page: Explore Dashboard
+    </a>
+
+    <script src="script.js"></script>
+</body>
+</html>

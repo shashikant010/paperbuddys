@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Official Announcements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === GLOBAL VARIABLES & RESET === */
+        :root {
+            --bg-color: #0B0F19;
+            --text-main: #FFFFFF;
+            --text-sub: #A0ABC0;
+            --cyan-primary: #00FFFF;
+            --cyan-light: #5CE1E6;
+            --urgent-red: #FF4757;
+            --urgent-glow: rgba(255, 71, 87, 0.6);
+            --cyan-glow: rgba(0, 255, 255, 0.4);
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(0, 255, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(var(--glass-border) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: 0 0;
+        }
+
+        /* === TYPOGRAPHY === */
+        h1, h2, h3 { font-weight: 700; line-height: 1.2; }
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 1rem; }
+        h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main); }
+        p { color: var(--text-sub); font-size: 1.1rem; margin-bottom: 1.5rem; }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--cyan-primary), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* === UI ELEMENTS (GLASSMORPHISM) === */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* === HEADER === */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .logo-cap {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--cyan-primary);
+            border-radius: 4px;
+            transform: rotate(45deg);
+            position: relative;
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .logo-cap::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: -10px;
+            width: 12px;
+            height: 2px;
+            background: var(--cyan-primary);
+            transform: rotate(-45deg);
+        }
+
+        .nav-content span { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px;}
+
+        /* === SECTION 1: HERO === */
+        .hero {
+            text-align: center;
+            padding: 6rem 0 4rem;
+        }
+
+        .hero p { max-width: 700px; margin: 0 auto 3rem; }
+
+        /* Animated Mobile Mockup */
+        .mockup-container {
+            display: flex;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .phone-mockup {
+            width: 320px;
+            height: 650px;
+            background: #000;
+            border-radius: 45px;
+            border: 8px solid #1E293B;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+            transform: rotateX(5deg);
+            transition: transform 0.5s ease;
+        }
+
+        .phone-mockup:hover { transform: rotateX(0deg) translateY(-10px); }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #1E293B;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .app-screen {
+            padding: 4rem 1.5rem 2rem;
+            height: 100%;
+            background: linear-gradient(180deg, #0B0F19 0%, #111827 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Mockup Animations */
+        .urgent-tag {
+            background: var(--urgent-red);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            align-self: flex-start;
+            box-shadow: 0 0 15px var(--urgent-glow);
+            animation: slideInTag 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        .message-bubble {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            border-top-left-radius: 4px;
+            padding: 1rem;
+            animation: fadeInBubble 1s ease 0.5s forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .message-header { font-size: 0.85rem; font-weight: 600; color: var(--cyan-primary); margin-bottom: 8px;}
+        
+        .voice-note {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+        .play-btn { width: 0; height: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 10px solid var(--cyan-primary); }
+
+        .waveform { display: flex; gap: 3px; height: 20px; align-items: center; }
+        .waveform div {
+            width: 3px; background: var(--cyan-primary); border-radius: 3px;
+            animation: waveformAnim 1.2s infinite ease-in-out;
+        }
+        .waveform div:nth-child(2) { animation-delay: 0.1s; height: 12px; }
+        .waveform div:nth-child(3) { animation-delay: 0.2s; height: 18px; }
+        .waveform div:nth-child(4) { animation-delay: 0.3s; height: 10px; }
+        .waveform div:nth-child(5) { animation-delay: 0.4s; height: 16px; }
+
+        .pdf-attachment {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .pdf-icon { color: var(--urgent-red); font-weight: bold; font-size: 1.2rem;}
+        .pdf-text { font-size: 0.75rem; color: #ccc;}
+
+        /* === SECTION 2: READ RECEIPTS === */
+        .analytics-section {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            padding: 6rem 0;
+            flex-wrap: wrap;
+        }
+
+        .analytics-text { flex: 1; min-width: 300px; }
+        .analytics-visual { flex: 1; min-width: 300px; display: flex; justify-content: center; }
+
+        .analytics-card {
+            padding: 2.5rem;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sending-anim {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            animation: pulseSend 2s infinite;
+            border: 1px solid var(--cyan-primary);
+        }
+
+        .counter-box { font-size: 2.5rem; font-weight: 700; color: var(--cyan-primary); text-shadow: 0 0 15px var(--cyan-glow); }
+        .counter-sub { font-size: 0.9rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
+
+        .double-check {
+            font-size: 2rem;
+            color: #3B82F6;
+            margin-top: 1rem;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .double-check.active { opacity: 1; transform: scale(1); }
+
+        /* === SECTION 3: FEATURES GRID === */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 0;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.4);
+        }
+
+        .icon-wrapper {
+            height: 60px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 2.5rem;
+        }
+
+        /* Feature Animations */
+        .anim-tag {
+            color: #FBBF24;
+            animation: pulseGlow 2s infinite alternate;
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+        }
+        
+        .anim-multi {
+            position: relative;
+            width: 40px; height: 40px;
+        }
+        .anim-multi::before {
+            content: '🎤';
+            position: absolute;
+            animation: morphIcon 6s infinite;
+        }
+        
+        .anim-shield {
+            color: #10B981;
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+            animation: floatShield 3s infinite ease-in-out;
+        }
+
+        /* === SECTION 4: ADVANTAGE === */
+        .advantage-section {
+            margin: 4rem 0 6rem;
+            padding: 4rem 2rem;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .advantage-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            box-shadow: inset 0 0 50px rgba(0, 255, 255, 0.05);
+            pointer-events: none;
+        }
+
+        /* === SECTION 5: FOOTER NAV === */
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+            margin-bottom: 4rem;
+            border-radius: 50px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: rgba(11, 15, 25, 0.8);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            animation: btnPulse 3s infinite;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            border-color: var(--cyan-primary);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        /* === KEYFRAMES === */
+        @keyframes slideInTag { 
+            to { opacity: 1; transform: translateX(0); } 
+        }
+        @keyframes fadeInBubble { 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        @keyframes waveformAnim {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.4); }
+        }
+        @keyframes pulseSend {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
+        }
+        @keyframes pulseGlow {
+            from { text-shadow: 0 0 5px rgba(251, 191, 36, 0.4); transform: scale(1); }
+            to { text-shadow: 0 0 20px rgba(251, 191, 36, 0.9); transform: scale(1.1); }
+        }
+        @keyframes morphIcon {
+            0%, 25% { content: '🎤'; opacity: 1; }
+            30%, 33% { opacity: 0; transform: scale(0.5); }
+            35%, 60% { content: '📊'; opacity: 1; transform: scale(1); }
+            65%, 68% { opacity: 0; transform: scale(0.5); }
+            70%, 95% { content: '📎'; opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+        @keyframes floatShield {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.2); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .analytics-section { flex-direction: column; text-align: center; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Official Announcements & <br><span class="gradient-text">School News</span></h1>
+            <p>The school's official broadcast channel. Ensure every critical notice and circular reaches the parent's pocket instantly.</p>
+            
+            <div class="mockup-container">
+                <div class="phone-mockup">
+                    <div class="notch"></div>
+                    <div class="app-screen">
+                        <div class="urgent-tag">URGENT</div>
+                        <div class="message-bubble">
+                            <div class="message-header">Principal's Office</div>
+                            <div class="voice-note">
+                                <div class="play-btn"></div>
+                                <div class="waveform">
+                                    <div></div><div></div><div></div><div></div><div></div>
+                                </div>
+                                <span style="font-size: 0.7rem; color: var(--text-sub);">0:45</span>
+                            </div>
+                            <div class="pdf-attachment">
+                                <div class="pdf-icon">📄</div>
+                                <div class="pdf-text">
+                                    <strong style="color: #fff; font-size: 0.85rem;">Weather_Closure_Notice.pdf</strong><br>
+                                    1.2 MB • Tap to view
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="analytics-section">
+            <div class="analytics-text">
+                <h2>Read-Receipts. <br><span class="gradient-text">Total Accountability.</span></h2>
+                <p>Stop wondering if parents actually read your circulars. Our advanced read-receipts give the school instant analytics on exactly how many people—and precisely who—saw the announcement.</p>
+            </div>
+            <div class="analytics-visual">
+                <div class="glass-panel analytics-card">
+                    <div class="sending-anim">📡</div>
+                    <div class="counter-box">
+                        <span id="read-counter">0</span> / 500
+                    </div>
+                    <div class="counter-sub">Parents reached</div>
+                    <div class="double-check" id="check-icon">✓✓ Seen</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-grid">
+            <div class="glass-panel feature-card">
+                <div class="icon-wrapper anim-tag">🏷️</div>
+                <h3>Priority Tagging</h3>
+                <p>Use glowing "Urgent" or "Important" priority tags to make critical alerts stand out from routine daily news.</p>
+            </div>
+            <div class="glass-panel feature-card">
+                <div class="icon-wrapper anim-multi"></div>
+                <h3>Rich Multimedia</h3>
+                <p>Go beyond text. Seamlessly embed voice notes, interactive polls, and high-res attachments directly into the feed.</p>
+            </div>
+            <div class="glass-panel feature-card">
+                <div class="icon-wrapper anim-shield">🛡️</div>
+                <h3>Guaranteed Delivery</h3>
+                <p>Bypass spam filters and chaotic WhatsApp groups. Official school news gets its own dedicated, un-mutable channel.</p>
+            </div>
+        </section>
+
+        <section class="glass-panel advantage-section">
+            <h2>End the Era of <span class="gradient-text">Crumpled Circulars.</span></h2>
+            <p>Printed circulars inevitably get crumpled, torn, or lost at the bottom of student backpacks. Paper Buddy replaces unreliable paper trails with an official, pocket-sized broadcast channel. You hit send, and they see it instantly.</p>
+        </section>
+
+        <nav class="glass-panel footer-nav">
+            <a href="syllabus.html" class="btn">← Previous Page (Syllabus)</a>
+            <a href="language.html" class="btn">Next Page: Languages →</a>
+        </nav>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Number Counter Animation for Read Receipts
+            const counterElement = document.getElementById('read-counter');
+            const checkIcon = document.getElementById('check-icon');
+            const targetCount = 450;
+            const duration = 2000; // 2 seconds
+            let hasAnimated = false;
+
+            const animateCounter = () => {
+                let startTime = null;
+                const step = (timestamp) => {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / duration, 1);
+                    // Easing function: easeOutQuart
+                    const easeProgress = 1 - Math.pow(1 - progress, 4);
+                    
+                    counterElement.innerText = Math.floor(easeProgress * targetCount);
+                    
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    } else {
+                        counterElement.innerText = targetCount;
+                        checkIcon.classList.add('active');
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            // Intersection Observer to trigger counter when visible
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !hasAnimated) {
+                        hasAnimated = true;
+                        setTimeout(animateCounter, 500); // Slight delay for dramatic effect
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            observer.observe(document.querySelector('.analytics-card'));
+
+            // Fade in elements smoothly on scroll
+            const fadeObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.feature-card, .advantage-section').forEach(el => {
+                el.style.opacity = 0;
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                fadeObserver.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

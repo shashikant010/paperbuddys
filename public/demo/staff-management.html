@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy - Staff Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === Core Variables === */
+        :root {
+            --bg-deep: #0B0F19;
+            --text-main: #FFFFFF;
+            --text-sub: #A0AABF;
+            --cyan-primary: #00E5FF;
+            --cyan-secondary: #00B4D8;
+            --gradient-cyan: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(0, 229, 255, 0.15);
+            --glass-border-hover: rgba(0, 229, 255, 0.4);
+            --glass-glow: 0 8px 32px 0 rgba(0, 229, 255, 0.1);
+        }
+
+        /* === Base Reset & Styles === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        /* Background Matrix Grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(var(--cyan-primary) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.1;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Ambient Background Glows */
+        .ambient-glow {
+            position: fixed;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(0,229,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-1 { top: -200px; right: -200px; }
+        .glow-2 { bottom: -200px; left: -200px; }
+
+        /* === Typography & Utilities === */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .gradient-text {
+            background: var(--gradient-cyan);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === Section 1: Header === */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-content { display: flex; align-items: center; }
+
+        .logo {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 1.5rem; font-weight: 700;
+            color: var(--text-main); text-decoration: none;
+        }
+
+        /* CSS Drawn Graduation Cap */
+        .css-cap { position: relative; width: 32px; height: 24px; }
+        .css-cap-top {
+            position: absolute; top: 0; left: 0; width: 100%; height: 14px;
+            background: var(--gradient-cyan);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .css-cap-base {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 10px; background: var(--cyan-secondary);
+            border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;
+        }
+
+        /* === Section 1: Hero Area === */
+        .hero {
+            padding: 6rem 0 4rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-text { max-width: 800px; margin-bottom: 4rem; }
+        .hero-text h1 { font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }
+        .hero-text h2 { font-size: 1.5rem; font-weight: 400; margin-bottom: 1.5rem; }
+
+        /* === Modifed for 3 phones, side-by-side fan arrangement === */
+        .hero-visual {
+            perspective: 1200px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Center them vertically in the visual space */
+            gap: 30px; /* Space between phones */
+            margin-top: 2rem;
+        }
+
+        /* Base properties for all phones, with a scaled down size */
+        .phone-mockup {
+            /* width: 320px; -> Scaled down 30% from 320px */
+            width: 224px;
+            /* height: 640px; -> Scaled down 30% from 640px */
+            height: 448px;
+            background: #060913;
+            border: 3px solid #1a2235; /* Subtly scale down border */
+            border-radius: 28px; /* Subtly scale down border radius */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,229,255,0.15); /* Subtly scale down shadow and inset glow */
+            position: relative;
+            transform-style: preserve-3d;
+            padding: 10px; /* Subtly scale down padding */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Base float animation for all phones, without rotation */
+        .phone-mockup.float-base {
+            animation: floatPhoneBase infinite;
+        }
+
+        /* Fan arrangement - Left Phone */
+        .phone-left {
+            transform: rotateY(-20deg) rotateX(10deg);
+            animation: floatPhoneLeft 6s ease-in-out infinite;
+            animation-delay: -0.5s; /* Staggered float start */
+        }
+        
+        /* Fan arrangement - Center Phone */
+        .phone-center {
+            transform: rotateY(0deg) rotateX(10deg);
+            animation: floatPhoneCenter 6s ease-in-out infinite;
+            /* No float stagger for center */
+        }
+        
+        /* Fan arrangement - Right Phone */
+        .phone-right {
+            transform: rotateY(20deg) rotateX(10deg);
+            animation: floatPhoneRight 6s ease-in-out infinite;
+            animation-delay: -1s; /* Staggered float start */
+        }
+
+        .phone-notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            /* width: 120px; -> scaled down notch from 120px x 25px */
+            width: 84px; height: 18px; background: #000;
+            border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; z-index: 10;
+        }
+
+        .phone-screen {
+            background: #0A0F1C;
+            flex: 1; border-radius: 18px; /* scaled down screen corner */
+            overflow: hidden; position: relative;
+            border: 1px solid rgba(255,255,255,0.05);
+            /* padding: 40px 20px 20px; -> scaled down padding */
+            padding: 30px 15px 15px;
+            display: flex; flex-direction: column; align-items: center; gap: 15px; /* scaled down gaps */
+        }
+
+        /* Screen Reveal Keyframes (One-Time, sequential across phones) */
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes fadeInLine { 0% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes slideUpIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* Float Keyframes (Infinite, with fanned rotations) */
+        @keyframes floatPhoneLeft {
+            0%, 100% { transform: translateY(0) rotateY(-20deg) rotateX(10deg); }
+            50% { transform: translateY(-15px) rotateY(-18deg) rotateX(12deg); box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 25px rgba(0,229,255,0.2); }
+        }
+        @keyframes floatPhoneCenter {
+            0%, 100% { transform: translateY(0) rotateY(0deg) rotateX(10deg); }
+            50% { transform: translateY(-15px) rotateY(0deg) rotateX(12deg); box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 25px rgba(0,229,255,0.2); }
+        }
+        @keyframes floatPhoneRight {
+            0%, 100% { transform: translateY(0) rotateY(20deg) rotateX(10deg); }
+            50% { transform: translateY(-15px) rotateY(18deg) rotateX(12deg); box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 25px rgba(0,229,255,0.2); }
+        }
+
+        /* Re-usable properties for screen content across phones */
+        .mock-avatar {
+            /* width: 100px; -> scaled avatar corner from 100x100 */
+            width: 70px; height: 70px; border-radius: 50%;
+            background: var(--glass-bg); border: 1.5px solid var(--cyan-primary); /* scaled down border */
+            box-shadow: 0 0 15px rgba(0,229,255,0.2); /* scaled down shadow corner */
+            opacity: 0; transform: scale(0.5);
+            /* animation: popIn 4s infinite; -> removed infinite, delay handled per phone */
+        }
+        
+        .mock-info-group {
+            width: 100%; display: flex; flex-direction: column; gap: 8px; align-items: center; /* scaled down gaps */
+        }
+        
+        .mock-line {
+            /* height: 10px; -> scaled down line height from 10px */
+            height: 7px; background: var(--glass-border); border-radius: 4px; /* scaled down border radius */
+            opacity: 0; /* animation: fadeInLine 4s infinite; -> removed infinite, delay handled per phone */
+        }
+        .mock-line.primary { width: 60%; background: var(--gradient-cyan); }
+        .mock-line.secondary { width: 40%; }
+        .mock-line.tertiary { width: 80%; }
+        
+        .mock-card {
+            width: 100%; /* height: 60px; -> scaled card height corner from 60px */
+            height: 42px; border-radius: 8px; /* scaled down corner radius */
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            /* margin-top: 20px; -> scaled down margin */
+            margin-top: 15px; opacity: 0; transform: translateY(20px);
+            /* animation: slideUpIn 4s infinite 1.5s; -> removed infinite, delay handled per phone */
+        }
+
+        /* Sequential content delays - Left Phone */
+        .phone-left .mock-avatar { animation: popIn 0.8s forwards 0.5s; }
+        .phone-left .mock-line.primary { animation: fadeInLine 0.8s forwards 1s; }
+        .phone-left .mock-line.secondary { animation: fadeInLine 0.8s forwards 1.3s; }
+        .phone-left .mock-line.tertiary { animation: fadeInLine 0.8s forwards 1.6s; }
+        .phone-left .mock-card:nth-of-type(1) { animation: slideUpIn 0.8s forwards 2s; }
+        .phone-left .mock-card:nth-of-type(2) { animation: slideUpIn 0.8s forwards 2.2s; }
+
+        /* Sequential content delays - Center Phone */
+        .phone-center .mock-avatar { animation: popIn 0.8s forwards 2.5s; }
+        .phone-center .mock-line.primary { animation: fadeInLine 0.8s forwards 3s; }
+        .phone-center .mock-line.secondary { animation: fadeInLine 0.8s forwards 3.3s; }
+        .phone-center .mock-line.tertiary { animation: fadeInLine 0.8s forwards 3.6s; }
+        .phone-center .mock-card:nth-of-type(1) { animation: slideUpIn 0.8s forwards 4s; }
+        .phone-center .mock-card:nth-of-type(2) { animation: slideUpIn 0.8s forwards 4.2s; }
+
+        /* Sequential content delays - Right Phone */
+        .phone-right .mock-avatar { animation: popIn 0.8s forwards 4.5s; }
+        .phone-right .mock-line.primary { animation: fadeInLine 0.8s forwards 5s; }
+        .phone-right .mock-line.secondary { animation: fadeInLine 0.8s forwards 5.3s; }
+        .phone-right .mock-line.tertiary { animation: fadeInLine 0.8s forwards 5.6s; }
+        .phone-right .mock-card:nth-of-type(1) { animation: slideUpIn 0.8s forwards 6s; }
+        .phone-right .mock-card:nth-of-type(2) { animation: slideUpIn 0.8s forwards 6.2s; }
+
+
+        /* === Section 2: Features Grid === */
+        .features-section { padding: 6rem 0; }
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2.5rem; transition: all 0.4s ease;
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        .feature-card::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
+            background: var(--gradient-cyan); transform: scaleX(0); transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--glass-border-hover);
+            box-shadow: var(--glass-glow);
+        }
+        .feature-card:hover::before { transform: scaleX(1); }
+
+        .feature-icon-wrapper {
+            width: 60px; height: 60px; border-radius: 15px;
+            background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0,229,255,0.1);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.8rem; color: var(--cyan-primary);
+            margin-bottom: 1.5rem; transition: all 0.3s;
+        }
+
+        .feature-card h3 { font-size: 1.4rem; margin-bottom: 1rem; color: #fff; }
+        .feature-card p { color: var(--text-sub); font-size: 1rem; line-height: 1.6; }
+
+        /* Hover Animations for Icons */
+        .card-id:hover .feature-icon-wrapper i { animation: flipId 1s ease; }
+        .card-radar:hover .feature-icon-wrapper i { animation: pulseRadar 1.5s infinite; color: #10B981;}
+        .card-upload:hover .feature-icon-wrapper i { animation: bounceUpload 1s infinite; }
+
+        @keyframes flipId { 0% { transform: rotateY(0); } 50% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); } }
+        @keyframes pulseRadar { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes bounceUpload { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+
+        /* === Section 3: Advantage Highlight === */
+        .advantage-section { padding: 4rem 0; }
+        .highlight-panel {
+            padding: 4rem 3rem; text-align: center;
+            background: linear-gradient(180deg, rgba(0, 229, 255, 0.08) 0%, rgba(11, 15, 25, 0.4) 100%);
+            border-top: 2px solid var(--cyan-primary);
+            box-shadow: 0 10px 40px rgba(0,229,255,0.05), inset 0 20px 40px -20px rgba(0,229,255,0.15);
+            position: relative; overflow: hidden;
+        }
+        .highlight-panel::after {
+            content: '\f274'; /* Calendar Check icon */
+            font-family: 'FontAwesome'; position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 15rem; color: rgba(0,229,255,0.02); z-index: 0; pointer-events: none;
+        }
+        
+        .highlight-content { position: relative; z-index: 1; }
+        .highlight-content h2 { font-size: 2.5rem; margin-bottom: 1.5rem; font-weight: 700; }
+        .highlight-content p {
+            font-size: 1.15rem; color: var(--text-sub);
+            max-width: 800px; margin: 0 auto; line-height: 1.8;
+        }
+
+
+        /* === Section 4: Bottom Navigation === */
+        .bottom-nav { padding: 4rem 0 6rem; display: flex; justify-content: center; }
+        .nav-container {
+            display: inline-flex; gap: 1.5rem; padding: 1.5rem 2rem;
+            border-radius: 50px; flex-wrap: wrap; justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem; border-radius: 30px;
+            text-decoration: none; font-weight: 500; font-size: 1rem;
+            transition: all 0.3s ease; text-align: center;
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+
+        .btn-prev {
+            background: rgba(255,255,255,0.02); color: var(--text-sub);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-prev:hover {
+            background: rgba(255,255,255,0.05); color: var(--text-main);
+            transform: translateX(-5px); border-color: rgba(255,255,255,0.2);
+        }
+
+        .btn-next {
+            background: rgba(0, 229, 255, 0.05); color: var(--cyan-primary);
+            border: 1px solid var(--cyan-primary);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+            animation: pulseBtn 2s infinite;
+        }
+        .btn-next:hover {
+            background: var(--gradient-cyan); color: var(--bg-deep);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+            transform: translateX(5px) scale(1.02);
+            border-color: transparent;
+        }
+
+        @keyframes pulseBtn {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(0, 229, 255, 0.4); }
+        }
+
+        /* === Responsive === */
+        @media (max-width: 900px) {
+            .hero-text h1 { font-size: 2.8rem; }
+            .hero-text h2 { font-size: 1.2rem; }
+            .hero-visual { flex-direction: column; gap: 1rem; margin-top: 1rem;} /* stacked phones for mobile */
+            .phone-mockup { transform: rotateX(0) rotateY(0); max-width: 180px; height: 360px; animation: floatMobile 4s ease-in-out infinite;}
+            @keyframes floatMobile { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+            
+            /* Remove fanned rotation on mobile, use float delay stagger instead */
+            .phone-left, .phone-center, .phone-right { transform: rotateY(0deg) rotateX(0deg); animation-name: floatMobile; }
+            .phone-left { animation-delay: 0s; }
+            .phone-center { animation-delay: -0.5s; }
+            .phone-right { animation-delay: -1s; }
+
+            /* Sequence delays are okay for mobile, but need to be shorter or non-sequential */
+            /* I'll make them sequential over t=0s, 1s, 2s instead of 0s, 2s, 4s for mobile to reduce wait time */
+            .phone-center .mock-avatar { animation-delay: 1s; }
+            .phone-center .mock-line.primary { animation-delay: 1.3s; }
+            .phone-center .mock-line.secondary { animation-delay: 1.5s; }
+            .phone-center .mock-line.tertiary { animation-delay: 1.7s; }
+            .phone-center .mock-card:nth-of-type(1) { animation-delay: 1.9s; }
+            .phone-center .mock-card:nth-of-type(2) { animation-delay: 2s; }
+
+            .phone-right .mock-avatar { animation-delay: 2s; }
+            .phone-right .mock-line.primary { animation-delay: 2.3s; }
+            .phone-right .mock-line.secondary { animation-delay: 2.5s; }
+            .phone-right .mock-line.tertiary { animation-delay: 2.7s; }
+            .phone-right .mock-card:nth-of-type(1) { animation-delay: 2.9s; }
+            .phone-right .mock-card:nth-of-type(2) { animation-delay: 3s; }
+
+            .grid-container { grid-template-columns: 1fr; }
+            .nav-container { flex-direction: column; background: none; border: none; padding: 0;}
+            .btn { width: 100%; justify-content: center; }
+            .highlight-content h2 { font-size: 2rem; }
+            .phone-screen { gap: 10px; padding: 25px 10px 10px;}
+            .mock-avatar { width: 50px; height: 50px;}
+            .mock-line { height: 5px; }
+            .mock-card { height: 30px; margin-top: 10px;}
+            .phone-notch { width: 60px; height: 12px; border-radius: 5px;}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main>
+        <section class="container hero">
+            <div class="hero-text fade-in-up">
+                <h1>Staff & Teacher Directory</h1>
+                <h2 class="gradient-text">A complete digital portfolio for every educator and staff member.</h2>
+            </div>
+            
+            <div class="hero-visual fade-in-up" style="transition-delay: 0.2s;">
+                <div class="phone-mockup phone-left">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="mock-avatar"></div>
+                        <div class="mock-info-group">
+                            <div class="mock-line primary"></div>
+                            <div class="mock-line secondary"></div>
+                            <div class="mock-line tertiary"></div>
+                        </div>
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                    </div>
+                </div>
+
+                <div class="phone-mockup phone-center">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="mock-avatar"></div>
+                        <div class="mock-info-group">
+                            <div class="mock-line primary"></div>
+                            <div class="mock-line secondary"></div>
+                            <div class="mock-line tertiary"></div>
+                        </div>
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                    </div>
+                </div>
+
+                <div class="phone-mockup phone-right">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="mock-avatar"></div>
+                        <div class="mock-info-group">
+                            <div class="mock-line primary"></div>
+                            <div class="mock-line secondary"></div>
+                            <div class="mock-line tertiary"></div>
+                        </div>
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-section">
+            <div class="grid-container">
+                <div class="glass-panel feature-card card-id fade-in-up">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-regular fa-id-badge"></i>
+                    </div>
+                    <h3>Digital Portfolios</h3>
+                    <p>Track teacher subjects, contact info, qualifications, and assigned classes at a glance. No more digging through paper files to find staff details.</p>
+                </div>
+
+                <div class="glass-panel feature-card card-radar fade-in-up" style="transition-delay: 0.1s;">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-satellite-dish"></i>
+                    </div>
+                    <h3>Live Attendance Radar</h3>
+                    <p>View "Today's Attendance" status in real-time. Instantly see who is present, absent, or on leave directly from the admin dashboard.</p>
+                </div>
+
+                <div class="glass-panel feature-card card-upload fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <h3>Seamless Profile Management</h3>
+                    <p>Easily upload, crop, and store high-quality staff profile photos. Maintain a professional look across your entire institutional directory.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="container advantage-section">
+            <div class="glass-panel highlight-panel fade-in-up">
+                <div class="highlight-content">
+                    <h2>Rapid Substitution Planning.</h2>
+                    <p>Stop waiting for manual morning reports to arrive at your desk. With the Live Attendance Radar, the principal instantly knows exactly which teachers are absent or late the second the bell rings, allowing for immediate, data-driven, and stress-free substitution planning.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="container bottom-nav fade-in-up">
+            <div class="glass-panel nav-container">
+                <a href="fee.html" class="btn btn-prev">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Page (Fees Management)
+                </a>
+                
+                <a href="staff-management2.html" class="btn btn-next">
+                    Next Page <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const elements = document.querySelectorAll('.fade-in-up');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // observer.unobserve(entry.target); // keep animating for a loop-like feel on repeated scroll
+                    }
+                });
+            }, {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            elements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

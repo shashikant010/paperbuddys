@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Live Quiz & Assessment Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables */
+        :root {
+            --bg-dark: #0B0F19;
+            --cyan-glow: #00FFFF;
+            --cyan-light: #87CEFA;
+            --coral-glow: #FF4D4D;
+            --glass-bg: rgba(11, 15, 25, 0.5);
+            --glass-border: rgba(0, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --text-main: #FFFFFF;
+            --text-muted: #A0AABF;
+        }
+
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(rgba(0, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 35px 35px;
+            background-attachment: fixed;
+            line-height: 1.6;
+        }
+
+        /* Typography & Gradients */
+        .cyan-gradient-text {
+            background: linear-gradient(90deg, var(--cyan-glow), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .coral-text {
+            color: var(--coral-glow);
+            text-shadow: 0 0 10px rgba(255, 77, 77, 0.6);
+        }
+
+        h1 { font-size: 3.5rem; line-height: 1.2; margin-bottom: 1rem; }
+        h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        p { color: var(--text-muted); font-size: 1.1rem; }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--glass-shadow);
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Navigation Header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 5%;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+        }
+
+        .cap-icon {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--cyan-glow);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 12px var(--cyan-glow);
+        }
+        .cap-icon::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 2px;
+            background: var(--cyan-glow);
+            bottom: -5px;
+            right: -8px;
+            transform: rotate(-45deg);
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* --- Section 1: Hero --- */
+        .hero {
+            text-align: center;
+            margin-bottom: 6rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .hero p {
+            max-width: 700px;
+            margin: 0 auto 4rem auto;
+        }
+
+        /* Animated Mobile Mockup (Hero) */
+        .mobile-mockup {
+            width: 300px;
+            height: 600px;
+            background: #05080f;
+            border: 8px solid #1a2235;
+            border-radius: 40px;
+            box-shadow: inset 0 0 25px rgba(0, 255, 255, 0.1), 0 25px 60px rgba(0,0,0,0.9);
+            position: relative;
+            overflow: hidden;
+            transform: perspective(1000px) rotateX(10deg);
+            transition: transform 0.5s ease;
+        }
+        .mobile-mockup:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-10px);
+        }
+        .mobile-notch {
+            width: 130px;
+            height: 25px;
+            background: #1a2235;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+        .app-screen {
+            width: 100%;
+            height: 100%;
+            padding: 3rem 1.5rem;
+            position: relative;
+            background: linear-gradient(180deg, #0B0F19 0%, #111827 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Quiz Animation Inside App */
+        .quiz-ui {
+            animation: hideQuiz 8s infinite;
+        }
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        .quiz-option {
+            background: rgba(0, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: left;
+            font-size: 0.85rem;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        .quiz-option.active {
+            animation: selectOption 8s infinite;
+        }
+        .quiz-submit {
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--cyan-glow);
+            border: 1px solid var(--cyan-glow);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: 600;
+            animation: clickSubmit 8s infinite;
+        }
+        .cursor {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            top: 60%;
+            left: 80%;
+            z-index: 20;
+            animation: moveCursor 8s infinite ease-in-out;
+            filter: drop-shadow(0 2px 4px rgba(0,255,255,0.5));
+        }
+        
+        .score-ui {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            text-align: center;
+            opacity: 0;
+            animation: showScore 8s infinite;
+        }
+        .score-badge {
+            background: rgba(11, 15, 25, 0.9);
+            border: 2px solid var(--cyan-glow);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            padding: 20px 30px;
+            border-radius: 20px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--cyan-glow);
+            position: relative;
+        }
+        .score-badge span { display: block; font-size: 1rem; color: #fff; font-weight: 400; margin-bottom: 5px;}
+
+        /* Particles */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--cyan-glow);
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            opacity: 0;
+        }
+        .p1 { animation: popParticle1 8s infinite; }
+        .p2 { animation: popParticle2 8s infinite; }
+        .p3 { animation: popParticle3 8s infinite; }
+
+        /* --- Section 2: Auto-Grading Feature --- */
+        .auto-grade-section {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            margin-bottom: 6rem;
+        }
+        .grade-text { flex: 1; }
+        .grade-visual { flex: 1; display: flex; justify-content: center; }
+        
+        .paper-card {
+            width: 100%;
+            max-width: 380px;
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            position: relative;
+        }
+        .paper-line {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            width: 80%;
+            position: relative;
+        }
+        .paper-line:nth-child(2) { width: 90%; }
+        .paper-line:nth-child(3) { width: 75%; }
+        
+        .check-mark {
+            position: absolute;
+            right: -30px;
+            top: -5px;
+            color: #00FF66;
+            font-size: 1.2rem;
+            opacity: 0;
+            text-shadow: 0 0 10px #00FF66;
+        }
+        .paper-line:nth-child(1) .check-mark { animation: showCheck 4s infinite 1s; }
+        .paper-line:nth-child(2) .check-mark { animation: showCheck 4s infinite 1.5s; }
+        .paper-line:nth-child(3) .check-mark { animation: showCheck 4s infinite 2s; }
+
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--cyan-glow);
+            box-shadow: 0 0 20px var(--cyan-glow), 0 0 40px var(--cyan-glow);
+            animation: scanPaper 4s infinite ease-in-out;
+            z-index: 5;
+        }
+        .final-grade {
+            margin-top: auto;
+            text-align: right;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: transparent;
+            animation: showGrade 4s infinite;
+        }
+
+        /* --- Section 3: Features Grid --- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 6rem;
+        }
+        .feature-card {
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--cyan-glow);
+        }
+        .icon-container {
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 3rem;
+            position: relative;
+        }
+
+        /* Feature Animations */
+        .timer-text {
+            font-family: monospace;
+            color: var(--cyan-glow);
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px var(--cyan-glow);
+            animation: pulseTimer 1s infinite alternate;
+        }
+        
+        .morph-icon {
+            font-size: 3.5rem;
+            animation: morphDocPhone 4s infinite;
+            filter: drop-shadow(0 0 15px rgba(0,255,255,0.4));
+        }
+
+        .alert-bell {
+            color: var(--coral-glow);
+            text-shadow: 0 0 20px var(--coral-glow);
+            animation: vibrateBell 0.3s infinite;
+            display: inline-block;
+        }
+
+        /* --- Section 4: Advantage --- */
+        .advantage-section {
+            text-align: center;
+            margin-bottom: 6rem;
+            border: 1px solid var(--cyan-glow);
+            box-shadow: inset 0 0 40px rgba(0, 255, 255, 0.05), 0 0 30px rgba(0, 255, 255, 0.1);
+            background: linear-gradient(180deg, rgba(11, 15, 25, 0.8) 0%, rgba(0, 50, 70, 0.2) 100%);
+        }
+
+        /* --- Section 5: Page Navigation --- */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem;
+            border-radius: 50px;
+        }
+        .btn {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.05);
+            animation: subtlePulseBtn 3s infinite alternate;
+        }
+        .btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            border-color: var(--cyan-glow);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        /* --- Keyframes --- */
+        @keyframes moveCursor {
+            0%, 10% { top: 70%; left: 80%; }
+            20%, 30% { top: 46%; left: 50%; } /* Hover Option 2 */
+            45%, 55% { top: 78%; left: 50%; } /* Hover Submit */
+            70%, 100% { top: 90%; left: 90%; opacity: 0; }
+        }
+        @keyframes selectOption {
+            0%, 25% { border-color: transparent; background: rgba(0, 255, 255, 0.05); }
+            28%, 100% { border-color: var(--cyan-glow); background: rgba(0, 255, 255, 0.2); box-shadow: inset 0 0 10px rgba(0,255,255,0.3); }
+        }
+        @keyframes clickSubmit {
+            0%, 48% { transform: scale(1); background: rgba(0, 255, 255, 0.1); }
+            50% { transform: scale(0.95); background: rgba(0, 255, 255, 0.3); }
+            52%, 100% { transform: scale(1); background: rgba(0, 255, 255, 0.1); }
+        }
+        @keyframes hideQuiz {
+            0%, 55% { opacity: 1; transform: scale(1); filter: blur(0); }
+            60%, 95% { opacity: 0; transform: scale(0.9); filter: blur(5px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+        @keyframes showScore {
+            0%, 55% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            65%, 90% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+        }
+        @keyframes popParticle1 { 0%, 65% { opacity: 0; transform: translate(0,0); } 70%, 90% { opacity: 1; transform: translate(-60px, -60px) scale(1.5); } 100% { opacity: 0; } }
+        @keyframes popParticle2 { 0%, 65% { opacity: 0; transform: translate(0,0); } 70%, 90% { opacity: 1; transform: translate(60px, -40px) scale(1.5); } 100% { opacity: 0; } }
+        @keyframes popParticle3 { 0%, 65% { opacity: 0; transform: translate(0,0); } 70%, 90% { opacity: 1; transform: translate(0px, -80px) scale(2); } 100% { opacity: 0; } }
+
+        @keyframes scanPaper {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            40% { top: 80%; opacity: 1; }
+            50%, 100% { top: 100%; opacity: 0; }
+        }
+        @keyframes showCheck {
+            0%, 10% { opacity: 0; transform: scale(0); }
+            15%, 80% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; }
+        }
+        @keyframes showGrade {
+            0%, 40% { color: transparent; text-shadow: none; }
+            45%, 80% { color: var(--cyan-glow); text-shadow: 0 0 15px var(--cyan-glow); }
+            100% { color: transparent; text-shadow: none; }
+        }
+        
+        @keyframes pulseTimer {
+            from { opacity: 0.8; text-shadow: 0 0 10px var(--cyan-glow); }
+            to { opacity: 1; text-shadow: 0 0 25px var(--cyan-glow); }
+        }
+        @keyframes morphDocPhone {
+            0%, 40% { content: "📄"; }
+            50%, 90% { content: "📱"; }
+            100% { content: "📄"; }
+        }
+        @keyframes vibrateBell {
+            0% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+            100% { transform: rotate(-10deg); }
+        }
+        @keyframes subtlePulseBtn {
+            0% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.05); }
+            100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); }
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 900px) {
+            .auto-grade-section { flex-direction: column; text-align: center; }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            .paper-card { margin: 0 auto; }
+            .nav-buttons { flex-direction: column; }
+            .btn { width: 100%; text-align: center; }
+        }
+
+        /* JS Scroll Reveal Class */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <div class="container">
+        
+        <section class="hero reveal">
+            <h1>Live Quiz & <br><span class="cyan-gradient-text">Assessment Portal</span></h1>
+            <p>Transform smartphones into powerful learning tools. Allow students to take quick, interactive, timed tests right from their pockets.</p>
+            
+            <div class="mobile-mockup">
+                <div class="mobile-notch"></div>
+                
+                <div class="app-screen">
+                    <svg class="cursor" viewBox="0 0 24 24" fill="white" stroke="#000" stroke-width="2">
+                        <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/>
+                    </svg>
+
+                    <div class="quiz-ui">
+                        <div style="font-weight: bold; color: var(--cyan-glow); margin-bottom: 15px;">Question 4 of 10</div>
+                        <div class="quiz-question">
+                            What is the powerhouse of the cell?
+                        </div>
+                        <div class="quiz-option">A) Nucleus</div>
+                        <div class="quiz-option active">B) Mitochondria</div>
+                        <div class="quiz-option">C) Ribosome</div>
+                        <div class="quiz-submit">Submit Answer</div>
+                    </div>
+
+                    <div class="score-ui">
+                        <div class="score-badge">
+                            <span>Quiz Complete</span>
+                            9/10
+                            <div class="particle p1"></div>
+                            <div class="particle p2"></div>
+                            <div class="particle p3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="auto-grade-section reveal">
+            <div class="grade-text">
+                <h2>Zero Manual Checking. <br><span class="cyan-gradient-text">Instant Results.</span></h2>
+                <p>Stop wasting weekends grading papers. Our powerful assessment engine auto-grades every quiz the exact second the student hits submit, providing instant feedback and saving teachers countless hours.</p>
+            </div>
+            <div class="grade-visual">
+                <div class="glass-panel paper-card">
+                    <div class="scanner-line"></div>
+                    <div style="font-weight: 600; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Science Weekly Test</div>
+                    
+                    <div class="paper-line"><span class="check-mark">✔</span></div>
+                    <div class="paper-line"><span class="check-mark">✔</span></div>
+                    <div class="paper-line"><span class="check-mark">✔</span></div>
+                    
+                    <div class="final-grade">Grade: A+</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-grid reveal">
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="timer-text">14:59</div>
+                </div>
+                <h3>Precision Countdown</h3>
+                <p>Build exam temperament. A live, glowing countdown timer creates a realistic testing environment right on their phone.</p>
+            </div>
+            
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="morph-icon">📄</div>
+                </div>
+                <h3>Seamless Practice Tests</h3>
+                <p>Schools can effortlessly conduct weekend practice tests or daily pop quizzes without printing a single sheet of paper.</p>
+            </div>
+
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="alert-bell">🔔</div>
+                </div>
+                <h3 class="coral-text">Missed-Quiz Alerts</h3>
+                <p>Never let a student fall behind. The system automatically triggers glowing red alerts to parents if a student misses a deadline.</p>
+            </div>
+        </section>
+
+        <section class="glass-panel advantage-section reveal">
+            <h2><span class="cyan-gradient-text">Effortless</span> Weekend Testing.</h2>
+            <p style="max-width: 800px; margin: 0 auto;">Traditional mock exams require printing hundreds of papers and hours of manual checking by exhausted teachers. With Paper Buddy's Live Quiz Portal, schools can deploy high-quality weekend assessments effortlessly, giving students immediate feedback while giving teachers their weekends back.</p>
+        </section>
+
+        <nav class="glass-panel" style="padding: 1rem; border-radius: 50px;">
+            <div class="nav-buttons">
+                <a href="exam_result.html" class="btn">← Previous Page (Exam Results)</a>
+                <a href="resources.html" class="btn">Next Page: Resources →</a>
+            </div>
+        </nav>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reveals = document.querySelectorAll('.reveal');
+
+            const revealOnScroll = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: stop observing once revealed
+                        // observer.unobserve(entry.target); 
+                    }
+                });
+            }, {
+                threshold: 0.15, // Trigger when 15% of the element is visible
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            reveals.forEach(reveal => {
+                revealOnScroll.observe(reveal);
+            });
+            
+            // Trigger immediately for elements already in viewport on load
+            setTimeout(() => {
+                reveals.forEach(reveal => {
+                    const rect = reveal.getBoundingClientRect();
+                    if(rect.top < window.innerHeight) {
+                        reveal.classList.add('active');
+                    }
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>

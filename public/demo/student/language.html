@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Global Gateway & Secure Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0B0F19;
+            --cyan-glow: #00FFFF;
+            --cyan-light: #80FFFF;
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(0, 255, 255, 0.15);
+            --text-main: #FFFFFF;
+            --text-muted: #A0ABC0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(var(--glass-border) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-attachment: fixed;
+        }
+
+        /* --- Typography & Gradients --- */
+        .cyan-gradient {
+            background: linear-gradient(90deg, var(--cyan-glow), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* --- UI Elements --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 1.5rem 5%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(11, 15, 25, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .cap-icon {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--cyan-glow);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .cap-icon::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 2px;
+            background: var(--cyan-glow);
+            bottom: -5px;
+            right: -8px;
+            transform: rotate(-45deg);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .subheadline {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 4rem;
+            font-size: 1.1rem;
+        }
+
+        /* --- 3D Mobile Mockup --- */
+        .mockup-container {
+            perspective: 1000px;
+            margin: 0 auto;
+            width: 300px;
+        }
+
+        .phone {
+            width: 300px;
+            height: 600px;
+            background: #000;
+            border-radius: 40px;
+            border: 8px solid #1a2235;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,255,255,0.1);
+            overflow: hidden;
+            transform: rotateX(10deg);
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #1a2235;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .app-screen {
+            padding: 4rem 1.5rem;
+            height: 100%;
+            background: linear-gradient(180deg, #0B0F19 0%, #16213E 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        .login-card {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            margin-top: 20px;
+        }
+
+        .lang-dropdown {
+            width: 100%;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--cyan-glow);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-stub {
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .login-btn {
+            height: 45px;
+            background: var(--cyan-glow);
+            color: #000;
+            border-radius: 5px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 0 15px var(--cyan-glow);
+        }
+
+        /* --- Inclusivity Engine Feature --- */
+        .feature-hero {
+            max-width: 1000px;
+            margin: 6rem auto;
+            padding: 4rem;
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            text-align: left;
+            flex-wrap: wrap;
+        }
+
+        .feature-content { flex: 1; min-width: 300px; }
+        .feature-visual { flex: 1; min-width: 300px; display: flex; justify-content: center; position: relative; }
+
+        .globe-container {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 1px solid var(--cyan-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: rotate 20s linear infinite;
+        }
+
+        .globe-icon {
+            font-size: 80px;
+            filter: drop-shadow(0 0 20px var(--cyan-glow));
+        }
+
+        .floating-text {
+            position: absolute;
+            color: var(--cyan-glow);
+            font-weight: 600;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px var(--cyan-glow);
+            animation: floatGreeting 5s infinite ease-in-out;
+        }
+
+        @keyframes rotate { to { transform: rotate(360deg); } }
+        
+        @keyframes floatGreeting {
+            0%, 100% { transform: translate(0, 0); opacity: 0.2; }
+            50% { transform: translate(10px, -20px); opacity: 1; }
+        }
+
+        /* --- Grid Features --- */
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto 6rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+
+        .feature-card {
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover { transform: translateY(-10px); }
+
+        .icon-box {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cyan-glow);
+        }
+
+        /* --- Advantage Section --- */
+        .advantage {
+            max-width: 1200px;
+            margin: 6rem auto;
+            padding: 4rem;
+            border: 1px solid var(--cyan-glow);
+            position: relative;
+            text-align: center;
+        }
+
+        .advantage::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0 0 30px rgba(0, 255, 255, 0.1);
+            pointer-events: none;
+        }
+
+        /* --- Navigation --- */
+        .bottom-nav {
+            padding: 4rem 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .pill-btn {
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            background: rgba(11, 15, 25, 0.8);
+            border: 1px solid var(--cyan-glow);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            animation: pulse-glow 3s infinite;
+        }
+
+        .pill-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.4); }
+        }
+
+        @media (max-width: 768px) {
+            .feature-hero { padding: 2rem; text-align: center; }
+            .bottom-nav { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main>
+        <section class="hero">
+            <h1>Multi-Language Selection & <br><span class="cyan-gradient">Secure Login</span></h1>
+            <p class="subheadline">Welcome every user with a secure, personalized, and inclusive gateway to their child's education.</p>
+            
+            <div class="mockup-container">
+                <div class="phone">
+                    <div class="notch"></div>
+                    <div class="app-screen">
+                        <div class="logo" style="margin-top: 40px; justify-content: center;">
+                            <div class="cap-icon"></div>
+                        </div>
+                        <h2 id="mockup-greet" style="margin-top: 20px; font-size: 1.5rem;">Welcome</h2>
+                        <div class="login-card">
+                            <div class="lang-dropdown">
+                                <span id="current-lang">English</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="input-stub"></div>
+                            <div class="input-stub"></div>
+                            <div class="login-btn" id="mockup-btn">Login</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="feature-hero glass-panel">
+            <div class="feature-content">
+                <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem;">Education Speaks <br><span class="cyan-gradient">Every Language.</span></h2>
+                <p>Paper Buddy breaks the language barrier. Our instant translation engine ensures that non-English speaking parents are just as informed and involved as everyone else. True partnership in education begins with understanding.</p>
+            </div>
+            <div class="feature-visual">
+                <div class="globe-container">
+                    <span class="globe-icon">🌐</span>
+                    <span class="floating-text" style="top: -20px;">Welcome</span>
+                    <span class="floating-text" style="right: -40px; top: 100px;">स्वागत है</span>
+                    <span class="floating-text" style="bottom: -20px;">Bienvenido</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-grid">
+            <div class="glass-panel feature-card">
+                <div class="icon-box">A/अ</div>
+                <h3>Instant App Translation</h3>
+                <p style="color: var(--text-muted);">One-tap switching between languages. The entire interface translates instantly to support every parent.</p>
+            </div>
+            <div class="glass-panel feature-card">
+                <div class="icon-box">🛡️</div>
+                <h3>Multi-Factor Security</h3>
+                <p style="color: var(--text-muted);">Industry-standard protocols keep sensitive academic and financial records locked behind a digital fortress.</p>
+            </div>
+            <div class="glass-panel feature-card">
+                <div class="icon-box">👋</div>
+                <h3>Personalized Greeting</h3>
+                <p style="color: var(--text-muted);">Every experience is tailored to the user’s role, providing a warm welcome for parents, students, and staff.</p>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="advantage glass-panel" style="border-radius: 0;">
+                <h2 style="font-size: 2rem; margin-bottom: 1.5rem;">Highly Inclusive. <span class="cyan-gradient">Entirely Secure.</span></h2>
+                <p style="color: var(--text-muted); max-width: 900px; margin: 0 auto;">The traditional method of school-parent communication often leaves non-English speakers behind. Paper Buddy ensures total inclusivity. When parents can navigate the school app in their native tongue, engagement skyrockets and student success follows.</p>
+            </div>
+        </section>
+
+        <nav class="bottom-nav">
+            <a href="announcement.html" class="pill-btn">← Previous Page (Announcement)</a>
+            <a href="notification.html" class="pill-btn">Next Page: Notification center →</a>
+        </nav>
+    </main>
+
+    <script>
+        // Mockup Language Animation
+        const languages = [
+            { name: 'English', greet: 'Welcome', btn: 'Login' },
+            { name: 'हिन्दी', greet: 'स्वागत है', btn: 'लॉग इन करें' },
+            { name: 'Español', greet: 'Bienvenido', btn: 'Acceso' }
+        ];
+        
+        let currentIdx = 0;
+        const langEl = document.getElementById('current-lang');
+        const greetEl = document.getElementById('mockup-greet');
+        const btnEl = document.getElementById('mockup-btn');
+
+        setInterval(() => {
+            currentIdx = (currentIdx + 1) % languages.length;
+            const lang = languages[currentIdx];
+            
+            // Subtle transition effect
+            greetEl.style.opacity = '0';
+            btnEl.style.opacity = '0';
+            
+            setTimeout(() => {
+                langEl.innerText = lang.name;
+                greetEl.innerText = lang.greet;
+                btnEl.innerText = lang.btn;
+                greetEl.style.opacity = '1';
+                btnEl.style.opacity = '1';
+            }, 300);
+        }, 3000);
+
+        // Scroll reveal logic
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = "1";
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.glass-panel').forEach(el => {
+            el.style.opacity = "0";
+            el.style.transform = "translateY(30px)";
+            el.style.transition = "all 0.8s ease-out";
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

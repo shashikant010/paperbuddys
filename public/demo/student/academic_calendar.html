@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy - Unified Academic Calendar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === CSS Variables === */
+        :root {
+            --bg-dark: #0B0F19;
+            --cyan-primary: #00E5FF;
+            --cyan-light: #80F2FF;
+            --cyan-glow: rgba(0, 229, 255, 0.4);
+            --cyan-glow-strong: rgba(0, 229, 255, 0.8);
+            --glass-bg: rgba(15, 25, 45, 0.6);
+            --glass-border: rgba(0, 229, 255, 0.15);
+            --text-main: #FFFFFF;
+            --text-muted: #A0ABC0;
+            --accent-purple: #B026FF;
+            --accent-gold: #FFD700;
+        }
+
+        /* === Global & Reset === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(var(--glass-border) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: 0 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* === Typography === */
+        h1, h2, h3 {
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--cyan-primary), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* === Glassmorphism Utility === */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* === Header === */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .logo-cap {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--cyan-primary);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .logo-cap::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: -10px;
+            width: 15px;
+            height: 2px;
+            background: var(--cyan-primary);
+            transform: rotate(-45deg);
+            box-shadow: 0 0 5px var(--cyan-glow);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* === Scroll Reveal Utility === */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === Section 1: Hero === */
+        .hero {
+            padding: 6rem 0 4rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        /* 3D Mobile Mockup */
+        .mockup-wrapper {
+            perspective: 1000px;
+        }
+
+        .mobile-device {
+            width: 320px;
+            height: 650px;
+            background: #050810;
+            border-radius: 40px;
+            border: 8px solid #1A2235;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), inset 0 0 20px var(--cyan-glow);
+            position: relative;
+            overflow: hidden;
+            transform: rotateX(10deg) translateY(0);
+            transition: transform 0.5s ease;
+        }
+
+        .mobile-device:hover {
+            transform: rotateX(0deg) translateY(-10px);
+        }
+
+        .device-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 25px;
+            background: #1A2235;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .app-screen {
+            padding: 3.5rem 1.5rem 2rem;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(180deg, #0B0F19 0%, #16243A 100%);
+        }
+
+        /* App Screen Toggle Animation */
+        .view-container {
+            position: absolute;
+            top: 4.5rem;
+            left: 1.5rem;
+            right: 1.5rem;
+            bottom: 2rem;
+            transition: opacity 0.5s ease;
+        }
+
+        .grid-view {
+            animation: toggleView 8s infinite alternate;
+        }
+
+        .list-view {
+            opacity: 0;
+            animation: toggleViewList 8s infinite alternate;
+        }
+
+        @keyframes toggleView {
+            0%, 45% { opacity: 1; transform: scale(1); pointer-events: all; }
+            55%, 100% { opacity: 0; transform: scale(0.95); pointer-events: none; }
+        }
+
+        @keyframes toggleViewList {
+            0%, 45% { opacity: 0; transform: scale(0.95); pointer-events: none; }
+            55%, 100% { opacity: 1; transform: scale(1); pointer-events: all; }
+        }
+
+        /* Fake UI Elements */
+        .fake-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+        
+        .fake-toggle {
+            width: 40px; height: 20px; border-radius: 10px; background: rgba(0, 229, 255, 0.2);
+            position: relative;
+        }
+        .fake-toggle::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+            border-radius: 50%; background: var(--cyan-primary);
+            animation: moveToggle 8s infinite alternate;
+        }
+        @keyframes moveToggle {
+            0%, 45% { transform: translateX(0); }
+            55%, 100% { transform: translateX(20px); }
+        }
+
+        /* Calendar Grid Fake UI */
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .cal-day {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 0.7rem; color: var(--text-muted);
+        }
+        .cal-day.event-red { background: rgba(255, 50, 50, 0.2); color: #FFF; box-shadow: 0 0 8px rgba(255, 50, 50, 0.6); }
+        .cal-day.event-cyan { background: var(--cyan-glow); color: #FFF; box-shadow: 0 0 8px var(--cyan-primary); }
+
+        /* List View Fake UI */
+        .list-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--cyan-primary);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .list-item.red { border-left-color: #FF3232; }
+        .list-title { font-size: 0.85rem; font-weight: 600; color: #FFF; margin-bottom: 4px; }
+        .list-date { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* === Section 2: Hero Feature === */
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            padding: 6rem 0;
+            flex-wrap: wrap;
+        }
+
+        .feature-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .feature-text h2 {
+            font-size: clamp(2rem, 3.5vw, 2.5rem);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-visual {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .dashboard-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            position: relative;
+        }
+
+        /* Complex Interactive Animation */
+        .interactive-cal {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+            margin-bottom: 2rem;
+        }
+        .int-day {
+            height: 40px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;
+            display: flex; justify-content: center; align-items: center; font-size: 0.8rem;
+            position: relative;
+        }
+        .int-day.mid-term { background: rgba(176, 38, 255, 0.2); border: 1px solid var(--accent-purple); box-shadow: 0 0 15px rgba(176, 38, 255, 0.4); }
+        .int-day.winter { background: var(--cyan-glow); border: 1px solid var(--cyan-primary); box-shadow: 0 0 15px var(--cyan-glow-strong); }
+
+        .cursor {
+            width: 24px; height: 24px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="1.5"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.42a.5.5 0 0 0 .5-.5V3.21a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0-.5.5z"/></svg>');
+            position: absolute;
+            z-index: 50;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+            animation: cursorMove 10s infinite;
+        }
+
+        .event-popup {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(20, 30, 50, 0.95);
+            border: 1px solid var(--cyan-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 90%;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 20px var(--cyan-glow);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .popup-1 { animation: showPopup1 10s infinite; border-color: var(--accent-purple); box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 20px rgba(176, 38, 255, 0.3); }
+        .popup-2 { animation: showPopup2 10s infinite; }
+
+        .popup-title { font-weight: 700; color: #FFF; margin-bottom: 5px; }
+        .popup-desc { font-size: 0.85rem; color: var(--text-muted); }
+        
+        .duration-timeline { margin-top: 10px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; position: relative; overflow:hidden;}
+        .duration-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--cyan-primary); animation: fillTimeline 10s infinite; }
+
+        @keyframes cursorMove {
+            0%, 5% { top: 80%; left: 80%; transform: scale(1); }
+            15% { top: 35%; left: 30%; transform: scale(1); } /* Move to Mid-Term */
+            18% { top: 35%; left: 30%; transform: scale(0.8); } /* Tap */
+            20%, 45% { top: 35%; left: 30%; transform: scale(1); } /* Hold */
+            55% { top: 55%; left: 70%; transform: scale(1); } /* Move to Winter Break */
+            58% { top: 55%; left: 70%; transform: scale(0.8); } /* Tap */
+            60%, 85% { top: 55%; left: 70%; transform: scale(1); } /* Hold */
+            95%, 100% { top: 80%; left: 80%; transform: scale(1); } /* Return */
+        }
+
+        @keyframes showPopup1 {
+            0%, 18% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            20%, 45% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            47%, 100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        }
+
+        @keyframes showPopup2 {
+            0%, 58% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            60%, 85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            87%, 100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        }
+
+        @keyframes fillTimeline {
+            0%, 60% { width: 0%; }
+            70%, 85% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        /* === Section 3: Features Grid === */
+        .features-grid {
+            padding: 4rem 0 6rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--cyan-primary);
+        }
+
+        .icon-container {
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        /* Feature Animations */
+        .anim-timeline {
+            width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; position: relative;
+        }
+        .anim-timeline::after {
+            content:''; position:absolute; left:0; top:0; height:100%; background: var(--cyan-primary);
+            box-shadow: 0 0 10px var(--cyan-glow);
+            animation: stretchTimeline 3s infinite ease-in-out;
+        }
+        @keyframes stretchTimeline { 0%, 20% {width:0;} 80%, 100% {width:100%;} }
+
+        .anim-toggle {
+            width: 60px; height: 30px; border-radius: 15px; border: 2px solid var(--glass-border);
+            position: relative; overflow: hidden;
+        }
+        .anim-toggle::before {
+            content:''; position:absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+            background: var(--cyan-primary); box-shadow: 0 0 10px var(--cyan-glow);
+            animation: slideToggle 2s infinite alternate ease-in-out;
+        }
+        @keyframes slideToggle { 0% {transform:translateX(0);} 100% {transform:translateX(30px);} }
+
+        .anim-dots { display: flex; gap: 8px; }
+        .anim-dots span { width: 16px; height: 16px; border-radius: 50%; display: inline-block; }
+        .anim-dots span:nth-child(1) { background: var(--cyan-primary); animation: pulseDot 1.5s infinite alternate; }
+        .anim-dots span:nth-child(2) { background: var(--accent-purple); animation: pulseDot 1.5s infinite alternate 0.5s; }
+        .anim-dots span:nth-child(3) { background: var(--accent-gold); animation: pulseDot 1.5s infinite alternate 1s; }
+        @keyframes pulseDot { 0% {transform: scale(0.8); opacity: 0.5; box-shadow: none;} 100% {transform: scale(1.2); opacity: 1; box-shadow: 0 0 15px currentColor;} }
+
+        /* === Section 4: Advantage === */
+        .advantage-section {
+            padding: 4rem 2rem;
+            margin: 4rem 0 6rem;
+            text-align: center;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.05) inset;
+            background: linear-gradient(180deg, transparent, rgba(0, 229, 255, 0.02), transparent);
+        }
+
+        .advantage-section h2 {
+            margin-bottom: 1.5rem;
+        }
+
+        .advantage-section p {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        /* === Section 5: Navigation === */
+        .page-navigation {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem;
+            margin-bottom: 4rem;
+            border-radius: 50px;
+        }
+
+        .btn-pill {
+            background: rgba(15, 25, 45, 0.8);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.05);
+            animation: subtlePulse 3s infinite alternate;
+        }
+
+        .btn-pill:hover {
+            transform: scale(1.05);
+            border-color: var(--cyan-primary);
+            box-shadow: 0 0 25px var(--cyan-glow);
+            background: rgba(0, 229, 255, 0.1);
+            animation-play-state: paused;
+        }
+
+        @keyframes subtlePulse {
+            0% { box-shadow: 0 0 10px rgba(0, 229, 255, 0.05); }
+            100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .hero-feature { flex-direction: column; text-align: center; }
+            .page-navigation { flex-direction: column; }
+            .btn-pill { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main>
+        <section class="container hero reveal">
+            <h1>Unified Academic <br><span class="gradient-text">Calendar</span></h1>
+            <p>The master schedule for the entire academic year, living right inside the parent's pocket.</p>
+            
+            <div class="mockup-wrapper">
+                <div class="mobile-device">
+                    <div class="device-notch"></div>
+                    <div class="app-screen">
+                        <div class="fake-header">
+                            <span style="font-weight: 600; color: #FFF;">Schedule</span>
+                            <div class="fake-toggle"></div>
+                        </div>
+                        
+                        <div class="view-container grid-view">
+                            <div style="text-align:center; font-size:0.9rem; color: var(--cyan-primary); margin-bottom: 1rem;">October 2024</div>
+                            <div class="cal-grid">
+                                <div class="cal-day">M</div><div class="cal-day">T</div><div class="cal-day">W</div><div class="cal-day">T</div><div class="cal-day">F</div><div class="cal-day">S</div><div class="cal-day">S</div>
+                                <div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div><div class="cal-day">5</div><div class="cal-day">6</div><div class="cal-day">7</div>
+                                <div class="cal-day">8</div><div class="cal-day">9</div><div class="cal-day event-red">10</div><div class="cal-day event-red">11</div><div class="cal-day event-red">12</div><div class="cal-day">13</div><div class="cal-day">14</div>
+                                <div class="cal-day">15</div><div class="cal-day">16</div><div class="cal-day">17</div><div class="cal-day">18</div><div class="cal-day">19</div><div class="cal-day">20</div><div class="cal-day">21</div>
+                                <div class="cal-day event-cyan">22</div><div class="cal-day">23</div><div class="cal-day">24</div><div class="cal-day">25</div><div class="cal-day">26</div><div class="cal-day">27</div><div class="cal-day">28</div>
+                            </div>
+                        </div>
+
+                        <div class="view-container list-view">
+                            <div class="list-item red">
+                                <div class="list-title">Mid-Term Exams</div>
+                                <div class="list-date">Oct 10 - Oct 12</div>
+                            </div>
+                            <div class="list-item">
+                                <div class="list-title">Science Fair</div>
+                                <div class="list-date">Oct 22 • 09:00 AM</div>
+                            </div>
+                            <div class="list-item">
+                                <div class="list-title">Parent-Teacher Meeting</div>
+                                <div class="list-date">Nov 05 • 04:00 PM</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container hero-feature reveal">
+            <div class="feature-text">
+                <h2>Plan Vacations & Prep <br><span class="gradient-text">Months in Advance.</span></h2>
+                <p>Give parents the ultimate tool for family planning. By providing a crystal-clear roadmap of the entire year, parents can schedule family vacations and map out exam prep months in advance without ever needing to call the school reception for dates.</p>
+            </div>
+            
+            <div class="feature-visual">
+                <div class="glass-panel dashboard-card">
+                    <h3 style="margin-bottom: 1.5rem; text-align: center;">Yearly Outlook</h3>
+                    
+                    <div class="interactive-cal">
+                        <div class="int-day">1</div><div class="int-day">2</div><div class="int-day">3</div><div class="int-day">4</div><div class="int-day">5</div>
+                        <div class="int-day">6</div><div class="int-day mid-term">7</div><div class="int-day">8</div><div class="int-day">9</div><div class="int-day">10</div>
+                        <div class="int-day">11</div><div class="int-day">12</div><div class="int-day">13</div><div class="int-day">14</div><div class="int-day">15</div>
+                        <div class="int-day">16</div><div class="int-day">17</div><div class="int-day winter">18</div><div class="int-day winter">19</div><div class="int-day winter">20</div>
+                    </div>
+
+                    <div class="cursor"></div>
+
+                    <div class="event-popup popup-1">
+                        <div class="popup-title" style="color: var(--accent-purple);">Mid-Term Exams</div>
+                        <div class="popup-desc">Math, Science, History.</div>
+                    </div>
+
+                    <div class="event-popup popup-2">
+                        <div class="popup-title" style="color: var(--cyan-primary);">Winter Break</div>
+                        <div class="popup-desc">School Closed. Resumes 4th Jan.</div>
+                        <div class="duration-timeline"><div class="duration-fill"></div></div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-grid reveal">
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="anim-timeline"></div>
+                </div>
+                <h3>The Master Blueprint</h3>
+                <p>Access the complete academic year's schedule, from the first day of school to final exams and everything in between.</p>
+            </div>
+            
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="anim-toggle"></div>
+                </div>
+                <h3>Smart View Toggles</h3>
+                <p>Instantly switch between a traditional monthly calendar view and a clean, chronological list of upcoming events.</p>
+            </div>
+
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="anim-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+                <h3>Color-Coded Clarity</h3>
+                <p>Instantly distinguish between public holidays, school events, and high-priority exam dates using glowing, color-coded markers.</p>
+            </div>
+        </section>
+
+        <section class="advantage-section reveal">
+            <div class="container">
+                <h2>End the <span class="gradient-text">Calendar Confusion.</span></h2>
+                <p>Traditional paper calendars get lost by the second week of school, leading to constant phone calls to the administration desk asking, "When do exams start?" or "Is Thursday a holiday?". Paper Buddy puts a dynamic, unified, and always-updated calendar directly in everyone's hands.</p>
+            </div>
+        </section>
+
+        <section class="container">
+            <nav class="glass-panel page-navigation reveal">
+                <a href="resources.html" class="btn-pill">← Previous Page (Resources)</a>
+                <a href="fees.html" class="btn-pill">Next Page: fees →</a>
+            </nav>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+            
+            // Trigger animation immediately for the hero section
+            setTimeout(() => {
+                const hero = document.querySelector('.hero.reveal');
+                if(hero) hero.classList.add('active');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Announcements & Communication</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================================================
+           GLOBAL VARIABLES & THEMES
+           ========================================================================== */
+        :root {
+            /* Colors */
+            --bg-dark: #0B0F19;
+            --bg-darker: #06090f;
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --cyan-primary: #00f2fe;
+            --cyan-secondary: #4facfe;
+            --cyan-glow: rgba(0, 242, 254, 0.4);
+            --alert-green: #10b981;
+            
+            /* UI Elements */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(0, 242, 254, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            
+            /* Gradients */
+            --cyan-gradient: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --------------------------------------------------------------------------
+           BACKGROUND EFFECTS
+           -------------------------------------------------------------------------- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(var(--cyan-primary) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.07;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-1 { top: -200px; left: -200px; }
+        .glow-2 { bottom: -200px; right: -200px; }
+
+        /* --------------------------------------------------------------------------
+           UTILITIES
+           -------------------------------------------------------------------------- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .text-gradient {
+            background: var(--cyan-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           SECTION 1: HEADER & NAVIGATION
+           ========================================================================== */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        /* CSS-Drawn Graduation Cap */
+        .css-cap { position: relative; width: 36px; height: 24px; }
+        .cap-top {
+            position: absolute; top: 0; left: 0; width: 100%; height: 16px;
+            background: var(--cyan-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .cap-base {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 10px; background: var(--cyan-secondary);
+            border-radius: 0 0 4px 4px;
+        }
+        .cap-tassel {
+            position: absolute; right: 4px; top: 8px; width: 2px; height: 14px;
+            background: var(--cyan-primary); transform: rotate(-15deg);
+        }
+
+        /* ==========================================================================
+           SECTION 1: HERO (CENTER ALIGNED + MOCKUP)
+           ========================================================================== */
+        .hero {
+            padding: 5rem 0 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-text {
+            max-width: 800px;
+            margin-bottom: 4rem;
+            z-index: 10;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        /* 3D Mobile Mockup */
+        .hero-visual {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            perspective: 1200px;
+        }
+
+        .phone-mockup {
+            width: 320px;
+            height: 640px;
+            background: var(--bg-darker);
+            border: 4px solid #1A2235;
+            border-radius: 45px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 0 20px rgba(0, 242, 254, 0.15);
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg);
+            animation: floatPhone 6s ease-in-out infinite;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 26px; background: #000;
+            border-radius: 0 0 14px 14px; z-index: 10;
+        }
+
+        .phone-screen {
+            background: #0B101C;
+            flex: 1; border-radius: 32px;
+            position: relative; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column;
+        }
+
+        /* App Screen Animations */
+        .screen-header {
+            padding: 40px 20px 20px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+        .header-bar-1 { width: 60%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 6px; margin: 0 auto 8px; }
+        .header-bar-2 { width: 40%; height: 8px; background: var(--cyan-dark); border-radius: 4px; margin: 0 auto; opacity: 0.8; }
+
+        /* Push Notification */
+        .push-notif {
+            position: absolute; top: 40px; left: 10px; right: 10px;
+            background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 16px;
+            padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 12px; z-index: 20;
+            opacity: 0; transform: translateY(-50px);
+            animation: pushNotifAnim 8s infinite;
+        }
+        .notif-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: rgba(0, 242, 254, 0.1); color: var(--cyan-light);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem;
+        }
+        .notif-text { flex: 1; }
+        .nt-1 { width: 100%; height: 8px; background: #fff; border-radius: 4px; margin-bottom: 6px; }
+        .nt-2 { width: 70%; height: 6px; background: var(--text-muted); border-radius: 3px; }
+
+        /* Digital Circular */
+        .circular-content {
+            padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 15px;
+            opacity: 0; transform: scale(0.95);
+            animation: circularAnim 8s infinite;
+        }
+        .circ-title { width: 80%; height: 16px; background: var(--cyan-gradient); border-radius: 8px; margin-bottom: 10px; }
+        .circ-line { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .circ-line.short { width: 85%; }
+        .circ-attachment {
+            margin-top: 15px; padding: 15px; border-radius: 12px;
+            background: rgba(0, 242, 254, 0.05); border: 1px dashed var(--cyan-primary);
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
+        }
+        .attach-icon { color: var(--cyan-light); font-size: 1.5rem; animation: pulseGlow 2s infinite alternate; }
+        .attach-text { width: 60%; height: 8px; background: var(--cyan-light); border-radius: 4px; opacity: 0.8; }
+
+        /* Keyframes */
+        @keyframes floatPhone {
+            0%, 100% { transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg) translateY(0); }
+            50% { transform: rotateX(12deg) rotateY(-12deg) rotateZ(2deg) translateY(-20px); box-shadow: 20px 50px 80px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 242, 254, 0.2); }
+        }
+        @keyframes pushNotifAnim {
+            0%, 10% { opacity: 0; transform: translateY(-50px); }
+            15%, 45% { opacity: 1; transform: translateY(0); }
+            50%, 100% { opacity: 0; transform: translateY(-50px); }
+        }
+        @keyframes circularAnim {
+            0%, 45% { opacity: 0; transform: scale(0.95); }
+            55%, 95% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.95); }
+        }
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 5px var(--cyan-light); }
+            100% { text-shadow: 0 0 20px var(--cyan-light), 0 0 30px var(--cyan-light); }
+        }
+
+        /* ==========================================================================
+           SECTION 2: HERO FEATURE (NO-REPLY BROADCASTING)
+           ========================================================================== */
+        .feature-hero {
+            padding: 6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4rem;
+        }
+
+        .feature-hero-text {
+            flex: 1;
+        }
+
+        .feature-hero-text h2 {
+            font-size: 2.8rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-hero-text p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .feature-hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .broadcast-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* Broadcast Animations */
+        .airplane-container {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .airplane {
+            position: absolute;
+            font-size: 2.5rem;
+            color: var(--cyan-light);
+            opacity: 0;
+        }
+        .plane-1 { animation: flyOut 4s infinite 0s; }
+        .plane-2 { font-size: 1.8rem; color: var(--cyan-secondary); animation: flyOutLeft 4s infinite 0.3s; }
+        .plane-3 { font-size: 2rem; color: #fff; animation: flyOutRight 4s infinite 0.6s; }
+
+        .shield-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--alert-green);
+            padding: 12px 24px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--alert-green);
+            font-weight: 600;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+            opacity: 0;
+            transform: scale(0.8);
+            animation: popShield 4s infinite 1.5s;
+        }
+        .shield-box i { font-size: 1.4rem; }
+
+        @keyframes flyOut {
+            0% { transform: translate(0, 50px) scale(0.5); opacity: 0; }
+            20% { transform: translate(0, 0) scale(1); opacity: 1; }
+            60% { transform: translate(0, -100px) scale(1.5); opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @keyframes flyOutLeft {
+            0% { transform: translate(0, 50px) scale(0.5); opacity: 0; }
+            20% { transform: translate(-30px, 10px) scale(1); opacity: 0.8; }
+            60% { transform: translate(-80px, -80px) scale(1.2); opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @keyframes flyOutRight {
+            0% { transform: translate(0, 50px) scale(0.5); opacity: 0; }
+            20% { transform: translate(40px, 20px) scale(1); opacity: 0.9; }
+            60% { transform: translate(100px, -90px) scale(1.3); opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @keyframes popShield {
+            0%, 10% { opacity: 0; transform: scale(0.8); }
+            20%, 80% { opacity: 1; transform: scale(1); box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); }
+            90%, 100% { opacity: 0; transform: scale(0.8); }
+        }
+
+        /* ==========================================================================
+           SECTION 3: CORE FEATURES GRID
+           ========================================================================== */
+        .features-grid {
+            padding: 5rem 0;
+        }
+
+        .grid-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: default;
+        }
+
+        .feature-card::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+            background: var(--cyan-gradient); transform: scaleX(0); transform-origin: right; transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 242, 254, 0.4);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.15);
+        }
+        .feature-card:hover::before { transform: scaleX(1); transform-origin: left; }
+
+        .f-icon {
+            width: 70px; height: 70px; border-radius: 18px;
+            background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; color: var(--cyan-light);
+            margin-bottom: 2rem; position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; color: #fff; }
+        .feature-card p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; flex: 1; }
+
+        /* Card Hover Animations */
+        /* Card 1: Target Bullseye */
+        .feature-card:hover .f-icon.anim-target i { animation: pulseTarget 1s infinite alternate; color: #fff; text-shadow: 0 0 15px var(--cyan-light); }
+        @keyframes pulseTarget { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
+
+        /* Card 2: Paperclip Glow */
+        .feature-card:hover .f-icon.anim-attach { background: var(--cyan-gradient); border-color: transparent; box-shadow: 0 0 20px rgba(0, 242, 254, 0.5); }
+        .feature-card:hover .f-icon.anim-attach i { color: var(--bg-dark); }
+
+        /* Card 3: Bell Vibrate */
+        .feature-card:hover .f-icon.anim-bell i { animation: vibrateBell 0.3s linear infinite both; color: #fff; text-shadow: 0 0 15px var(--cyan-light); }
+        @keyframes vibrateBell {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        /* ==========================================================================
+           SECTION 4: ADVANTAGE SECTION
+           ========================================================================== */
+        .advantage {
+            padding: 6rem 0;
+            text-align: center;
+        }
+
+        .adv-panel {
+            padding: 5rem 3rem;
+            background: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, rgba(11, 15, 25, 0.4) 100%);
+            border-top: 1px solid rgba(0, 242, 254, 0.2);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            border-radius: 30px;
+            box-shadow: inset 0 20px 50px -20px rgba(0, 242, 254, 0.1);
+        }
+
+        .adv-panel h2 { font-size: 3rem; margin-bottom: 1.5rem; font-weight: 700; }
+        .adv-panel p { font-size: 1.2rem; color: var(--text-muted); max-width: 850px; margin: 0 auto; line-height: 1.8; }
+
+        /* ==========================================================================
+           SECTION 5: BOTTOM NAVIGATION
+           ========================================================================== */
+        .bottom-nav {
+            padding: 2rem 0 8rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-pill-container {
+            display: inline-flex; gap: 1.5rem; padding: 1.5rem 2rem;
+            border-radius: 60px;
+            background: rgba(11, 15, 25, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap; justify-content: center;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem; border-radius: 40px; text-decoration: none;
+            font-weight: 500; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-prev {
+            background: rgba(255,255,255,0.03); color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-prev:hover {
+            background: rgba(255,255,255,0.08); color: var(--text-main);
+            transform: translateX(-5px); border-color: rgba(0, 242, 254, 0.4);
+        }
+
+        .btn-next {
+            background: rgba(0, 242, 254, 0.05); color: var(--cyan-light);
+            border: 1px solid var(--cyan-light);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            animation: pulseNav 2.5s infinite alternate;
+        }
+        .btn-next:hover {
+            background: var(--cyan-gradient); color: #000; font-weight: 600;
+            border-color: transparent; box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+            transform: scale(1.05) translateX(5px); animation: none;
+        }
+
+        @keyframes pulseNav {
+            0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); }
+            100% { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); }
+        }
+
+        /* ==========================================================================
+           RESPONSIVE DESIGN
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            .feature-hero { flex-direction: column; text-align: center; gap: 4rem; }
+            .feature-hero-text { max-width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 2.8rem; }
+            .feature-hero-text h2 { font-size: 2.4rem; }
+            .adv-panel h2 { font-size: 2.2rem; }
+            .phone-mockup { transform: rotateY(0) rotateX(0) rotateZ(0); animation: floatMobile 6s ease-in-out infinite; max-width: 300px; height: 600px;}
+            @keyframes floatMobile { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+            
+            .nav-pill-container { flex-direction: column; width: 100%; border-radius: 20px; padding: 1.5rem; gap: 1rem; }
+            .btn { justify-content: center; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:inherit;color: white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main>
+        <section class="container hero">
+            <div class="hero-text reveal">
+                <h1>Digital Notice Board & <br><span class="text-gradient">School Broadcasts</span></h1>
+                <p>A powerful megaphone for your school. Send instant, official alerts and circulars to parents, students, or staff without the chaos of text messages.</p>
+            </div>
+
+            <div class="hero-visual reveal" style="transition-delay: 0.2s;">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        
+                        <div class="screen-header">
+                            <div class="header-bar-1"></div>
+                            <div class="header-bar-2"></div>
+                        </div>
+
+                        <div class="push-notif">
+                            <div class="notif-icon"><i class="fa-solid fa-bell"></i></div>
+                            <div class="notif-text">
+                                <div class="nt-1"></div>
+                                <div class="nt-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="circular-content">
+                            <div class="circ-title"></div>
+                            <div class="circ-line"></div>
+                            <div class="circ-line short"></div>
+                            <div class="circ-line"></div>
+                            
+                            <div class="circ-attachment">
+                                <i class="fa-solid fa-file-pdf attach-icon"></i>
+                                <div class="attach-text"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container feature-hero">
+            <div class="feature-hero-text reveal">
+                <h2 class="text-gradient">Absolute Professional Authority. Zero Spam.</h2>
+                <p>Maintain absolute professional authority. The No-Reply Broadcasting feature ensures parents get the exact information they need immediately, without the admin getting spammed with hundreds of unnecessary replies. It’s one-way, official communication.</p>
+            </div>
+            
+            <div class="feature-hero-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel broadcast-card">
+                    <div class="airplane-container">
+                        <i class="fa-solid fa-paper-plane airplane plane-1"></i>
+                        <i class="fa-solid fa-paper-plane airplane plane-2"></i>
+                        <i class="fa-solid fa-paper-plane airplane plane-3"></i>
+                    </div>
+                    <div class="shield-box">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Replies Disabled
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-grid">
+            <div class="grid-wrapper">
+                
+                <div class="glass-panel feature-card reveal">
+                    <div class="f-icon anim-target">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h3>Targeted Delivery</h3>
+                    <p>Pinpoint your audience. Send messages to the entire school, specific grades, individual sections, or exclusively to the teaching staff with a single click.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.1s;">
+                    <div class="f-icon anim-attach">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </div>
+                    <h3>Rich Media Attachments</h3>
+                    <p>Easily attach important PDF documents, high-resolution event flyers, permission slips, or photos directly to your broadcast instantly.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.2s;">
+                    <div class="f-icon anim-bell">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                    <h3>Instant Push Notifications</h3>
+                    <p>Ensure maximum visibility. Every broadcast triggers an instant, unmissable push notification directly on parents' and staff members' phones.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="container advantage">
+            <div class="glass-panel adv-panel reveal">
+                <h2 class="text-gradient">End the WhatsApp Chaos & Printing Costs.</h2>
+                <p>Completely eliminate the massive cost of printing hundreds of paper circulars that students inevitably lose at the bottom of their bags. Replace chaotic, unmanageable WhatsApp groups where the principal's original, important message gets buried under endless parent replies. Take back your communication channels.</p>
+            </div>
+        </section>
+
+        <section class="container bottom-nav reveal">
+            <div class="nav-pill-container">
+                <a href="timetable.html" class="btn btn-prev">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Page (Timetable)
+                </a>
+                <a href="fee.html" class="btn btn-next">
+                    Next Page: Fee Management<i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: observer.unobserve(entry.target); to animate only once
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

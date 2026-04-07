@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Course Syllabus & Revision Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === GLOBAL VARIABLES === */
+        :root {
+            --bg-dark: #0B0F19;
+            --cyan-bright: #00FFFF;
+            --cyan-light: #87CEFA;
+            --cyan-glow: rgba(0, 255, 255, 0.5);
+            --blue-glow: rgba(0, 150, 255, 0.5);
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --glass-bg: rgba(15, 23, 42, 0.4);
+            --glass-border: rgba(0, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* === RESET & BASE TYPOGRAPHY === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(circle at center, rgba(0, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3 { font-weight: 700; line-height: 1.2; }
+        p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--cyan-bright), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* === UTILITIES === */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === HEADER === */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        /* CSS Drawn Graduation Cap */
+        .logo-cap {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--cyan-bright);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+        .logo-cap::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 2px;
+            background: var(--cyan-bright);
+            bottom: -6px;
+            right: -10px;
+            transform: rotate(-45deg);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* === SECTION 1: HERO === */
+        .hero {
+            text-align: center;
+            padding: 5rem 0 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 1rem; }
+        .hero p { max-width: 600px; margin: 0 auto 3rem; }
+
+        /* Animated Mobile Mockup */
+        .phone-mockup {
+            width: 320px;
+            height: 650px;
+            background: #000;
+            border-radius: 40px;
+            border: 8px solid #1a2235;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px var(--cyan-glow);
+            position: relative;
+            overflow: hidden;
+            transform: rotateX(5deg);
+            transition: transform 0.5s ease;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #1a2235;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .app-screen {
+            width: 100%;
+            height: 100%;
+            padding: 4rem 1.5rem 2rem;
+            background: linear-gradient(180deg, #0B0F19 0%, #111827 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Syllabus Tree UI */
+        .syllabus-module {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            animation: pulse-module 4s infinite alternate;
+        }
+        
+        .module-header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .chevron {
+            font-size: 0.8rem;
+            color: var(--cyan-bright);
+            animation: rotateChevron 4s infinite;
+        }
+
+        .module-body {
+            padding: 1rem;
+            background: rgba(0,0,0,0.3);
+            max-height: 0;
+            opacity: 0;
+            animation: dropdownBody 4s infinite;
+            overflow: hidden;
+        }
+
+        .mini-track-label { font-size: 0.7rem; color: #ccc; margin-bottom: 4px; display: flex; justify-content: space-between;}
+        .mini-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+        .mini-bar-fill { height: 100%; border-radius: 10px; }
+        .fill-class { background: var(--cyan-bright); box-shadow: 0 0 8px var(--cyan-glow); animation: fill100 4s infinite; }
+        .fill-home { background: #3B82F6; box-shadow: 0 0 8px var(--blue-glow); animation: fill50 4s infinite; }
+
+        /* === SECTION 2: DUAL-TRACKING HERO FEATURE === */
+        .dual-tracking-section {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            padding: 6rem 0;
+            flex-wrap: wrap;
+        }
+
+        .dual-tracking-text { flex: 1; min-width: 300px; }
+        .dual-tracking-text h2 { font-size: clamp(2rem, 4vw, 2.5rem); margin-bottom: 1.5rem; }
+
+        .dual-tracking-visual {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .dashboard-card {
+            padding: 2.5rem;
+            position: relative;
+        }
+
+        .track-group { margin-bottom: 2rem; }
+        .track-group:last-child { margin-bottom: 0; }
+        
+        .track-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .track-bg {
+            width: 100%;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .track-fill-teacher {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00C6FF, var(--cyan-bright));
+            box-shadow: 0 0 15px var(--cyan-glow);
+            border-radius: 20px;
+            transition: width 2s cubic-bezier(0.1, 0.7, 0.1, 1);
+        }
+
+        .track-fill-student {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0052D4, #4364F7);
+            box-shadow: 0 0 15px var(--blue-glow);
+            border-radius: 20px;
+            transition: width 2s cubic-bezier(0.1, 0.7, 0.1, 1) 0.5s;
+        }
+
+        .catch-up-badge {
+            background: rgba(255, 77, 77, 0.15);
+            color: #FF4D4D;
+            border: 1px solid #FF4D4D;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            position: absolute;
+            right: 0;
+            top: -30px;
+            opacity: 0;
+            animation: pulseBadge 1.5s infinite;
+            transition: opacity 0.5s ease 2s;
+        }
+
+        .dashboard-card.animated .track-fill-teacher { width: 100%; }
+        .dashboard-card.animated .track-fill-student { width: 50%; }
+        .dashboard-card.animated .catch-up-badge { opacity: 1; }
+
+        /* === SECTION 3: FEATURES GRID === */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 0 6rem;
+        }
+
+        .feature-card {
+            padding: 2.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--cyan-bright);
+        }
+
+        .icon-container {
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Custom Animated Icons */
+        /* 1. Roadmap Path */
+        .icon-map {
+            width: 50px;
+            height: 50px;
+            border: 2px dashed var(--glass-border);
+            border-radius: 10px;
+            position: relative;
+        }
+        .icon-map::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--cyan-bright);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--cyan-glow);
+            animation: travelMap 4s linear infinite;
+        }
+
+        /* 2. Speedometer Gauge */
+        .icon-gauge {
+            width: 60px;
+            height: 30px;
+            border-top-left-radius: 60px;
+            border-top-right-radius: 60px;
+            border: 4px solid var(--glass-border);
+            border-bottom: 0;
+            position: relative;
+        }
+        .icon-gauge::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            height: 25px;
+            background: var(--cyan-bright);
+            transform-origin: bottom center;
+            border-radius: 4px;
+            box-shadow: 0 0 8px var(--cyan-glow);
+            animation: sweepGauge 3s infinite alternate ease-in-out;
+        }
+
+        /* 3. Glowing Spark */
+        .icon-spark {
+            font-size: 3rem;
+            color: var(--cyan-bright);
+            text-shadow: 0 0 20px var(--cyan-glow);
+            animation: pulseSpark 2s infinite alternate;
+        }
+
+        /* === SECTION 4: ADVANTAGE === */
+        .advantage-section {
+            padding: 4rem;
+            text-align: center;
+            border-left: 0;
+            border-right: 0;
+            border-radius: 0;
+            border-top: 2px solid var(--cyan-glow);
+            border-bottom: 2px solid var(--cyan-glow);
+            background: linear-gradient(90deg, rgba(0,255,255,0.02) 0%, rgba(0,255,255,0.08) 50%, rgba(0,255,255,0.02) 100%);
+            margin-bottom: 5rem;
+        }
+
+        .advantage-section h2 { margin-bottom: 1.5rem; font-size: 2.2rem;}
+        .advantage-section p { max-width: 800px; margin: 0 auto; }
+
+        /* === SECTION 5: NAVIGATION === */
+        .page-navigation {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem;
+            border-radius: 50px;
+            margin-bottom: 4rem;
+        }
+
+        .btn-pill {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            animation: subtlePulse 3s infinite;
+        }
+
+        .btn-pill:hover {
+            transform: scale(1.05);
+            background: rgba(0, 255, 255, 0.1);
+            border-color: var(--cyan-bright);
+            box-shadow: 0 0 25px var(--cyan-glow);
+        }
+
+        /* === ANIMATION KEYFRAMES === */
+        @keyframes float {
+            0%, 100% { transform: rotateX(5deg) translateY(0); }
+            50% { transform: rotateX(5deg) translateY(-15px); }
+        }
+        @keyframes rotateChevron {
+            0%, 20% { transform: rotate(0deg); }
+            30%, 80% { transform: rotate(180deg); }
+            90%, 100% { transform: rotate(0deg); }
+        }
+        @keyframes dropdownBody {
+            0%, 20% { max-height: 0; opacity: 0; padding: 0 1rem; }
+            30%, 80% { max-height: 200px; opacity: 1; padding: 1rem; }
+            90%, 100% { max-height: 0; opacity: 0; padding: 0 1rem; }
+        }
+        @keyframes fill100 {
+            0%, 30% { width: 0%; }
+            50%, 80% { width: 100%; }
+            90%, 100% { width: 0%; }
+        }
+        @keyframes fill50 {
+            0%, 40% { width: 0%; }
+            60%, 80% { width: 50%; }
+            90%, 100% { width: 0%; }
+        }
+        @keyframes pulseBadge {
+            0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
+        }
+        @keyframes travelMap {
+            0% { top: -6px; left: -6px; }
+            25% { top: -6px; left: 44px; }
+            50% { top: 44px; left: 44px; }
+            75% { top: 44px; left: -6px; }
+            100% { top: -6px; left: -6px; }
+        }
+        @keyframes sweepGauge {
+            0% { transform: rotate(-70deg); }
+            100% { transform: rotate(70deg); }
+        }
+        @keyframes pulseSpark {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 30px var(--cyan-bright); }
+        }
+        @keyframes subtlePulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 900px) {
+            .dual-tracking-section { flex-direction: column; text-align: center; }
+            .advantage-section { padding: 3rem 1.5rem; }
+            .btn-pill { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+      <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main class="container">
+        <section class="hero reveal">
+            <h1>Course Syllabus & <br><span class="gradient-text">Revision Tracker</span></h1>
+            <p>Map out the entire year's curriculum in one place and empower students to track their personal learning progress with precision.</p>
+            
+            <div class="phone-mockup">
+                <div class="phone-notch"></div>
+                <div class="app-screen">
+                    <h3 style="font-size:1.1rem; margin-bottom:10px;">Syllabus Roadmap</h3>
+                    
+                    <div class="syllabus-module">
+                        <div class="module-header">
+                            Science: Chapter 4
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="module-body">
+                            <div class="mini-track-label">
+                                <span>Class Progress</span> <span>100%</span>
+                            </div>
+                            <div class="mini-bar-bg"><div class="mini-bar-fill fill-class"></div></div>
+                            
+                            <div class="mini-track-label" style="margin-top:10px;">
+                                <span>My Revision</span> <span>50%</span>
+                            </div>
+                            <div class="mini-bar-bg"><div class="mini-bar-fill fill-home"></div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="syllabus-module" style="opacity:0.5; animation:none;">
+                        <div class="module-header">Math: Chapter 2 <span class="chevron" style="animation:none;">▶</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="dual-tracking-section reveal">
+            <div class="dual-tracking-text">
+                <h2>"<span class="gradient-text">Taught in Class</span>" vs. <br> "Revised at Home"</h2>
+                <p>A groundbreaking way to study. Our system clearly distinguishes between what the teacher has finished in the classroom and what the student has actually revised at home, closing the learning gap instantly.</p>
+            </div>
+            <div class="dual-tracking-visual">
+                <div class="glass-panel dashboard-card" id="dual-dashboard">
+                    <div class="track-group">
+                        <div class="track-header">
+                            <span>Completed by Teacher</span>
+                            <span style="color: var(--cyan-bright);">100%</span>
+                        </div>
+                        <div class="track-bg">
+                            <div class="track-fill-teacher"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="track-group" style="position: relative;">
+                        <div class="catch-up-badge">Catch Up!</div>
+                        <div class="track-header">
+                            <span>Revised at Home</span>
+                            <span style="color: #4364F7;">50%</span>
+                        </div>
+                        <div class="track-bg">
+                            <div class="track-fill-student"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-grid reveal">
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="icon-map"></div>
+                </div>
+                <h3>Full-Year Roadmap</h3>
+                <p>Students get a crystal-clear, interactive roadmap for the whole year. No more guessing what chapter comes next.</p>
+            </div>
+            
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="icon-gauge"></div>
+                </div>
+                <h3>Exam Readiness Gauge</h3>
+                <p>Visually track exactly how much of the syllabus is left before finals, turning overwhelming books into manageable data.</p>
+            </div>
+
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="icon-spark">✦</div>
+                </div>
+                <h3>Cultivate Responsibility</h3>
+                <p>By putting the progress directly in the student's hands, the app encourages deep self-responsibility and proactive study habits.</p>
+            </div>
+        </section>
+
+        <section class="glass-panel advantage-section reveal">
+            <h2>End Last-Minute <span class="gradient-text">Exam Panic</span>.</h2>
+            <p>The traditional method leaves students blind to the big picture, causing massive anxiety right before exams. Paper Buddy gives them a visual roadmap. They can see exactly how much of the syllabus is left, empowering them to pace themselves and take charge of their own success.</p>
+        </section>
+
+        <nav class="glass-panel page-navigation reveal">
+            <a href="leave.html" class="btn-pill">← Previous Page (Leave)</a>
+            <a href="announcement.html" class="btn-pill">Next Page: announcement →</a>
+        </nav>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Intersection Observer for scroll-triggered reveal animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        
+                        // Trigger the dashboard animation when section is in view
+                        if(entry.target.classList.contains('dual-tracking-section')) {
+                            setTimeout(() => {
+                                document.getElementById('dual-dashboard').classList.add('animated');
+                            }, 300);
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+            
+            // Trigger first element immediately if at top of page
+            setTimeout(() => {
+                const hero = document.querySelector('.hero.reveal');
+                if(hero) hero.classList.add('active');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

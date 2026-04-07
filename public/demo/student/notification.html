@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Smart Notification Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0B0F19;
+            --cyan-glow: #00FFFF;
+            --cyan-light: #80FFFF;
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(0, 255, 255, 0.15);
+            --text-main: #FFFFFF;
+            --text-muted: #A0ABC0;
+            --exam-red: #FF4D4D;
+            --news-cyan: #00FFFF;
+            --fee-green: #00FF88;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(var(--glass-border) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-attachment: fixed;
+        }
+
+        /* --- Typography --- */
+        .cyan-gradient {
+            background: linear-gradient(90deg, var(--cyan-glow), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* --- UI Elements --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 1.5rem 5%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(11, 15, 25, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .cap-icon {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--cyan-glow);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .cap-icon::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 2px;
+            background: var(--cyan-glow);
+            bottom: -5px;
+            right: -8px;
+            transform: rotate(-45deg);
+        }
+
+        /* --- Hero Section --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .subheadline {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            font-size: 1.1rem;
+        }
+
+        /* --- 3D Mobile Mockup --- */
+        .mockup-container {
+            perspective: 1000px;
+            margin: 2rem auto;
+            display: inline-block;
+        }
+
+        .phone {
+            width: 300px;
+            height: 600px;
+            background: #000;
+            border-radius: 40px;
+            border: 8px solid #1a2235;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,255,255,0.1);
+            overflow: hidden;
+            transform: rotateX(10deg);
+            transition: transform 0.5s;
+        }
+
+        .phone:hover {
+            transform: rotateX(0deg) translateY(-10px);
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #1a2235;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .app-screen {
+            padding: 3rem 1rem;
+            height: 100%;
+            background: linear-gradient(180deg, #0B0F19 0%, #16213E 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .notif-tile {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            position: relative;
+            animation: cascade 4s infinite ease-out;
+            opacity: 0;
+        }
+
+        .notif-tile::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 15%;
+            height: 70%;
+            width: 4px;
+            border-radius: 2px;
+        }
+
+        .notif-tile.red::before { background: var(--exam-red); box-shadow: 0 0 8px var(--exam-red); }
+        .notif-tile.cyan::before { background: var(--news-cyan); box-shadow: 0 0 8px var(--news-cyan); }
+        .notif-tile.green::before { background: var(--fee-green); box-shadow: 0 0 8px var(--fee-green); }
+
+        .notif-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        @keyframes cascade {
+            0% { transform: translateY(20px); opacity: 0; }
+            20% { transform: translateY(0); opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .notif-tile:nth-child(1) { animation-delay: 0.2s; }
+        .notif-tile:nth-child(2) { animation-delay: 0.5s; }
+        .notif-tile:nth-child(3) { animation-delay: 0.8s; }
+
+        /* --- Hero Feature (One-Tap Routing) --- */
+        .routing-section {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            margin-top: 6rem;
+            text-align: left;
+            flex-wrap: wrap;
+        }
+
+        .routing-content { flex: 1; min-width: 300px; }
+        .routing-visual { flex: 1; min-width: 300px; display: flex; justify-content: center; }
+
+        .live-alert-card {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tap-gesture {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 255, 255, 0.4);
+            border-radius: 50%;
+            border: 2px solid var(--cyan-glow);
+            pointer-events: none;
+            z-index: 5;
+            animation: tapEffect 3s infinite;
+        }
+
+        .routing-notif {
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--cyan-glow);
+            border-radius: 15px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: zoomOut 3s infinite;
+        }
+
+        @keyframes tapEffect {
+            0% { transform: scale(0); opacity: 0; top: 60%; left: 60%; }
+            45% { transform: scale(0); opacity: 0; top: 60%; left: 60%; }
+            50% { transform: scale(1.5); opacity: 1; top: 60%; left: 60%; }
+            60% { transform: scale(1); opacity: 0; top: 60%; left: 60%; }
+        }
+
+        @keyframes zoomOut {
+            0%, 45% { transform: scale(1); opacity: 1; }
+            55% { transform: scale(2); opacity: 0; filter: blur(10px); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- Features Grid --- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 6rem;
+        }
+
+        .feature-card {
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .icon-box {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- Advantage Section --- */
+        .advantage-section {
+            margin-top: 6rem;
+            padding: 4rem;
+            border: 1px solid var(--glass-border);
+            border-left: 4px solid var(--cyan-glow);
+            text-align: left;
+        }
+
+        /* --- Navigation --- */
+        .bottom-nav {
+            margin-top: 6rem;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .pill-btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            background: rgba(11, 15, 25, 0.8);
+            border: 1px solid var(--cyan-glow);
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            animation: pulse-glow 3s infinite;
+        }
+
+        .pill-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.5); }
+        }
+
+        /* --- Icons / Animations for Grid --- */
+        .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 5px;
+            animation: pulse-dot 2s infinite alternate;
+        }
+        @keyframes pulse-dot {
+            from { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 0px transparent; }
+            to { transform: scale(1.2); opacity: 1; box-shadow: 0 0 10px currentColor; }
+        }
+
+        .signal-wave {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--cyan-glow);
+            border-radius: 50%;
+            animation: ripple 2s infinite;
+        }
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .routing-section { flex-direction: column; text-align: center; }
+            .advantage-section { padding: 2rem; }
+            .bottom-nav { flex-direction: column; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main class="container">
+        <section>
+            <h1>Smart Notification <br><span class="cyan-gradient">Center</span></h1>
+            <p class="subheadline">A centralized, high-intelligence inbox for every school alert. Ensure nothing ever slips through the cracks again.</p>
+            
+            <div class="mockup-container">
+                <div class="phone">
+                    <div class="notch"></div>
+                    <div class="app-screen">
+                        <div class="notif-tile red">
+                            <div class="notif-icon">📅</div>
+                            <div>
+                                <p style="font-size: 12px; font-weight: 700;">Final Exam Schedule</p>
+                                <p style="font-size: 10px; color: var(--text-muted);">Term 2 dates published.</p>
+                            </div>
+                        </div>
+                        <div class="notif-tile cyan">
+                            <div class="notif-icon">📑</div>
+                            <div>
+                                <p style="font-size: 12px; font-weight: 700;">Assignment Posted</p>
+                                <p style="font-size: 10px; color: var(--text-muted);">Physics: Quantum Basics.</p>
+                            </div>
+                        </div>
+                        <div class="notif-tile green">
+                            <div class="notif-icon">💰</div>
+                            <div>
+                                <p style="font-size: 12px; font-weight: 700;">Fee Receipt</p>
+                                <p style="font-size: 10px; color: var(--text-muted);">Tuition payment confirmed.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="routing-section">
+            <div class="routing-content">
+                <h2>Instant Access. <br><span class="cyan-gradient">One-Tap Routing.</span></h2>
+                <p style="margin-top: 1.5rem;">Stop hunting through menus. Every alert in the Paper Buddy Notification Center is an interactive portal. One tap takes the parent or student exactly where they need to be.</p>
+            </div>
+            <div class="routing-visual">
+                <div class="glass-panel live-alert-card">
+                    <div class="tap-gesture"></div>
+                    <div class="routing-notif">
+                        <p style="color: var(--cyan-glow); font-weight: 700; margin-bottom: 5px;">New Assignment</p>
+                        <p style="font-size: 0.9rem;">Physics: Thermodynamics</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Tap to view details</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-grid">
+            <div class="glass-panel feature-card">
+                <div class="icon-box">
+                    <span class="color-dot" style="color: var(--exam-red); background: var(--exam-red);"></span>
+                    <span class="color-dot" style="color: var(--news-cyan); background: var(--news-cyan);"></span>
+                    <span class="color-dot" style="color: var(--fee-green); background: var(--fee-green);"></span>
+                </div>
+                <h3>Intelligent Color-Coding</h3>
+                <p style="font-size: 0.9rem;">Instantly distinguish between urgent exam alerts, daily assignments, and general news.</p>
+            </div>
+            <div class="glass-panel feature-card">
+                <div class="icon-box">
+                    <div style="border: 2px solid var(--cyan-glow); border-radius: 5px; padding: 5px 10px; font-size: 1.5rem;">📥</div>
+                </div>
+                <h3>Persistent Alert History</h3>
+                <p style="font-size: 0.9rem;">Every alert is saved safely and permanently within the app's secure inbox. Never lose a message.</p>
+            </div>
+            <div class="glass-panel feature-card">
+                <div class="icon-box">
+                    <div class="signal-wave"></div>
+                </div>
+                <h3>Real-Time Sync</h3>
+                <p style="font-size: 0.9rem;">Experience zero-latency updates across every linked device the moment a teacher hits 'Post'.</p>
+            </div>
+        </section>
+
+        <section class="glass-panel advantage-section">
+            <h2 style="margin-bottom: 1rem;">Reliability Beyond the <span class="cyan-gradient">Lock Screen.</span></h2>
+            <p>Traditional communication methods—like SMS or printed notes—are easily missed or forgotten. Paper Buddy's Notification Center acts as a fail-safe digital archive. It ensures that 100% of school communications are delivered, read, and accessible 24/7.</p>
+        </section>
+
+        <nav class="bottom-nav">
+            <a href="language.html" class="pill-btn">← Previous Page (Language)</a>
+            <a href="performance.html" class="btn-glow pill-btn">Next Page: Performance Analytics →</a>
+        </nav>
+    </main>
+
+    <script>
+        // Interactive Scroll Effects
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = "1";
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.glass-panel').forEach(panel => {
+            panel.style.opacity = "0";
+            panel.style.transform = "translateY(30px)";
+            panel.style.transition = "all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)";
+            observer.observe(panel);
+        });
+    </script>
+</body>
+</html>

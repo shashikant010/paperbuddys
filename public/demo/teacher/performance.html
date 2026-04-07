@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Class Performance Analytics</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & THEME SETUP
+           ========================================================================== */
+        :root {
+            /* Core Colors */
+            --bg-cosmic: #0A0F1C;
+            --bg-panel: rgba(16, 23, 40, 0.4);
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            
+            /* Gradients & Accents */
+            --cyan-primary: #00E5FF;
+            --cyan-secondary: #0077FF;
+            --purple-primary: #9D00FF;
+            --purple-secondary: #5B00FF;
+            
+            --grad-cyan-blue: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
+            --grad-purple-blue: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary));
+            
+            /* Status Colors */
+            --status-red: #FF3B30;
+            --status-green: #00E676;
+            --status-amber: #FFAB00;
+
+            /* Glassmorphism */
+            --glass-border: rgba(0, 229, 255, 0.15);
+            --glass-border-hover: rgba(0, 229, 255, 0.4);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --blur-amount: blur(16px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-cosmic);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* Animated Cosmic Dot-Grid Background */
+        .cosmic-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(rgba(0, 229, 255, 0.15) 1px, transparent 1px),
+                radial-gradient(rgba(157, 0, 255, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px, 60px 60px;
+            background-position: 0 0, 20px 20px;
+            z-index: -1;
+            animation: cosmicDrift 60s linear infinite;
+        }
+
+        /* Ambient Glow Blobs */
+        .glow-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.3;
+            animation: pulseGlow 8s ease-in-out infinite alternate;
+        }
+        .glow-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: rgba(0, 229, 255, 0.15); }
+        .glow-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: rgba(91, 0, 255, 0.15); animation-delay: -4s; }
+
+        @keyframes cosmicDrift {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-40px); }
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.1); opacity: 0.4; }
+        }
+
+        /* ==========================================================================
+           2. TYPOGRAPHY & UTILITIES
+           ========================================================================== */
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 700; }
+        p { color: var(--text-muted); }
+
+        .text-gradient {
+            background: var(--grad-cyan-blue);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .glass-card {
+            background: var(--bg-panel);
+            backdrop-filter: var(--blur-amount);
+            -webkit-backdrop-filter: var(--blur-amount);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           3. HEADER & NAVIGATION
+           ========================================================================== */
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 16px 0;
+            background: rgba(10, 15, 28, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        /* CSS Origami Bird Logo */
+        .origami-logo {
+            width: 36px; height: 36px;
+            position: relative;
+            filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.5));
+        }
+        .origami-logo::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 28px solid var(--cyan-primary);
+            transform: rotate(45deg);
+        }
+        .origami-logo::after {
+            content: ''; position: absolute; top: 5px; left: 5px;
+            border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 24px solid var(--cyan-secondary);
+            transform: rotate(-15deg);
+            opacity: 0.9;
+        }
+
+        .brand-name {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+        }
+
+        .badge-admin {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-download {
+            background: var(--grad-purple-blue);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(91, 0, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(91, 0, 255, 0.6);
+        }
+
+        /* ==========================================================================
+           4. HERO SECTION & 3D MOCKUP
+           ========================================================================== */
+        .hero {
+            padding: 140px 0 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero-sub {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            max-width: 750px;
+            margin: 0 auto 50px;
+        }
+
+        /* 3D Tablet Mockup */
+        .mockup-container {
+            perspective: 2000px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .tablet-device {
+            width: 900px;
+            max-width: 90%;
+            height: 500px;
+            background: #050811;
+            border-radius: 30px;
+            border: 12px solid #1C2436;
+            box-shadow: 
+                0 50px 100px rgba(0,0,0,0.8),
+                inset 0 0 0 2px rgba(255,255,255,0.05),
+                0 0 40px rgba(0, 229, 255, 0.15);
+            transform: rotateX(15deg) rotateY(0deg) translateY(0);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .tablet-device:hover {
+            transform: rotateX(5deg) rotateY(0deg) translateY(-10px);
+            box-shadow: 
+                0 60px 120px rgba(0,0,0,0.9),
+                inset 0 0 0 2px rgba(255,255,255,0.05),
+                0 0 60px rgba(0, 229, 255, 0.3);
+        }
+
+        .tablet-notch {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 100px; height: 15px;
+            background: #1C2436;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            z-index: 10;
+        }
+
+        .tablet-screen {
+            flex: 1;
+            background: linear-gradient(180deg, #0A0F1C 0%, #131B2F 100%);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Mockup Internals: Analytics UI */
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .an-title h3 { font-size: 1.2rem; color: #fff; margin-bottom: 4px; }
+        .an-title p { font-size: 0.8rem; color: var(--cyan-primary); }
+
+        .health-badge {
+            background: rgba(0, 230, 118, 0.1);
+            border: 1px solid var(--status-green);
+            color: var(--status-green);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: badgePop 6s infinite;
+        }
+
+        .health-badge::before {
+            content: '';
+            width: 8px; height: 8px;
+            background: var(--status-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--status-green);
+            animation: pulseGreen 2s infinite;
+        }
+
+        /* The Chart Area */
+        .chart-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            margin-left: 20px;
+        }
+
+        /* SVG Line Chart Animation */
+        .svg-chart {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0; left: 0;
+            overflow: visible;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: var(--cyan-primary);
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 4px 10px rgba(0, 229, 255, 0.4));
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 6s infinite ease-in-out;
+        }
+
+        .chart-gradient {
+            fill: url(#chartGrad);
+            opacity: 0;
+            animation: fadeChart 6s infinite ease-in-out;
+        }
+
+        @keyframes drawLine {
+            0% { stroke-dashoffset: 1000; }
+            40%, 100% { stroke-dashoffset: 0; }
+        }
+        @keyframes fadeChart {
+            0%, 30% { opacity: 0; }
+            40%, 100% { opacity: 0.2; }
+        }
+        @keyframes badgePop {
+            0%, 45% { opacity: 0; transform: scale(0.8); }
+            50%, 95% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.8); }
+        }
+        @keyframes pulseGreen {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        /* ==========================================================================
+           5. PROOF OF LEARNING HIGHLIGHT SECTION
+           ========================================================================== */
+        .proof-highlight {
+            padding: 100px 0;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .ph-text { flex: 1; }
+        .ph-text h2 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 20px; }
+        .ph-text p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; }
+
+        .ph-visual {
+            flex: 1;
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visual-card {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            padding: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .vc-header {
+            position: absolute; top: 30px; left: 30px; right: 30px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+
+        .student-info h4 { font-size: 1.1rem; margin-bottom: 2px;}
+        .student-info p { font-size: 0.8rem; color: var(--text-muted); }
+
+        .growth-badge {
+            background: rgba(0, 230, 118, 0.15);
+            border: 1px solid var(--status-green);
+            color: var(--status-green);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 0 15px rgba(0, 230, 118, 0.2);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: floatBadge 4s infinite;
+        }
+
+        /* Dual Bar Chart Comparison */
+        .bar-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 40px;
+            height: 150px;
+            width: 100%;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .bar-group {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 100%;
+            position: relative;
+        }
+
+        .bar-past {
+            width: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px 6px 0 0;
+            height: 40%;
+        }
+
+        .bar-current {
+            width: 40px;
+            background: var(--grad-cyan-blue);
+            border-radius: 6px 6px 0 0;
+            height: 0%;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+            animation: riseBar 4s infinite;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px; left: 50%; transform: translateX(-50%);
+            font-size: 0.7rem; color: var(--text-muted); white-space: nowrap;
+        }
+
+        .bg-2 .bar-past { height: 50%; }
+        .bg-2 .bar-current { animation-delay: 0.2s; animation-name: riseBar2;}
+
+        @keyframes riseBar { 0%, 20% { height: 40%; } 40%, 100% { height: 85%; } }
+        @keyframes riseBar2 { 0%, 20% { height: 50%; } 40%, 100% { height: 95%; } }
+        @keyframes floatBadge { 0%, 35% { opacity: 0; transform: translateY(10px); } 40%, 95% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(10px); } }
+
+        /* ==========================================================================
+           6. CORE FEATURES GRID
+           ========================================================================== */
+        .features-grid {
+            padding: 80px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .feat-card {
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            cursor: default;
+        }
+
+        .feat-card:hover {
+            border-color: var(--glass-border-hover);
+            transform: translateY(-5px);
+        }
+
+        .feat-anim-box {
+            height: 100px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feat-card h3 { font-size: 1.4rem; }
+
+        /* Feature Animations */
+        /* 1. Growth/Downfall */
+        .trend-icon { font-size: 2rem; color: var(--status-green); transition: all 0.4s; text-shadow: 0 0 15px rgba(0,230,118,0.4); }
+        .feat-card:hover .trend-icon { transform: translateY(-5px) scale(1.1); }
+        .pulse-ring { position: absolute; width: 50px; height: 50px; border: 2px solid var(--status-green); border-radius: 50%; opacity: 0; }
+        .feat-card:hover .pulse-ring { animation: ringPulse 1.5s infinite; }
+
+        /* 2. Curve Chart */
+        .curve-svg { width: 80%; height: 60%; overflow: visible; }
+        .curve-path { fill: none; stroke: var(--cyan-primary); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 200; stroke-dashoffset: 200; transition: stroke-dashoffset 1s ease; filter: drop-shadow(0 2px 5px rgba(0,229,255,0.5)); }
+        .feat-card:hover .curve-path { stroke-dashoffset: 0; }
+
+        /* 3. Gap Analysis */
+        .gap-chart { display: flex; align-items: flex-end; gap: 15px; height: 60%; width: 60%; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .gap-bar { width: 30px; border-radius: 4px 4px 0 0; transition: height 0.6s ease; position: relative; }
+        .gap-bar.b1 { background: rgba(255,255,255,0.2); height: 20%; }
+        .gap-bar.b2 { background: var(--cyan-primary); height: 20%; box-shadow: 0 0 10px rgba(0,229,255,0.3); }
+        .feat-card:hover .gap-bar.b1 { height: 50%; }
+        .feat-card:hover .gap-bar.b2 { height: 90%; }
+
+        @keyframes ringPulse { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+
+        /* ==========================================================================
+           7. THE ADVANTAGE SECTION
+           ========================================================================== */
+        .advantage-section {
+            padding: 80px 0;
+            margin: 60px 0;
+        }
+
+        .adv-box {
+            text-align: center;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(0, 229, 255, 0.03) 0%, rgba(10, 15, 28, 0.5) 100%);
+        }
+
+        .adv-box::before {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan-primary), transparent);
+        }
+        .adv-box::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan-primary), transparent);
+        }
+
+        .adv-box h2 { font-size: clamp(2rem, 3vw, 2.5rem); margin-bottom: 20px; }
+        .adv-box p { font-size: 1.15rem; color: var(--text-muted); max-width: 800px; margin: 0 auto; }
+
+        /* ==========================================================================
+           8. BOTTOM NAVIGATION
+           ========================================================================== */
+        .bottom-nav {
+            padding: 40px 0 100px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-glass-container {
+            display: flex;
+            gap: 20px;
+            padding: 15px 25px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pill-btn {
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.95rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pill-btn.next {
+            border-color: var(--cyan-primary);
+            animation: subtlePulse 3s infinite;
+        }
+
+        .pill-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: rgba(0, 229, 255, 0.1);
+            border-color: var(--cyan-primary);
+            box-shadow: 0 10px 20px rgba(0, 229, 255, 0.2);
+            color: #fff;
+        }
+
+        @keyframes subtlePulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 229, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+
+        /* ==========================================================================
+           9. RESPONSIVE DESIGN
+           ========================================================================== */
+        @media (max-width: 992px) {
+            .proof-highlight { flex-direction: column; text-align: center; }
+            .tablet-device { height: 400px; transform: rotateX(5deg); }
+            .tablet-device:hover { transform: rotateX(2deg) translateY(-5px); }
+        }
+
+        @media (max-width: 768px) {
+            .nav-glass-container { flex-direction: column; border-radius: 20px; padding: 20px; width: 100%; }
+            .pill-btn { text-align: center; }
+            .bar-container { gap: 20px; }
+            .gb-avg strong { font-size: 1.2rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="cosmic-bg"></div>
+    <div class="glow-blob glow-1"></div>
+    <div class="glow-blob glow-2"></div>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <section class="hero container">
+        <div class="reveal">
+            <h1>Class Performance & <br><span class="text-gradient">Growth Analytics</span></h1>
+            <p class="hero-sub">Transform raw grades into a visual x-ray of your institute’s health. Provide undeniable proof of learning to parents and stakeholders in seconds.</p>
+        </div>
+
+        <div class="mockup-container reveal">
+            <div class="tablet-device">
+                <div class="tablet-notch"></div>
+                <div class="tablet-screen">
+                    <div class="gb-header">
+                        <div class="gb-title">
+                            <h3>Analytics Dashboard</h3>
+                            <p>Grade 10-A Science | Mid-Term Results</p>
+                        </div>
+                        <div class="gb-avg">
+                            <span>Class Health</span>
+                            <strong>Processing...</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-area">
+                        <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div style="border-bottom: 1px dashed rgba(255,255,255,0.05); width: 100%; height: 1px;"></div>
+                            <div style="border-bottom: 1px dashed rgba(255,255,255,0.05); width: 100%; height: 1px;"></div>
+                            <div style="border-bottom: 1px dashed rgba(255,255,255,0.05); width: 100%; height: 1px;"></div>
+                            <div style="border-bottom: 1px dashed rgba(255,255,255,0.05); width: 100%; height: 1px;"></div>
+                        </div>
+
+                        <svg class="svg-chart" viewBox="0 0 800 200" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="chartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.8"/>
+                                    <stop offset="100%" stop-color="#00E5FF" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <path class="chart-gradient" d="M0,200 L0,150 Q200,180 400,80 T800,20 L800,200 Z" />
+                            <path class="chart-line" d="M0,150 Q200,180 400,80 T800,20" />
+                        </svg>
+
+                        <div style="position: absolute; top: 10px; right: 10px;">
+                            <div class="health-badge">
+                                Excellent
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="proof-highlight container reveal">
+        <div class="ph-text">
+            <h2>Undeniable Proof of <br><span class="text-gradient">Progress.</span></h2>
+            <p>Stop relying on gut feelings. Visually show exactly how a class or individual student is improving over time. It provides teachers with actionable insights and gives parents the clarity they’ve always wanted.</p>
+        </div>
+        <div class="ph-visual">
+            <div class="glass-card visual-card">
+                <div class="vc-header">
+                    <div class="student-info">
+                        <h4>Arjun Mehta</h4>
+                        <p>Mathematics Assessment Trajectory</p>
+                    </div>
+                    <div class="growth-badge">+18% Growth</div>
+                </div>
+                
+                <div class="bar-container">
+                    <div class="bar-group">
+                        <div class="bar-past"></div>
+                        <div class="bar-current"></div>
+                        <div class="bar-label">Term 1</div>
+                    </div>
+                    <div class="bar-group bg-2">
+                        <div class="bar-past"></div>
+                        <div class="bar-current"></div>
+                        <div class="bar-label">Term 2</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-grid container">
+        <div class="glass-card feat-card reveal">
+            <div class="feat-anim-box">
+                <div class="pulse-ring"></div>
+                <i class="fa-solid fa-arrow-trend-up trend-icon"></i>
+            </div>
+            <h3>Growth/Downfall Metrics</h3>
+            <p>Instantly spot trends. The system automatically flags significant improvement in green or concerning drops in red, allowing for immediate intervention.</p>
+        </div>
+
+        <div class="glass-card feat-card reveal">
+            <div class="feat-anim-box">
+                <svg class="curve-svg" viewBox="0 0 100 50">
+                    <path class="curve-path" d="M0,50 Q20,50 40,10 T60,10 Q80,50 100,50" />
+                </svg>
+            </div>
+            <h3>Performance Curve Charts</h3>
+            <p>View the bell curve of your classroom. Instantly identify top achievers and those who need focused attention with beautiful visual distributions.</p>
+        </div>
+
+        <div class="glass-card feat-card reveal">
+            <div class="feat-anim-box">
+                <div class="gap-chart">
+                    <div class="gap-bar b1"></div>
+                    <div class="gap-bar b2"></div>
+                </div>
+            </div>
+            <h3>Gap Analysis</h3>
+            <p>Analyze the distance between your top performers and the class median to ensure no student is left behind and teaching methods are effective.</p>
+        </div>
+    </section>
+
+    <section class="advantage-section container reveal">
+        <div class="glass-card adv-box">
+            <h2>Data-Driven Guiding, <span class="text-gradient">Not Guessing.</span></h2>
+            <p>Without analytics, teachers see numbers; with Paper Buddy, they see stories of growth. Principals can monitor the academic health of the entire school from a single dashboard, ensuring high standards are met in every classroom.</p>
+        </div>
+    </section>
+
+    <section class="bottom-nav container reveal">
+        <div class="nav-glass-container">
+            <a href="#" class="pill-btn">← Previous Page <span style="font-size:0.7em; font-weight:400; opacity:0.8; display:block;">(Grading & Analytics)</span></a>
+            <a href="#" class="pill-btn next">Next Page: Fee Management → <span style="font-size:0.7em; font-weight:400; opacity:0.8; display:block;">(Admin Tools)</span></a>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            /* --- 1. Scroll Reveal Logic --- */
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+            
+            const revealObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                });
+            }, revealOptions);
+
+            reveals.forEach(reveal => {
+                revealObserver.observe(reveal);
+            });
+
+            /* --- 2. Mockup Automation Loop --- */
+            const avgBadge = document.querySelector('.gb-avg');
+            const avgText = avgBadge.querySelector('strong');
+
+            function runMockupAnimation() {
+                // Reset State
+                avgBadge.classList.remove('highlight');
+                avgText.innerText = 'Processing...';
+
+                // Sequence
+                setTimeout(() => {
+                    avgBadge.classList.add('highlight');
+                    avgText.innerText = 'Excellent';
+                }, 3000);
+            }
+
+            // Start loop
+            runMockupAnimation();
+            setInterval(runMockupAnimation, 6000);
+        });
+    </script>
+</body>
+</html>

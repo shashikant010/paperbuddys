@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Staff GPS Attendance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================================================
+           GLOBAL VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --bg-color: #0B0F19;
+            --cyan-primary: #00E5FF;
+            --cyan-secondary: #3A86FF;
+            --success-green: #00e676;
+            --error-red: #ff3d00;
+            --text-main: #FFFFFF;
+            --text-muted: #A0AEC0;
+            --glass-bg: rgba(11, 15, 25, 0.5);
+            --glass-border: rgba(0, 229, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --font-main: 'Poppins', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Glowing cyan dot-grid matrix background */
+            background-image: radial-gradient(circle, rgba(0, 229, 255, 0.15) 1.5px, transparent 1.5px);
+            background-size: 28px 28px;
+            background-position: 0 0;
+            background-attachment: fixed;
+            line-height: 1.6;
+        }
+
+        /* ==========================================================================
+           UTILITY CLASSES
+           ========================================================================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            border-radius: 16px;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           HEADER
+           ========================================================================== */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            fill: none;
+            stroke: var(--cyan-primary);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 5px var(--cyan-primary));
+        }
+
+        .brand-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: var(--cyan-primary);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            background: rgba(0, 229, 255, 0.05);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+        }
+
+        /* ==========================================================================
+           HERO SECTION
+           ========================================================================== */
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 80px 0 60px;
+            gap: 50px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.8rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .hero-content p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* 3D Mobile Mockup */
+        .hero-visual {
+            perspective: 1200px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .phone-mockup {
+            width: 300px;
+            height: 600px;
+            background: #05080E;
+            border-radius: 40px;
+            border: 8px solid #1A2035;
+            box-shadow: 
+                -30px 30px 60px rgba(0, 0, 0, 0.9),
+                inset 0 0 20px rgba(0, 229, 255, 0.1),
+                0 0 40px rgba(0, 229, 255, 0.15);
+            transform: rotateY(-12deg) rotateX(10deg);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-mockup:hover {
+            transform: rotateY(0deg) rotateX(5deg) scale(1.02);
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #1A2035;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #0B0F19;
+            position: relative;
+        }
+
+        /* Map UI inside Mockup */
+        .mock-map-area {
+            flex: 1;
+            position: relative;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+        }
+
+        .school-boundary {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px; height: 160px;
+            border: 2px dashed var(--cyan-primary);
+            border-radius: 50%;
+            background: rgba(0, 229, 255, 0.05);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);
+        }
+
+        .school-icon {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .user-dot {
+            position: absolute;
+            width: 16px; height: 16px;
+            background: var(--cyan-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--cyan-primary);
+            bottom: -20px; left: 50%;
+            transform: translateX(-50%);
+            animation: moveUser 8s infinite ease-in-out;
+            z-index: 5;
+        }
+
+        .user-dot::before {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border: 2px solid var(--cyan-primary);
+            border-radius: 50%;
+            animation: pulseDot 1.5s infinite;
+        }
+
+        /* Controls inside Mockup */
+        .mock-controls {
+            padding: 20px;
+            background: rgba(11, 15, 25, 0.95);
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .punch-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #fff;
+            background: #334155; /* Default inactive */
+            transition: all 0.3s;
+            animation: buttonState 8s infinite;
+        }
+
+        .success-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 15, 25, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            opacity: 0;
+            pointer-events: none;
+            animation: showSuccess 8s infinite;
+        }
+
+        .success-icon {
+            width: 60px; height: 60px;
+            background: var(--success-green);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 30px rgba(0, 230, 118, 0.4);
+        }
+        .success-icon svg { width: 30px; height: 30px; stroke: #fff; stroke-width: 3; fill: none; stroke-linecap: round; }
+
+        @keyframes moveUser {
+            0%, 10% { bottom: -20px; }
+            30%, 70% { bottom: 45%; } /* Inside boundary */
+            90%, 100% { bottom: 120%; } /* Walk away */
+        }
+        @keyframes pulseDot {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes buttonState {
+            0%, 25% { background: #334155; box-shadow: none; transform: scale(1); content: 'Out of Range'; }
+            30%, 45% { background: var(--success-green); box-shadow: 0 0 20px rgba(0,230,118,0.4); transform: scale(1); }
+            48% { transform: scale(0.95); } /* Click */
+            50%, 100% { transform: scale(1); background: var(--success-green); }
+        }
+        @keyframes showSuccess {
+            0%, 50% { opacity: 0; }
+            55%, 85% { opacity: 1; }
+            90%, 100% { opacity: 0; }
+        }
+
+        /* ==========================================================================
+           GEO-FENCE FEATURE SECTION
+           ========================================================================== */
+        .geo-feature {
+            padding: 100px 0;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .geo-text {
+            flex: 1;
+        }
+
+        .geo-text h2 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .geo-text p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+        }
+
+        .geo-visual {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .radar-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            overflow: hidden;
+        }
+
+        .radar-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .radar-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid var(--cyan-primary);
+            border-radius: 50%;
+            opacity: 0;
+        }
+        
+        .radar-ring:nth-child(1) { width: 60px; height: 60px; animation: radarPing 3s infinite 0s; }
+        .radar-ring:nth-child(2) { width: 120px; height: 120px; animation: radarPing 3s infinite 1s; }
+        .radar-ring:nth-child(3) { width: 180px; height: 180px; animation: radarPing 3s infinite 2s; }
+        
+        .radar-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px; height: 20px;
+            background: var(--cyan-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--cyan-primary);
+        }
+
+        .sim-user {
+            position: absolute;
+            width: 12px; height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            top: 50%;
+            animation: simWalk 6s infinite ease-in-out;
+            z-index: 10;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        .status-badge-container {
+            width: 100%;
+            height: 50px;
+            position: relative;
+        }
+
+        .sim-badge {
+            position: absolute;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: opacity 0.3s;
+        }
+
+        .badge-out {
+            background: rgba(255, 61, 0, 0.1);
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+            box-shadow: 0 0 15px rgba(255, 61, 0, 0.2);
+            animation: toggleOut 6s infinite;
+        }
+
+        .badge-in {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--cyan-primary);
+            border: 1px solid var(--cyan-primary);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+            opacity: 0;
+            animation: toggleIn 6s infinite;
+        }
+
+        @keyframes radarPing {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; border-width: 2px; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; border-width: 1px; }
+        }
+        @keyframes simWalk {
+            0%, 10% { left: -20px; } /* Outside */
+            40%, 60% { left: 50%; }  /* Inside */
+            90%, 100% { left: 220px; } /* Outside */
+        }
+        @keyframes toggleOut {
+            0%, 25% { opacity: 1; }
+            30%, 70% { opacity: 0; }
+            75%, 100% { opacity: 1; }
+        }
+        @keyframes toggleIn {
+            0%, 25% { opacity: 0; }
+            30%, 70% { opacity: 1; }
+            75%, 100% { opacity: 0; }
+        }
+
+        /* ==========================================================================
+           CORE FEATURES GRID
+           ========================================================================== */
+        .features-section {
+            padding: 60px 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            padding: 40px 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.15);
+            border-color: rgba(0, 229, 255, 0.4);
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Custom Anim Boxes for Grid */
+        .anim-box {
+            height: 100px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        /* Card 1: Touchless */
+        .morph-container { position: relative; width: 40px; height: 40px; }
+        .icon-finger, .icon-phone { position: absolute; top: 0; left: 0; width: 100%; height: 100%; fill: none; stroke: var(--cyan-primary); stroke-width: 1.5; transition: all 0.5s ease; }
+        .icon-phone { opacity: 0; transform: scale(0.5); stroke: var(--success-green); }
+        .feature-card:hover .icon-finger { opacity: 0; transform: scale(1.5); }
+        .feature-card:hover .icon-phone { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 8px rgba(0,230,118,0.5)); }
+
+        /* Card 2: Mini Calendar */
+        .mini-cal { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+        .cal-dot { width: 12px; height: 12px; background: rgba(255,255,255,0.1); border-radius: 3px; transition: all 0.3s; }
+        .feature-card:hover .cal-dot:nth-child(even) { background: var(--cyan-primary); box-shadow: 0 0 8px var(--cyan-primary); }
+
+        /* Card 3: Cluster Dots */
+        .cluster { display: flex; flex-wrap: wrap; gap: 4px; width: 100px; justify-content: center;}
+        .c-dot { width: 8px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 50%; transition: background 0.4s ease, box-shadow 0.4s ease; }
+
+        /* ==========================================================================
+           ADVANTAGE SECTION
+           ========================================================================== */
+        .advantage-section {
+            margin: 80px 0;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, rgba(0, 229, 255, 0.02) 0%, rgba(11, 15, 25, 1) 100%);
+            border-top: 1px solid rgba(0, 229, 255, 0.3);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+            box-shadow: inset 0 20px 50px rgba(0, 229, 255, 0.05);
+        }
+
+        .advantage-section h2 {
+            font-size: 2.8rem;
+            margin-bottom: 25px;
+        }
+
+        .advantage-section p {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        /* ==========================================================================
+           NAVIGATION (BOTTOM)
+           ========================================================================== */
+        .nav-section {
+            padding: 40px 0 80px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-container {
+            display: inline-flex;
+            gap: 20px;
+            padding: 20px 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: rgba(11, 15, 25, 0.6);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .nav-btn span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: block;
+            font-weight: 400;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+            border-color: var(--cyan-primary);
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .nav-btn.next-btn {
+            animation: pulseGlowBtn 2s infinite;
+        }
+
+        @keyframes pulseGlowBtn {
+            0% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 229, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+
+        /* ==========================================================================
+           RESPONSIVE DESIGN
+           ========================================================================== */
+        @media (max-width: 900px) {
+            .geo-feature { flex-direction: column; text-align: center; padding: 40px 0; }
+            .hero-content h1 { font-size: 3rem; }
+            .advantage-section h2 { font-size: 2.2rem; }
+        }
+
+        @media (max-width: 600px) {
+            .nav-container { flex-direction: column; width: 100%; }
+            .nav-btn { justify-content: center; width: 100%; flex-direction: column; gap: 4px;}
+            .radar-card { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <section class="hero-section container">
+        <div class="hero-content fade-in-up">
+            <h1>Staff GPS Attendance & <br><span class="gradient-text">Smart Check-In</span></h1>
+            <p>Allow your staff to "punch in" digitally using their smartphone's precise location. Fast, touchless, and completely secure.</p>
+        </div>
+        
+        <div class="hero-visual fade-in-up">
+            <div class="phone-mockup">
+                <div class="phone-notch"></div>
+                <div class="phone-screen">
+                    <div class="mock-map-area">
+                        <div class="school-boundary"></div>
+                        <div class="school-icon">🏫</div>
+                        <div class="user-dot"></div>
+                    </div>
+                    
+                    <div class="mock-controls">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; text-align: center;">Location Verification...</div>
+                        <div class="punch-btn" id="btn-punch">Punch In</div>
+                    </div>
+
+                    <div class="success-overlay">
+                        <div class="success-icon">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div style="color: #fff; font-weight: 600; font-size: 1.1rem; text-align: center;">Check-In Successful<br><span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">07:55 AM</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="geo-feature container fade-in-up">
+        <div class="geo-text">
+            <h2 class="gradient-text">Strict Geo-Fencing. Completely Tamper-Proof.</h2>
+            <p>Eliminate proxy attendance. The check-in button strictly only activates when the teacher is physically inside the customized GPS boundaries of the school campus. No workarounds, no buddy-punching.</p>
+        </div>
+        <div class="geo-visual">
+            <div class="glass-panel radar-card">
+                <div class="radar-container">
+                    <div class="radar-ring"></div>
+                    <div class="radar-ring"></div>
+                    <div class="radar-ring"></div>
+                    <div class="radar-center"></div>
+                    <div class="sim-user"></div>
+                </div>
+                
+                <div class="status-badge-container">
+                    <div class="sim-badge badge-out">🚫 Out of Range: Cannot Check In</div>
+                    <div class="sim-badge badge-in">✅ In Range: Ready to Punch In</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section container">
+        <div class="grid-container">
+            
+            <div class="glass-panel feature-card fade-in-up">
+                <div class="anim-box">
+                    <div class="morph-container">
+                        <svg class="icon-finger" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-10 10M12 6a6 6 0 0 0-6 6M12 10a2 2 0 0 0-2 2M12 14v8M16 14v4M8 14v2M20 12v6M4 12v6" stroke-linecap="round"/></svg>
+                        <svg class="icon-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/><polyline points="9 11 11 13 15 9"/></svg>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="gradient-text">Touchless & Hygienic</h3>
+                    <p>Replace unhygienic, shared biometric fingerprint machines that spread germs. Your phone is your secure, personal ID card.</p>
+                </div>
+            </div>
+
+            <div class="glass-panel feature-card fade-in-up" id="card-history">
+                <div class="anim-box">
+                    <div class="mini-cal">
+                        <div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot"></div>
+                        <div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot"></div>
+                        <div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot"></div><div class="cal-dot"></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="gradient-text">Daily History Log</h3>
+                    <p>Teachers can instantly access their own punch-in/punch-out history, total hours logged, and monthly attendance percentage right from their phone.</p>
+                </div>
+            </div>
+
+            <div class="glass-panel feature-card fade-in-up" id="card-cluster">
+                <div class="anim-box">
+                    <div class="cluster" id="dot-cluster">
+                        </div>
+                </div>
+                <div>
+                    <h3 class="gradient-text">No More Bottlenecks</h3>
+                    <p>End the frustrating morning queues at the gate. 50 teachers can punch in simultaneously the second they walk onto the campus.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="advantage-section fade-in-up">
+        <div class="container">
+            <h2 class="gradient-text">Ditch the Outdated Hardware.</h2>
+            <p>Physical attendance registers are easily manipulated, and biometric machines are expensive, unhygienic, and constantly break down. Paper Buddy leverages the supercomputer already in your teachers' pockets to deliver flawless, tamper-proof attendance data straight to HR.</p>
+        </div>
+    </section>
+
+    <section class="nav-section container">
+        <div class="glass-panel nav-container fade-in-up">
+            <a href="student-attendance.html" class="nav-btn">
+                ← Previous Page
+                <span>(Student Attendance)</span>
+            </a>
+            <a href="homework.html" class="nav-btn next-btn">
+                Next Page →
+                <span>(Homework screen)</span>
+            </a>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            /* --- Intersection Observer for Scroll Fades --- */
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        
+                        // Trigger specific feature hover simulation if needed
+                        if(entry.target.id === 'card-cluster') {
+                            startClusterAnimation();
+                        }
+
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+
+
+            /* --- Populate Cluster Dots for Feature 3 --- */
+            const cluster = document.getElementById('dot-cluster');
+            const numDots = 30; // Amount of dots to show bottleneck removal
+            
+            for(let i = 0; i < numDots; i++) {
+                let dot = document.createElement('div');
+                dot.className = 'c-dot';
+                cluster.appendChild(dot);
+            }
+
+            function startClusterAnimation() {
+                const dots = document.querySelectorAll('.c-dot');
+                const card = document.getElementById('card-cluster');
+                
+                card.addEventListener('mouseenter', () => {
+                    dots.forEach((dot, index) => {
+                        // Stagger the turn to green slightly to show "simultaneous processing"
+                        setTimeout(() => {
+                            dot.style.background = 'var(--success-green)';
+                            dot.style.boxShadow = '0 0 8px rgba(0,230,118,0.5)';
+                        }, Math.random() * 300);
+                    });
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    dots.forEach(dot => {
+                        dot.style.background = 'rgba(255,255,255,0.1)';
+                        dot.style.boxShadow = 'none';
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

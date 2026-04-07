@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* === GLOBAL RESET & VARIABLES === */
+        :root {
+            --primary-bg: #030a16;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --cyan-glow: #00f2fe;
+            --blue-glow: #4facfe;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* === ANIMATED MESH GRADIENT BACKGROUND === */
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(79, 172, 254, 0.15), transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(0, 242, 254, 0.1), transparent 50%);
+            animation: pulseBg 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseBg {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* === TYPOGRAPHY & UTILITIES === */
+        .text-gradient {
+            background: linear-gradient(90deg, var(--cyan-glow) 0%, var(--blue-glow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+        }
+
+        /* === ANIMATION CLASSES === */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === SECTION 1: HERO AREA === */
+        .hero-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 90%;
+        }
+
+        /* MOBILE MOCKUP */
+        .mockup-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .greeting-badge {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .greeting-badge i {
+            color: var(--cyan-glow);
+        }
+
+        .phone-frame {
+            width: 280px;
+            height: 580px;
+            border-radius: 40px;
+            border: 8px solid #1a2333;
+            background: #0b1320;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* Mockup Internals & Animations */
+        .phone-header {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .skeleton-title {
+            height: 12px;
+            width: 60%;
+            border-radius: 6px;
+            background: var(--glass-bg);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .skeleton-card {
+            height: 80px;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .shimmer {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            transform: skewX(-20deg);
+            animation: sweep 2.5s infinite;
+        }
+
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* === SECTION 2: HERO STAT CARD === */
+        .stats-section {
+            margin-top: 4rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-grid::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% -20%, rgba(0, 242, 254, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            border-right: 1px solid var(--glass-border);
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(180deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* === SECTION 3: QUICK-ACTION SHORTCUTS === */
+        .shortcuts-section {
+            margin-top: 6rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .shortcut-card {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .shortcut-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(0, 242, 254, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--cyan-glow);
+            transition: all 0.3s ease;
+        }
+
+        .shortcut-card:hover .shortcut-icon {
+            background: var(--cyan-glow);
+            color: var(--primary-bg);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .shortcut-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* === SECTION 4: THE ADVANTAGE === */
+        .advantage-section {
+            margin-top: 6rem;
+            text-align: center;
+            padding: 4rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0,242,254,0.05) 100%);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .advantage-section i {
+            font-size: 2.5rem;
+            color: var(--cyan-glow);
+            margin-bottom: 1.5rem;
+        }
+
+        .advantage-section p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* === SECTION 5: NAVIGATION === */
+        .navigation-section {
+            margin-top: 6rem;
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(90deg, #0072ff 0%, #00c6ff 100%);
+            color: white;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 198, 255, 0.4);
+            transition: all 0.3s ease;
+            animation: pulseBtn 2s infinite;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 198, 255, 0.6);
+        }
+
+        @keyframes pulseBtn {
+            0% { box-shadow: 0 0 0 0 rgba(0, 198, 255, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 198, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 198, 255, 0); }
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 1024px) {
+            .hero-section {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 3rem;
+            }
+            .hero-content p {
+                margin: 0 auto 2rem auto;
+            }
+            .greeting-badge {
+                right: 10px;
+                top: -10px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .stat-item {
+                border-right: none;
+                border-bottom: 1px solid var(--glass-border);
+                padding-bottom: 2rem;
+            }
+            .stat-item:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+            .shortcuts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero-content h1 { font-size: 2.5rem; }
+            .shortcuts-grid { grid-template-columns: 1fr; }
+            .advantage-section p { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mesh-bg"></div>
+
+    <div class="container">
+        
+        <section class="hero-section">
+            <div class="hero-content fade-up">
+                <h1 class="text-gradient">School Control Center</h1>
+                <p>See your entire school's health at a single glance. Paper Buddy brings total clarity to your daily administration.</p>
+            </div>
+            
+            <div class="mockup-container fade-up" style="transition-delay: 0.2s;">
+                <div class="greeting-badge">
+                    <i class="fa-solid fa-hand-sparkles"></i> Good morning, Principal Shashi Kant
+                </div>
+                <div class="phone-frame">
+                    <div class="phone-header">
+                        <div class="skeleton-title"><div class="shimmer"></div></div>
+                    </div>
+                    <div class="phone-body">
+                        <div class="skeleton-card"><div class="shimmer"></div></div>
+                        <div class="skeleton-card" style="height: 120px;"><div class="shimmer"></div></div>
+                        <div class="skeleton-card" style="height: 60px;"><div class="shimmer"></div></div>
+                        <div class="skeleton-card"><div class="shimmer"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-section fade-up">
+            <div class="glass-panel stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" data-target="1452">0</div>
+                    <div class="stat-label">Live Attendance</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value prefix-currency" data-target="85000">0</div>
+                    <div class="stat-label">Fee Collections Today</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" data-target="1500">0</div>
+                    <div class="stat-label">Total Active Students</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="shortcuts-section fade-up">
+            <div class="section-header">
+                <h2>Admin <span class="text-gradient">Quick Actions</span></h2>
+            </div>
+            <div class="shortcuts-grid">
+                <div class="glass-panel shortcut-card">
+                    <div class="shortcut-icon"><i class="fa-solid fa-bullhorn"></i></div>
+                    <h3>Broadcast Message</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Instantly alert all staff or parents.</p>
+                </div>
+                <div class="glass-panel shortcut-card">
+                    <div class="shortcut-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                    <h3>Approve Leaves</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Manage pending staff requests.</p>
+                </div>
+                <div class="glass-panel shortcut-card">
+                    <div class="shortcut-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                    <h3>View Reports</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Daily financial and academic logs.</p>
+                </div>
+                <div class="glass-panel shortcut-card">
+                    <div class="shortcut-icon"><i class="fa-solid fa-address-book"></i></div>
+                    <h3>Staff Directory</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Quick access to all personnel.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="advantage-section fade-up">
+            <i class="fa-solid fa-bolt"></i>
+            <p>"No need to call 5 different staff members to get the day's numbers. Everything is right on your phone or tablet in real-time."</p>
+        </section>
+
+        <section class="navigation-section fade-up">
+            <a href="attendance.html" id="next-page-btn" class="nav-btn">
+                Next Page: Attendance <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Scroll Reveal Animation (Intersection Observer)
+            const fadeElements = document.querySelectorAll('.fade-up');
+            
+            const appearOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('visible');
+                    
+                    // Trigger number counter if it's the stats section
+                    if(entry.target.classList.contains('stats-section')) {
+                        startCounters();
+                    }
+                    
+                    observer.unobserve(entry.target);
+                });
+            }, appearOptions);
+
+            fadeElements.forEach(el => {
+                appearOnScroll.observe(el);
+            });
+
+            // 2. Number Counter Animation Logic
+            let countersStarted = false;
+
+            function startCounters() {
+                if(countersStarted) return;
+                countersStarted = true;
+
+                const counters = document.querySelectorAll('.stat-value');
+                const speed = 200; // The lower the slower
+
+                counters.forEach(counter => {
+                    const updateCount = () => {
+                        const target = +counter.getAttribute('data-target');
+                        const count = +counter.innerText.replace(/[^0-9.-]+/g,"");
+                        
+                        // Calculate increment
+                        const inc = target / speed;
+
+                        if (count < target) {
+                            let nextVal = Math.ceil(count + inc);
+                            
+                            // Formatting: Add ₹ prefix if class exists, and comma separators
+                            if(counter.classList.contains('prefix-currency')) {
+                                counter.innerText = '₹' + nextVal.toLocaleString('en-IN');
+                            } else {
+                                counter.innerText = nextVal.toLocaleString('en-IN');
+                            }
+                            setTimeout(updateCount, 15);
+                        } else {
+                            if(counter.classList.contains('prefix-currency')) {
+                                counter.innerText = '₹' + target.toLocaleString('en-IN');
+                            } else {
+                                counter.innerText = target.toLocaleString('en-IN');
+                            }
+                        }
+                    };
+                    updateCount();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

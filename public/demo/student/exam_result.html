@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Exam Results & Digital Report Cards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           VARIABLES & RESET
+        ========================================= */
+        :root {
+            --bg-dark: #0B0F19;
+            --cyan-primary: #00FFFF;
+            --cyan-secondary: #00BFFF;
+            --cyan-glow: rgba(0, 255, 255, 0.4);
+            --text-main: #FFFFFF;
+            --text-muted: #A0ABC0;
+            --glass-bg: rgba(15, 20, 35, 0.65);
+            --glass-border: rgba(0, 255, 255, 0.15);
+            --pass-green: #00FF88;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            /* Subtle glowing cyan dot-grid matrix */
+            background-image: 
+                radial-gradient(rgba(0, 255, 255, 0.12) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-attachment: fixed;
+            background-position: center center;
+        }
+
+        /* =========================================
+           TYPOGRAPHY & UTILITIES
+        ========================================= */
+        .text-gradient {
+            background: linear-gradient(90deg, var(--cyan-primary), var(--cyan-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: 6rem 0;
+        }
+
+        /* Fade-in animation utility */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* =========================================
+           HEADER
+        ========================================= */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        /* CSS Drawn Graduation Cap */
+        .logo-cap {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--cyan-primary);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .logo-cap::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            bottom: -2px;
+            width: 14px;
+            height: 2px;
+            background: var(--cyan-primary);
+            transform: rotate(-45deg);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-main);
+        }
+
+        /* =========================================
+           HERO SECTION
+        ========================================= */
+        .hero {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            padding-top: 4rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* 3D Mobile Mockup */
+        .mobile-mockup {
+            width: 320px;
+            height: 650px;
+            background: #05080F;
+            border-radius: 40px;
+            border: 8px solid #1A2235;
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.8),
+                inset 0 0 20px rgba(0,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+            transform: perspective(1000px) rotateX(10deg);
+            transition: transform 0.5s ease;
+        }
+
+        .mobile-mockup:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-10px);
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 25px;
+            background: #1A2235;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .app-screen {
+            padding: 3.5rem 1.5rem 2rem;
+            height: 100%;
+            background: linear-gradient(180deg, #0B0F19 0%, #152038 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+            transform: translateY(100%);
+            animation: slideUpScreen 1s 0.5s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideUpScreen {
+            to { transform: translateY(0); }
+        }
+
+        /* Digital Report Card UI Elements */
+        .report-header {
+            text-align: center;
+            font-weight: 600;
+            color: var(--cyan-primary);
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 140px;
+        }
+
+        .circular-chart {
+            width: 120px;
+            height: 120px;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 3;
+        }
+
+        .circle {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke: var(--cyan-primary);
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            filter: drop-shadow(0 0 8px var(--cyan-glow));
+            animation: fillProgress 2s 1.5s forwards ease-out;
+        }
+
+        @keyframes fillProgress {
+            to { stroke-dashoffset: 8; /* 92% */ }
+        }
+
+        .percentage {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            opacity: 0;
+            animation: fadeIn 1s 2s forwards;
+        }
+
+        .rank-badge {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--cyan-primary);
+            color: var(--cyan-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 0 15px var(--cyan-glow);
+            opacity: 0;
+            transform: scale(0.8);
+            animation: popIn 0.5s 2.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .subject-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            border-left: 3px solid var(--cyan-primary);
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        /* Sequential subject loading */
+        .subject-item:nth-child(1) { animation: slideRight 0.5s 3.0s forwards; }
+        .subject-item:nth-child(2) { animation: slideRight 0.5s 3.2s forwards; border-left-color: #A020F0; }
+        .subject-item:nth-child(3) { animation: slideRight 0.5s 3.4s forwards; border-left-color: #FF1493; }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+        @keyframes slideRight { to { opacity: 1; transform: translateX(0); } }
+
+        /* =========================================
+           AI-POWERED INSIGHTS (HERO FEATURE)
+        ========================================= */
+        .ai-feature {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .ai-text {
+            flex: 1;
+        }
+
+        .ai-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .ai-text p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .ai-visual {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ai-dashboard {
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            position: relative;
+        }
+
+        .dummy-grades {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 2rem;
+            opacity: 0.5;
+        }
+
+        .dummy-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dummy-bar::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; height: 100%;
+            background: var(--cyan-primary);
+            width: 80%;
+            border-radius: 5px;
+        }
+        .dummy-bar:nth-child(2)::after { width: 60%; background: #A020F0;}
+        .dummy-bar:nth-child(3)::after { width: 95%; background: var(--pass-green);}
+
+        /* Scanner Animation */
+        .scanner-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--cyan-primary);
+            box-shadow: 0 0 20px 5px var(--cyan-glow);
+            animation: scan 3s infinite ease-in-out;
+            z-index: 2;
+        }
+
+        .ai-brain-icon {
+            position: absolute;
+            right: -20px;
+            top: 0;
+            font-size: 2rem;
+            filter: drop-shadow(0 0 10px var(--cyan-primary));
+            animation: scanFloat 3s infinite ease-in-out;
+            z-index: 3;
+        }
+
+        @keyframes scan {
+            0%, 100% { top: 20px; opacity: 0; }
+            10%, 90% { opacity: 1; }
+            50% { top: 120px; }
+        }
+
+        @keyframes scanFloat {
+            0%, 100% { top: 10px; }
+            50% { top: 110px; }
+        }
+
+        /* AI Message Bubble */
+        .ai-message {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid var(--cyan-primary);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-top-left-radius: 0;
+            font-size: 0.95rem;
+            color: #E2E8F0;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset 0 0 15px rgba(0,255,255,0.1);
+            animation: pulseMessage 4s infinite alternate;
+        }
+
+        .ai-message::before {
+            content: '✨ AI Insight';
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--cyan-primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes pulseMessage {
+            0% { box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset 0 0 10px rgba(0,255,255,0.05); }
+            100% { box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset 0 0 25px rgba(0,255,255,0.2); }
+        }
+
+        /* =========================================
+           CORE FEATURES GRID
+        ========================================= */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: transform 0.4s ease, border-color 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--cyan-primary);
+        }
+
+        .icon-wrapper {
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Icon 1: Trophy */
+        .icon-trophy {
+            font-size: 3.5rem;
+            filter: drop-shadow(0 0 15px var(--cyan-glow));
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        /* Icon 2: Pass/Fail Stamp */
+        .icon-stamp {
+            border: 3px solid var(--pass-green);
+            color: var(--pass-green);
+            font-weight: 800;
+            font-size: 1.5rem;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transform: rotate(-15deg);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+            animation: stampAnim 3s infinite;
+        }
+
+        @keyframes stampAnim {
+            0%, 20% { transform: scale(3) rotate(-15deg); opacity: 0; }
+            25% { transform: scale(0.9) rotate(-15deg); opacity: 1; }
+            30%, 90% { transform: scale(1) rotate(-15deg); opacity: 1; }
+            100% { transform: scale(1) rotate(-15deg); opacity: 0; }
+        }
+
+        /* Icon 3: Secure Lock */
+        .icon-lock-container {
+            position: relative;
+            width: 60px;
+            height: 80px;
+        }
+
+        .lock-body {
+            position: absolute;
+            bottom: 0;
+            width: 60px;
+            height: 45px;
+            background: var(--cyan-primary);
+            border-radius: 8px;
+            box-shadow: 0 0 20px var(--cyan-glow);
+            z-index: 2;
+        }
+
+        .lock-shackle {
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            border: 6px solid var(--cyan-primary);
+            border-bottom: none;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            z-index: 1;
+            animation: unlock 3s infinite;
+            transform-origin: bottom left;
+        }
+
+        .lock-doc {
+            position: absolute;
+            bottom: 45px;
+            left: 15px;
+            width: 30px;
+            height: 40px;
+            background: #fff;
+            border-radius: 4px;
+            z-index: 0;
+            opacity: 0;
+            animation: slideDoc 3s infinite;
+        }
+
+        @keyframes unlock {
+            0%, 20% { transform: translateY(0); }
+            30%, 80% { transform: translateY(-15px); }
+            90%, 100% { transform: translateY(0); }
+        }
+
+        @keyframes slideDoc {
+            0%, 30% { opacity: 0; transform: translateY(20px); }
+            40%, 80% { opacity: 1; transform: translateY(0); }
+            90%, 100% { opacity: 0; transform: translateY(20px); }
+        }
+
+
+        /* =========================================
+           ADVANTAGE SECTION
+        ========================================= */
+        .advantage-section {
+            text-align: center;
+            padding: 5rem 2rem;
+            border: 1px solid var(--cyan-primary);
+            box-shadow: inset 0 0 40px rgba(0, 255, 255, 0.05),
+                        0 0 30px rgba(0, 255, 255, 0.1);
+            background: linear-gradient(180deg, rgba(15,20,35,0.4) 0%, rgba(0,255,255,0.05) 100%);
+            margin-bottom: 4rem;
+        }
+
+        .advantage-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .advantage-section p {
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* =========================================
+           NAVIGATION BUTTONS
+        ========================================= */
+        .page-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 50px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: rgba(11, 15, 25, 0.7);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.05);
+            animation: pulseBtn 3s infinite alternate;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            border-color: var(--cyan-primary);
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 10px 25px var(--cyan-glow);
+            animation: none; /* Stop ambient pulse on hover */
+        }
+
+        @keyframes pulseBtn {
+            0% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.05); }
+            100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); }
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN
+        ========================================= */
+        @media (max-width: 900px) {
+            .ai-feature {
+                flex-direction: column;
+                text-align: center;
+            }
+            .ai-text h2, .advantage-section h2 {
+                font-size: 2rem;
+            }
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .page-nav {
+                flex-direction: column;
+                border-radius: 20px;
+            }
+            .nav-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+      <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main>
+        <section class="hero container fade-in-up">
+            <div>
+                <h1>Exam Results & <br> <span class="text-gradient">Digital Report Cards</span></h1>
+                <p>Instantly deliver beautiful, secure term report cards directly to parents' phones, eliminating administrative bottlenecks and massive printing costs.</p>
+            </div>
+
+            <div class="mobile-mockup">
+                <div class="notch"></div>
+                <div class="app-screen">
+                    <div class="report-header">Term 1 Final Results</div>
+                    
+                    <div class="progress-container">
+                        <svg viewBox="0 0 36 36" class="circular-chart">
+                            <path class="circle-bg"
+                                d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle"
+                                d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="percentage">92%</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: center;">
+                        <div class="rank-badge">Class Rank: 3rd</div>
+                    </div>
+
+                    <div class="subject-list">
+                        <div class="subject-item">
+                            <span>Science</span>
+                            <span style="font-weight: 600; color: var(--cyan-primary);">96% (A+)</span>
+                        </div>
+                        <div class="subject-item">
+                            <span>Mathematics</span>
+                            <span style="font-weight: 600; color: #A020F0;">88% (A)</span>
+                        </div>
+                        <div class="subject-item">
+                            <span>Literature</span>
+                            <span style="font-weight: 600; color: #FF1493;">91% (A)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="ai-feature fade-in-up">
+                <div class="ai-text">
+                    <h2><span class="text-gradient">AI-Generated</span> Encouragement</h2>
+                    <p>Go beyond letter grades. Our system analyzes a student's strong and weak subjects and automatically generates personalized, constructive encouragement, turning a simple report card into a motivating learning tool.</p>
+                </div>
+                
+                <div class="ai-visual">
+                    <div class="glass-panel ai-dashboard">
+                        <div class="dummy-grades">
+                            <div class="dummy-bar"></div>
+                            <div class="dummy-bar"></div>
+                            <div class="dummy-bar"></div>
+                        </div>
+                        
+                        <div class="scanner-line"></div>
+                        <div class="ai-brain-icon">🧠</div>
+
+                        <div class="ai-message">
+                            "Outstanding work in Science! Let's focus a bit more on Math next term to unlock your full potential."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="features-grid">
+                
+                <div class="glass-panel feature-card fade-in-up">
+                    <div class="icon-wrapper">
+                        <div class="icon-trophy">🏆</div>
+                    </div>
+                    <h3>Comprehensive Grading Metrics</h3>
+                    <p>Instantly calculate and display total percentages, percentiles, and class ranks without manual spreadsheet work.</p>
+                </div>
+
+                <div class="glass-panel feature-card fade-in-up" style="transition-delay: 0.1s;">
+                    <div class="icon-wrapper">
+                        <div class="icon-stamp">PASS</div>
+                    </div>
+                    <h3>Clear Pass/Fail Badges</h3>
+                    <p>Automatically stamp digital report cards with highly visible, glowing pass/fail status indicators based on customizable school criteria.</p>
+                </div>
+
+                <div class="glass-panel feature-card fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="icon-wrapper">
+                        <div class="icon-lock-container">
+                            <div class="lock-doc"></div>
+                            <div class="lock-shackle"></div>
+                            <div class="lock-body"></div>
+                        </div>
+                    </div>
+                    <h3>Private & Secure Delivery</h3>
+                    <p>Deliver results directly to the authenticated parent's app. No more intercepted report cards or tampered grades.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="glass-panel advantage-section fade-in-up">
+                <h2>Eliminate Printing Costs. <br><span class="text-gradient">Maximize Privacy.</span></h2>
+                <p>Stop wasting thousands of dollars on premium paper and printer ink. Traditional report card days are administratively exhausting and lack student privacy. Paper Buddy securely delivers tamper-proof digital report cards to the parent's pocket the exact second grades are finalized.</p>
+            </div>
+        </section>
+
+        <section class="container" style="padding-top: 0;">
+            <div class="glass-panel page-nav fade-in-up">
+                <a href="timetable.html" class="nav-btn">← Previous Page (Timetable)</a>
+                <a href="live_quiz.html" class="nav-btn">Next Page: Live Quiz →</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Optional: Stop observing once visible if you want the animation to run only once
+                        // observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const fadeElements = document.querySelectorAll('.fade-in-up');
+            fadeElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

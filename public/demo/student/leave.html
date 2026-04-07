@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Digital Leave Application</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === GLOBAL VARIABLES === */
+        :root {
+            --bg-dark: #0B0F19;
+            --cyan-primary: #00FFFF;
+            --cyan-light: #87CEFA;
+            --cyan-glow: rgba(0, 255, 255, 0.4);
+            --amber-status: #FFC107;
+            --amber-glow: rgba(255, 193, 7, 0.4);
+            --green-status: #00FF88;
+            --green-glow: rgba(0, 255, 136, 0.4);
+            --text-main: #FFFFFF;
+            --text-muted: #A0AABF;
+            --glass-bg: rgba(11, 15, 25, 0.5);
+            --glass-border: rgba(0, 255, 255, 0.15);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* === RESET & BASE TYPOGRAPHY === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        p {
+            color: var(--text-muted);
+        }
+
+        /* === UTILITIES === */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--cyan-primary), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scroll Animation Class */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === HEADER === */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .logo-cap {
+            width: 26px;
+            height: 26px;
+            border: 2px solid var(--cyan-primary);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .logo-cap::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 2px;
+            background: var(--cyan-primary);
+            bottom: -5px;
+            right: -8px;
+            transform: rotate(-45deg);
+        }
+
+        .brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* === SECTION 1: HERO === */
+        .hero-section {
+            text-align: center;
+            padding: 5rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-section h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero-section p {
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin: 0 auto 4rem auto;
+        }
+
+        /* Mobile Mockup */
+        .mockup-wrapper {
+            perspective: 1000px;
+        }
+
+        .phone {
+            width: 320px;
+            height: 650px;
+            background: #000;
+            border-radius: 40px;
+            border: 8px solid #1A2235;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+            transform: rotateX(5deg);
+            transition: transform 0.5s ease;
+        }
+
+        .phone:hover {
+            transform: rotateX(0deg) translateY(-10px);
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #1A2235;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .app-screen {
+            width: 100%;
+            height: 100%;
+            padding: 4rem 1.5rem 2rem;
+            background: linear-gradient(180deg, #0B0F19 0%, #111827 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+        }
+
+        .app-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: left;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        /* Mockup Calendar */
+        .mockup-calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .cal-day {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+        }
+        .cal-day.active {
+            animation: highlightDays 8s infinite;
+        }
+
+        /* Mockup Chips */
+        .mockup-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .chip {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+        }
+        .chip.medical {
+            animation: highlightChip 8s infinite;
+        }
+
+        /* Mockup Submit */
+        .mockup-submit {
+            margin-top: auto;
+            background: var(--cyan-primary);
+            color: #000;
+            font-weight: 700;
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            animation: pressButton 8s infinite;
+        }
+
+        /* Mockup Status Overlay */
+        .status-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 15, 25, 0.9);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            animation: showOverlay 8s infinite;
+        }
+        .status-badge {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--amber-status);
+            color: var(--amber-status);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            box-shadow: 0 0 20px var(--amber-glow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-badge::before {
+            content: '';
+            width: 10px; height: 10px;
+            background: var(--amber-status);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--amber-status);
+        }
+
+        /* === SECTION 2: ANTI-FORGERY (HERO FEATURE) === */
+        .feature-split {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            padding: 6rem 0;
+            flex-wrap: wrap;
+        }
+
+        .split-text { flex: 1; min-width: 300px; }
+        .split-text h2 { font-size: clamp(2rem, 4vw, 2.5rem); margin-bottom: 1.5rem; }
+
+        .split-visual {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .record-card {
+            width: 100%;
+            max-width: 450px;
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .visual-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .paper-note {
+            position: absolute;
+            background: #fdfdfd;
+            width: 80%;
+            height: 150px;
+            border-radius: 4px;
+            padding: 20px;
+            color: #333;
+            font-family: 'Comic Sans MS', cursive, sans-serif; /* For the scribbled look */
+            transform: rotate(-5deg);
+            box-shadow: 2px 5px 15px rgba(0,0,0,0.5);
+            animation: dissolveNote 6s infinite alternate;
+        }
+
+        .digital-row {
+            position: absolute;
+            width: 90%;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid var(--cyan-primary);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--cyan-glow);
+            opacity: 0;
+            transform: scale(0.9);
+            animation: materializeRow 6s infinite alternate;
+        }
+        
+        .digital-row-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .verified-tag { color: var(--green-status); font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 5px; text-shadow: 0 0 10px var(--green-glow);}
+        .timestamp { color: var(--text-muted); font-size: 0.8rem; }
+
+        /* === SECTION 3: FEATURES GRID === */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 0 6rem;
+        }
+
+        .feature-card {
+            padding: 2.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--cyan-primary);
+        }
+
+        .icon-container {
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Icon 1: Calendar Grid Anim */
+        .anim-cal { display: grid; grid-template-columns: repeat(3, 15px); gap: 4px; }
+        .anim-cal div { width: 15px; height: 15px; background: rgba(255,255,255,0.1); border-radius: 3px; }
+        .anim-cal div.hlt { animation: calHighlight 3s infinite alternate; }
+
+        /* Icon 2: Chips Anim */
+        .anim-chips { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .anim-chips div { width: 60px; height: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .anim-chips div:nth-child(2) { animation: chipHighlight 3s infinite alternate; }
+
+        /* Icon 3: Status Dot Anim */
+        .anim-status { width: 24px; height: 24px; border-radius: 50%; animation: statusChange 4s infinite alternate; }
+
+        /* === SECTION 4: ADVANTAGE SECTION === */
+        .advantage-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            margin-bottom: 6rem;
+            border-left: 0;
+            border-right: 0;
+            border-radius: 0;
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+            background: linear-gradient(90deg, rgba(0,255,255,0.0) 0%, rgba(0,255,255,0.05) 50%, rgba(0,255,255,0.0) 100%);
+        }
+        .advantage-section::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan-primary), transparent);
+            box-shadow: 0 0 15px var(--cyan-primary);
+        }
+        .advantage-section h2 { margin-bottom: 1.5rem; font-size: 2.2rem; }
+        .advantage-section p { max-width: 800px; margin: 0 auto; font-size: 1.1rem; }
+
+        /* === SECTION 5: PAGE NAVIGATION === */
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem;
+            margin-bottom: 4rem;
+            border-radius: 50px;
+        }
+
+        .btn-pill {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.05);
+            animation: subtlePulse 3s infinite alternate;
+        }
+
+        .btn-pill:hover {
+            transform: scale(1.05);
+            background: rgba(0, 255, 255, 0.1);
+            border-color: var(--cyan-primary);
+            box-shadow: 0 0 25px var(--cyan-glow);
+            animation-play-state: paused;
+        }
+
+        /* === KEYFRAME ANIMATIONS === */
+        /* Phone Mockup Animations */
+        @keyframes highlightDays {
+            0%, 15% { background: rgba(255,255,255,0.05); box-shadow: none; }
+            20%, 80% { background: var(--cyan-primary); box-shadow: 0 0 10px var(--cyan-glow); }
+            85%, 100% { background: rgba(255,255,255,0.05); box-shadow: none; }
+        }
+        @keyframes highlightChip {
+            0%, 30% { background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: rgba(255,255,255,0.1); }
+            35%, 80% { background: rgba(0,255,255,0.1); color: var(--cyan-primary); border-color: var(--cyan-primary); box-shadow: 0 0 10px var(--cyan-glow); }
+            85%, 100% { background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: rgba(255,255,255,0.1); }
+        }
+        @keyframes pressButton {
+            0%, 45% { transform: scale(1); opacity: 1; }
+            48% { transform: scale(0.95); opacity: 0.8; }
+            52%, 100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes showOverlay {
+            0%, 55% { opacity: 0; pointer-events: none; }
+            60%, 85% { opacity: 1; pointer-events: all; }
+            90%, 100% { opacity: 0; pointer-events: none; }
+        }
+
+        /* Anti-Forgery Animations */
+        @keyframes dissolveNote {
+            0%, 30% { opacity: 1; filter: blur(0); transform: rotate(-5deg) translateY(0); }
+            45%, 100% { opacity: 0; filter: blur(10px); transform: rotate(-5deg) translateY(20px); }
+        }
+        @keyframes materializeRow {
+            0%, 40% { opacity: 0; transform: scale(0.9) translateY(-20px); box-shadow: 0 0 0 transparent;}
+            55%, 100% { opacity: 1; transform: scale(1) translateY(0); box-shadow: 0 0 25px var(--cyan-glow);}
+        }
+
+        /* Features Icons Animations */
+        @keyframes calHighlight {
+            0%, 20% { background: rgba(255,255,255,0.1); box-shadow: none; }
+            100% { background: var(--cyan-primary); box-shadow: 0 0 8px var(--cyan-glow); }
+        }
+        @keyframes chipHighlight {
+            0%, 20% { background: rgba(255,255,255,0.1); box-shadow: none; border: 1px solid transparent; width: 60px;}
+            100% { background: rgba(0,255,255,0.2); box-shadow: 0 0 10px var(--cyan-glow); border: 1px solid var(--cyan-primary); width: 70px;}
+        }
+        @keyframes statusChange {
+            0%, 40% { background: var(--amber-status); box-shadow: 0 0 15px var(--amber-glow); }
+            60%, 100% { background: var(--green-status); box-shadow: 0 0 15px var(--green-glow); }
+        }
+
+        @keyframes subtlePulse {
+            from { box-shadow: 0 0 10px rgba(0, 255, 255, 0.05); }
+            to { box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); }
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 900px) {
+            .feature-split { flex-direction: column; text-align: center; }
+            .nav-container { flex-direction: column; }
+            .btn-pill { width: 100%; text-align: center; }
+            h1 { font-size: 2.8rem; }
+            h2 { font-size: 2.2rem; }
+            .advantage-section { padding: 3rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main>
+        <section class="container hero-section reveal">
+            <h1>Digital Leave <br><span class="gradient-text">Application</span></h1>
+            <p>Allow parents to request time off for their child instantly through a seamless, paperless interface.</p>
+            
+            <div class="mockup-wrapper">
+                <div class="phone">
+                    <div class="notch"></div>
+                    <div class="app-screen">
+                        <div class="app-header">New Request</div>
+                        
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: -10px;">Select Dates</div>
+                        <div class="mockup-calendar">
+                            <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div>
+                            <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div>
+                            <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day active"></div>
+                            <div class="cal-day active"></div><div class="cal-day active"></div><div class="cal-day"></div>
+                            <div class="cal-day"></div><div class="cal-day"></div>
+                        </div>
+
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: -10px;">Reason</div>
+                        <div class="mockup-chips">
+                            <div class="chip medical">Medical Issue</div>
+                            <div class="chip">Family Event</div>
+                            <div class="chip">Appointment</div>
+                        </div>
+
+                        <div class="mockup-submit">Submit Request</div>
+
+                        <div class="status-overlay">
+                            <div class="status-badge">Pending Approval</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container feature-split reveal">
+            <div class="split-text">
+                <h2>End Forged Notes & <br><span class="gradient-text">Lost Diary Pages.</span></h2>
+                <p>Say goodbye to questionable signatures and lost diary pages. Paper Buddy gives school administration an instant, searchable, and verified digital record of all absences, directly from the authenticated parent app.</p>
+            </div>
+            
+            <div class="split-visual">
+                <div class="glass-panel record-card">
+                    <div class="visual-container">
+                        <div class="paper-note">
+                            <div style="font-size: 0.8rem; margin-bottom: 5px;">To whom it may concern,</div>
+                            <div style="font-size: 0.9rem;">Please excuse Jimmy today. He is sick.</div>
+                            <div style="margin-top: 15px; border-top: 1px solid #ccc; width: 50%; padding-top: 5px;">Sign: J. Doe ???</div>
+                        </div>
+                        
+                        <div class="digital-row">
+                            <div class="digital-row-header">
+                                <span class="verified-tag">✓ Verified ID: PARENT_784A</span>
+                                <span class="timestamp">Today, 08:14 AM</span>
+                            </div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">Student: James Doe (Grade 4)</div>
+                            <div style="color: var(--cyan-light); font-size: 0.9rem; margin-bottom: 5px;">Dates: Mon 10th - Wed 12th</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Reason: Medical Issue (Fever)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-grid reveal">
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="anim-cal">
+                        <div></div><div></div><div></div>
+                        <div></div><div class="hlt"></div><div class="hlt"></div>
+                        <div class="hlt"></div><div></div><div></div>
+                    </div>
+                </div>
+                <h3>Quick Date-Range Picker</h3>
+                <p>Seamlessly select start and end dates with a beautiful, intuitive digital calendar. No more manual date writing.</p>
+            </div>
+            
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="anim-chips">
+                        <div></div><div></div><div></div>
+                    </div>
+                </div>
+                <h3>One-Tap Reason Chips</h3>
+                <p>Parents can apply in seconds using pre-filled, one-tap reason chips (e.g., Sick, Family Event, Doctor's Appointment).</p>
+            </div>
+
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="anim-status"></div>
+                </div>
+                <h3>Live Status Updates</h3>
+                <p>Eliminate the "did the teacher see my note?" anxiety. Parents receive live status updates the moment the request is reviewed.</p>
+            </div>
+        </section>
+
+        <section class="advantage-section reveal">
+            <div class="container">
+                <h2>A Searchable <span class="gradient-text">Digital Record.</span></h2>
+                <p>Traditional leave applications rely on easily misplaced pieces of paper. With Paper Buddy, every single leave request is permanently logged in a searchable digital archive. Teachers and admins can pull up historical absence data in seconds.</p>
+            </div>
+        </section>
+
+        <section class="container">
+            <nav class="glass-panel nav-container reveal">
+                <a href="community.html" class="btn-pill">← Previous Page (Class Community)</a>
+                <a href="syllabus.html" class="btn-pill">Next Page: Syllabus →</a>
+            </nav>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: observer.unobserve(entry.target); to animate only once
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+            
+            // Trigger animation immediately for hero section if visible on load
+            setTimeout(() => {
+                const hero = document.querySelector('.hero-section.reveal');
+                if(hero) hero.classList.add('active');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

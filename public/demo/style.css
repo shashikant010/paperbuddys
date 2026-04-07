@@ -1,0 +1,352 @@
+/* --- Global Styles --- */
+:root {
+    --primary-bg: #1a1a2e;
+    --text-primary: #fff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --accent: #ff007f;
+    --accent-glow: 0 0 15px rgba(2ff, 0, 127, 0.7);
+    --glass-background: rgba(255, 255, 255, 0.05);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(15px);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background: var(--primary-bg);
+    color: var(--text-primary);
+    overflow: hidden; /* Recommended for the dynamic background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* --- Animated Mesh Gradient Background --- */
+.mesh-gradient-bg {
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: -1;
+    background: linear-gradient(
+        45deg,
+        #1a1a2e, #16213e, #0f3460, #e94560, #ff007f, #b310e8, #1a1a2e
+    );
+    background-size: 400% 400%;
+    filter: blur(80px); /* Creates the soft 'mesh' effect */
+    opacity: 0.8;
+    animation: gradientFlow 20s ease-in-out infinite;
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- Split-Screen Layout --- */
+.login-page-container {
+    display: flex;
+    width: 90%;
+    max-width: 1600px;
+    height: 80vh;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-mockup-section,
+.features-section {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+/* --- Animated Floating Mobile Mockup (Left Side) --- */
+.phone-frame {
+    width: 300px;
+    height: 600px;
+    background: var(--glass-background);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-radius: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,255,255,0.1);
+    backdrop-filter: var(--glass-blur);
+    position: relative;
+    padding: 15px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- Shimmer Animation Inside Phone --- */
+.shimmering-animation::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%;
+    width: 150%; height: 100%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 4s infinite;
+}
+
+@keyframes shimmer {
+    100% { left: 150%; }
+}
+
+/* --- Simulated App Login Screen --- */
+.app-login-screen {
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-secondary);
+}
+
+.app-logo {
+    width: 80px;
+    margin-bottom: 20px;
+}
+
+.app-login-screen h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+}
+
+.app-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #fff;
+    outline: none;
+    transition: 0.3s;
+}
+
+.app-input:focus {
+    border-color: var(--accent);
+    box-shadow: var(--accent-glow);
+}
+
+.app-password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.toggle-app-password {
+    position: absolute;
+    right: 12px;
+    top: 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+.toggle-app-password:hover {
+    color: var(--accent);
+}
+
+.app-login-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, var(--accent), #b310e8);
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: 0.3s;
+}
+
+.app-login-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 5px 15px rgba(255,0,127,0.5);
+}
+
+.phone-speaker { width: 60px; height: 5px; background: rgba(255,255,255,0.2); position: absolute; top: 10px; left: 50%; transform: translateX(-50%); border-radius: 10px; }
+.phone-button { width: 35px; height: 35px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); }
+
+/* --- Feature Section Styling (Right Side) --- */
+.features-section h1 { font-size: 3rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+.features-section p { color: var(--text-secondary); margin-bottom: 40px; font-size: 1.1rem; }
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* --- Glassmorphic Feature Cards with Micro-Interactions --- */
+.feature-card {
+    padding: 25px;
+    background: var(--glass-background);
+    border: var(--glass-border);
+    border-radius: 15px;
+    backdrop-filter: var(--glass-blur);
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    overflow: hidden;
+    position: relative;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: rgba(255,255,255,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255,0.1);
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    background: linear-gradient(45deg, #fff, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.feature-card h3 { margin-bottom: 10px; font-size: 1.3rem; }
+.feature-card p { font-size: 0.95rem; line-height: 1.5; color: var(--text-secondary); margin-bottom: 0; }
+
+/* --- Custom Unlocking Padlock Animation --- */
+.padlock-animation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.padlock {
+    width: 50px; height: 60px;
+    position: relative;
+    margin-bottom: 10px;
+    transition: transform 0.5s;
+    animation: floatingPadlock 3s infinite ease-in-out;
+}
+
+/* Floating animation for the whole padlock */
+@keyframes floatingPadlock {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+.padlock-body {
+    width: 100%; height: 40px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    position: absolute; bottom: 0;
+    box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    transition: box-shadow 0.5s, background 0.5s;
+}
+
+.padlock-shackle {
+    width: 30px; height: 35px;
+    border: 5px solid rgba(255,255,255,0.2);
+    border-bottom: none;
+    border-radius: 15px 15px 0 0;
+    position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%);
+    transition: transform 0.5s, border-color 0.5s, top 0.5s;
+}
+
+/* Unlocked State (Triggered by JS) */
+.unlocked .padlock-shackle {
+    transform: translateX(-50%) translateY(-10px) rotate(-15deg);
+    border-color: var(--accent);
+}
+.unlocked .padlock-body {
+    background: linear-gradient(135deg, rgba(255,0,127,0.2), rgba(255,0,127,0.1));
+    box-shadow: 0 0 20px rgba(255,0,127,0.5);
+}
+
+.padlock-status { font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+
+/* --- Pulsing Next Page Button --- */
+.next-page-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 15px 30px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 30px;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s, box-shadow 0.3s;
+    animation: pulseGlow 2s infinite;
+    overflow: hidden; /* For the reflection effect */
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(255,255,255,0.1); }
+    50% { box-shadow: 0 0 25px rgba(255,255,255,0.3); }
+}
+
+.next-page-btn:hover {
+    transform: scale(1.05) translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255,0.2);
+}
+
+/* --- Sweeping Light Reflection Effect --- */
+.reflection-effect::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0) 30%,
+        rgba(255,255,255,0.3) 50%,
+        rgba(255,255,255,0) 70%
+    );
+    transition: 0.6s;
+}
+
+.next-page-btn:hover::after {
+    left: 100%;
+}
+
+/* --- Entrance Animations (Staggered) --- */
+.staggered-entry {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInSlide 0.8s forwards ease-out;
+}
+
+@keyframes fadeInSlide {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Define delays for staggering */
+.features-header { animation-delay: 0.2s; }
+.features-grid { animation-delay: 0.4s; }
+.padlock-animation-container { animation-delay: 0.6s; }
+.next-page-btn { animation-delay: 0.8s; }

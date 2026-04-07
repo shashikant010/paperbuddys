@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Deep Performance Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === CSS Variables & Theme === */
+        :root {
+            --bg-dark: #0B0F19;
+            --cyan-glow: #00FFFF;
+            --cyan-light: #87CEFA;
+            --cyan-dark: #008B8B;
+            --purple-glow: #B026FF;
+            --glass-bg: rgba(11, 15, 25, 0.5);
+            --glass-border: rgba(0, 255, 255, 0.15);
+            --text-main: #FFFFFF;
+            --text-muted: #A0AABF;
+        }
+
+        /* === Global & Reset === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(circle at center, rgba(0, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 35px 35px;
+            background-attachment: fixed;
+            line-height: 1.6;
+        }
+
+        /* === Typography & Gradients === */
+        .cyan-gradient-text {
+            background: linear-gradient(90deg, var(--cyan-glow), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
+        h2 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 1rem; line-height: 1.2; }
+        h3 { font-size: 1.4rem; margin-bottom: 0.8rem; color: var(--text-main); }
+        p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1.5rem; }
+
+        /* === Glassmorphism Utilities === */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s ease, border-color 0.4s ease;
+        }
+
+        /* === Header === */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 5%;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        /* CSS Drawn Graduation Cap */
+        .cap-icon {
+            width: 26px;
+            height: 26px;
+            border: 2px solid var(--cyan-glow);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 12px var(--cyan-glow);
+        }
+        .cap-icon::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 2px;
+            background: var(--cyan-glow);
+            bottom: -5px;
+            right: -8px;
+            transform: rotate(-45deg);
+        }
+
+        /* === Layout Container === */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        /* === Section 1: Hero === */
+        .hero {
+            text-align: center;
+            margin-bottom: 8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .hero p {
+            max-width: 650px;
+            margin: 0 auto 4rem auto;
+        }
+
+        /* Animated Mobile Mockup */
+        .mobile-mockup {
+            width: 320px;
+            height: 650px;
+            background: #05080F;
+            border: 8px solid #1A2235;
+            border-radius: 45px;
+            box-shadow: inset 0 0 30px rgba(0, 255, 255, 0.05), 0 25px 50px rgba(0,0,0,0.8), 0 0 40px rgba(0,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+            transform: perspective(1000px) rotateX(12deg) translateY(0);
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: floatPhone 6s ease-in-out infinite alternate;
+        }
+        .mobile-mockup:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-10px);
+            animation-play-state: paused;
+        }
+        .mobile-notch {
+            width: 120px;
+            height: 28px;
+            background: #1A2235;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+            z-index: 10;
+        }
+        .app-screen {
+            width: 100%;
+            height: 100%;
+            padding: 4rem 1.5rem 2rem;
+            background: linear-gradient(180deg, #0B0F19 0%, #111827 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* App Screen Internal Widgets */
+        .widget-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .radar-svg { width: 100%; height: 160px; filter: drop-shadow(0 0 8px rgba(0,255,255,0.4)); }
+        .radar-web { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 1; }
+        .radar-data { 
+            fill: rgba(0, 255, 255, 0.2); 
+            stroke: var(--cyan-glow); 
+            stroke-width: 2;
+            transform-origin: center;
+            animation: expandRadar 4s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+        }
+
+        .donut-svg { width: 140px; height: 140px; transform: rotate(-90deg); }
+        .donut-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 15; }
+        .donut-segment { fill: none; stroke-width: 15; stroke-linecap: round; }
+        .seg-1 { stroke: var(--cyan-glow); stroke-dasharray: 200 300; animation: fillDonut1 3s ease-out forwards infinite; }
+        .seg-2 { stroke: var(--purple-glow); stroke-dasharray: 100 300; stroke-dashoffset: -200; animation: fillDonut2 3s ease-out forwards infinite; }
+
+        /* === Section 2: Hero Feature (Video Game Stat Sheet) === */
+        .feature-split {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            margin-bottom: 8rem;
+        }
+        .feature-text { flex: 1; min-width: 300px; }
+        .feature-visual { flex: 1; min-width: 300px; display: flex; justify-content: center; }
+
+        .radar-dashboard {
+            width: 100%;
+            max-width: 450px;
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .large-radar { width: 100%; max-width: 300px; height: auto; margin: 0 auto; filter: drop-shadow(0 0 15px rgba(0,255,255,0.3)); }
+        .large-radar-data {
+            fill: rgba(0, 255, 255, 0.15);
+            stroke: var(--cyan-glow);
+            stroke-width: 2;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawRadarLines 3s ease-in-out forwards infinite alternate;
+        }
+
+        .radar-labels { font-size: 0.75rem; fill: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
+
+        /* === Section 3: Core Analytics Grid === */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 8rem;
+        }
+
+        .grid-card { text-align: center; }
+        .grid-card:hover { transform: translateY(-10px); border-color: var(--cyan-glow); box-shadow: 0 15px 40px rgba(0,255,255,0.1); }
+
+        .icon-wrapper {
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Grid Icons Animations */
+        /* 1. Mini Radar */
+        .anim-radar {
+            width: 60px; height: 60px; border: 2px solid var(--cyan-glow); border-radius: 50%;
+            position: relative; box-shadow: 0 0 15px var(--cyan-glow);
+        }
+        .anim-radar::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 50%; height: 2px;
+            background: var(--cyan-glow); transform-origin: 0 50%;
+            animation: sweep 2s linear infinite;
+        }
+
+        /* 2. Doughnut */
+        .anim-donut {
+            width: 60px; height: 60px; border: 8px solid rgba(255,255,255,0.1); border-radius: 50%;
+            border-top-color: var(--cyan-glow); border-right-color: var(--purple-glow);
+            animation: spin 3s linear infinite;
+            filter: drop-shadow(0 0 10px rgba(0,255,255,0.5));
+        }
+
+        /* 3. Sparkline Heartbeat */
+        .anim-sparkline {
+            width: 80px; height: 40px;
+        }
+        .spark-path {
+            fill: none; stroke: var(--cyan-glow); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 200; stroke-dashoffset: 200;
+            animation: heartbeatDraw 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            filter: drop-shadow(0 0 6px var(--cyan-glow));
+        }
+
+        /* === Section 4: Advantage === */
+        .advantage-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            margin-bottom: 6rem;
+            border: 1px solid var(--cyan-dark);
+            background: linear-gradient(135deg, rgba(11,15,25,0.8) 0%, rgba(0, 40, 60, 0.4) 100%);
+            box-shadow: inset 0 0 50px rgba(0,255,255,0.05), 0 0 30px rgba(0,255,255,0.1);
+        }
+
+        /* === Section 5: Page Navigation === */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 2rem;
+            border-radius: 50px;
+        }
+
+        .btn {
+            background: rgba(11, 15, 25, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.05);
+            animation: btnPulse 3s infinite alternate;
+        }
+
+        .btn:hover {
+            transform: scale(1.05) translateY(-3px);
+            border-color: var(--cyan-glow);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        /* === Keyframes === */
+        @keyframes floatPhone {
+            from { transform: perspective(1000px) rotateX(12deg) translateY(0px); }
+            to { transform: perspective(1000px) rotateX(12deg) translateY(-20px); }
+        }
+        @keyframes expandRadar {
+            0% { transform: scale(0.6); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes fillDonut1 { 0% { stroke-dasharray: 0 300; } 100% { stroke-dasharray: 200 300; } }
+        @keyframes fillDonut2 { 0% { stroke-dasharray: 0 300; } 100% { stroke-dasharray: 100 300; } }
+        
+        @keyframes drawRadarLines {
+            0% { stroke-dashoffset: 1000; fill: rgba(0,255,255,0); }
+            60% { stroke-dashoffset: 0; fill: rgba(0,255,255,0); }
+            100% { stroke-dashoffset: 0; fill: rgba(0,255,255,0.2); }
+        }
+        
+        @keyframes sweep { to { transform: rotate(360deg); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @keyframes heartbeatDraw {
+            0% { stroke-dashoffset: 200; }
+            40%, 100% { stroke-dashoffset: 0; }
+        }
+        @keyframes btnPulse {
+            from { box-shadow: 0 0 10px rgba(0, 255, 255, 0.05); }
+            to { box-shadow: 0 0 25px rgba(0, 255, 255, 0.2); }
+        }
+
+        /* Intersection Observer Fade-in Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === Responsive === */
+        @media (max-width: 900px) {
+            .feature-split { flex-direction: column; text-align: center; }
+            .nav-buttons { flex-direction: column; }
+            .btn { width: 100%; text-align: center; }
+            h1 { font-size: 2.8rem; }
+            h2 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <div class="container">
+        
+        <section class="hero reveal">
+            <h1>Deep Performance <br><span class="cyan-gradient-text">Analytics</span></h1>
+            <p>Move beyond simple numbers. Get a highly advanced, visual breakdown of student grades that tells the true story of their learning habits.</p>
+            
+            <div class="mobile-mockup">
+                <div class="mobile-notch"></div>
+                <div class="app-screen">
+                    <h3 style="font-size: 1.1rem; color: #fff;">Performance Overview</h3>
+                    
+                    <div class="widget-card">
+                        <svg class="radar-svg" viewBox="0 0 100 100">
+                            <polygon class="radar-web" points="50,10 85,30 85,70 50,90 15,70 15,30" />
+                            <polygon class="radar-web" points="50,30 67.5,40 67.5,60 50,70 32.5,60 32.5,40" />
+                            <line class="radar-web" x1="50" y1="50" x2="50" y2="10"/>
+                            <line class="radar-web" x1="50" y1="50" x2="85" y2="30"/>
+                            <line class="radar-web" x1="50" y1="50" x2="85" y2="70"/>
+                            <line class="radar-web" x1="50" y1="50" x2="50" y2="90"/>
+                            <line class="radar-web" x1="50" y1="50" x2="15" y2="70"/>
+                            <line class="radar-web" x1="50" y1="50" x2="15" y2="30"/>
+                            <polygon class="radar-data" points="50,25 75,35 60,65 50,80 30,55 35,35" />
+                        </svg>
+                    </div>
+
+                    <div class="widget-card" style="padding: 1rem;">
+                        <svg class="donut-svg" viewBox="0 0 100 100">
+                            <circle class="donut-bg" cx="50" cy="50" r="40" />
+                            <circle class="donut-segment seg-1" cx="50" cy="50" r="40" />
+                            <circle class="donut-segment seg-2" cx="50" cy="50" r="40" />
+                        </svg>
+                        <div style="position: absolute; text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--cyan-glow);">84%</div>
+                            <div style="font-size: 0.6rem; color: var(--text-muted);">Overall</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="feature-split reveal">
+            <div class="feature-text">
+                <h2>The <span class="cyan-gradient-text">"Skill Balance"</span> Radar</h2>
+                <p>A standard report card just gives a number. Our Skill Balance Radar visually maps out a student's strengths and weaknesses across all subjects exactly like a video game stat sheet, instantly identifying where to focus.</p>
+            </div>
+            <div class="feature-visual">
+                <div class="glass-panel radar-dashboard">
+                    <svg class="large-radar" viewBox="-20 -20 140 140">
+                        <polygon class="radar-web" points="50,0 93.3,25 93.3,75 50,100 6.7,75 6.7,25" />
+                        <polygon class="radar-web" points="50,25 71.65,37.5 71.65,62.5 50,75 28.35,62.5 28.35,37.5" />
+                        <line class="radar-web" x1="50" y1="50" x2="50" y2="0"/>
+                        <line class="radar-web" x1="50" y1="50" x2="93.3" y2="25"/>
+                        <line class="radar-web" x1="50" y1="50" x2="93.3" y2="75"/>
+                        <line class="radar-web" x1="50" y1="50" x2="50" y2="100"/>
+                        <line class="radar-web" x1="50" y1="50" x2="6.7" y2="75"/>
+                        <line class="radar-web" x1="50" y1="50" x2="6.7" y2="25"/>
+                        
+                        <text x="50" y="-10" text-anchor="middle" class="radar-labels">Science</text>
+                        <text x="105" y="28" text-anchor="start" class="radar-labels">Math</text>
+                        <text x="105" y="80" text-anchor="start" class="radar-labels">English</text>
+                        <text x="50" y="115" text-anchor="middle" class="radar-labels">History</text>
+                        <text x="-5" y="80" text-anchor="end" class="radar-labels">Arts</text>
+                        <text x="-5" y="28" text-anchor="end" class="radar-labels">Sports</text>
+
+                        <polygon class="large-radar-data" points="50,15 80,40 60,65 50,90 20,50 35,25" />
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-grid reveal">
+            <div class="glass-panel grid-card">
+                <div class="icon-wrapper">
+                    <div class="anim-radar"></div>
+                </div>
+                <h3>Gamified Strengths</h3>
+                <p>Use beautiful, interactive radar charts to visualize a student's true academic balance at a single glance.</p>
+            </div>
+            
+            <div class="glass-panel grid-card">
+                <div class="icon-wrapper">
+                    <div class="anim-donut"></div>
+                </div>
+                <h3>Grade Distribution</h3>
+                <p>Break down performance by assignment types or subjects using sleek, animated doughnut charts.</p>
+            </div>
+
+            <div class="glass-panel grid-card">
+                <div class="icon-wrapper">
+                    <svg class="anim-sparkline" viewBox="0 0 100 50">
+                        <path class="spark-path" d="M 0,25 L 20,25 L 30,10 L 45,45 L 60,5 L 70,25 L 100,25" />
+                    </svg>
+                </div>
+                <h3>The Volatility Tracker</h3>
+                <p>Is the student consistent or unpredictable? Track grade volatility over time with dynamic line graphs to spot sudden drops early.</p>
+            </div>
+        </section>
+
+        <section class="glass-panel advantage-section reveal">
+            <h2>Stop Reading Numbers. <br><span class="cyan-gradient-text">Start Reading Habits.</span></h2>
+            <p style="max-width: 800px; margin: 0 auto;">A traditional report card stating '75%' tells you nothing about how a student got there. Paper Buddy’s deep analytics tell a comprehensive story about the student's learning habits, empowering teachers and parents to provide precise, targeted support rather than guessing.</p>
+        </section>
+
+        <nav class="glass-panel" style="padding: 1.5rem; border-radius: 50px;">
+            <div class="nav-buttons">
+                <a href="notification.html" class="btn">← Previous Page (Notification)</a>
+                <a href="profile.html" class="btn">Next Page: Student Profile →</a>
+            </div>
+        </nav>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+            
+            // Trigger first element if visible on load
+            setTimeout(() => {
+                const rect = revealElements[0].getBoundingClientRect();
+                if(rect.top < window.innerHeight) {
+                    revealElements[0].classList.add('active');
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

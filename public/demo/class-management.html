@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Class Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === CSS Variables === */
+        :root {
+            --bg-dark: #050a15;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --cyan-light: #00f2fe;
+            --blue-deep: #4facfe;
+            --gradient-text: linear-gradient(135deg, var(--cyan-light), var(--blue-deep));
+        }
+
+        /* === Global Resets === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 15% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(79, 172, 254, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+            height: 320vh; /* Scroll depth for the 3D split animation */
+        }
+
+        /* Ambient Particle Background */
+        .particles-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; opacity: 0.4;
+            background-image: radial-gradient(var(--cyan-light) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: particleFloat 40s linear infinite;
+        }
+        @keyframes particleFloat { 0% { background-position: 0 0; } 100% { background-position: 1000px 1000px; } }
+
+        /* === Utilities === */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 10; }
+        .text-gradient { background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
+        
+        .glass-panel {
+            background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .section-wrapper { min-height: 100vh; display: flex; align-items: center; position: relative; }
+
+        /* === Header === */
+        header { position: fixed; top: 0; width: 100%; padding: 1.2rem 0; z-index: 100; background: rgba(5, 10, 21, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border); }
+        .logo { display: flex; align-items: center; gap: 0.8rem; font-size: 1.4rem; font-weight: 700; color: var(--text-main); text-decoration: none; }
+        .logo i { color: var(--cyan-light); font-size: 1.6rem; }
+
+        /* === Section 1: Hero === */
+        .hero-text { max-width: 50%; padding-top: 100px; }
+        .hero-text h1 { font-size: 3.5rem; line-height: 1.2; margin-bottom: 1.5rem; font-weight: 700; }
+        .hero-text p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2rem; }
+
+        /* === Section 2: Features Grid (Target Boxes) === */
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; width: 100%; }
+        
+        .feature-card { 
+            padding: 2.5rem; height: 380px; 
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            will-change: opacity, transform; transition: border-color 0.3s;
+        }
+        .feature-icon-wrapper {
+            width: 60px; height: 60px; border-radius: 16px; background: rgba(0, 242, 254, 0.1);
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--cyan-light); margin-bottom: 1.5rem;
+        }
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+        .feature-card p { color: var(--text-muted); font-size: 1rem; }
+
+        /* === Section 3: Highlight === */
+        .highlight-section { min-height: 60vh; display: flex; justify-content: center; align-items: center; }
+        .highlight-card { max-width: 900px; padding: 4rem 3rem; text-align: center; background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0, 242, 254, 0.05) 100%); border: 1px solid rgba(0, 242, 254, 0.2); position: relative; overflow: hidden; }
+        .highlight-card h2 { font-size: 3rem; margin-bottom: 1.5rem; }
+        .highlight-card p { font-size: 1.25rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* === Section 4: Bottom Navigation === */
+        .bottom-nav { margin: 50px auto 100px; padding: 1.5rem; display: flex; justify-content: center; gap: 1.5rem; border-radius: 50px; max-width: 800px; }
+        .btn { display: inline-flex; align-items: center; gap: 10px; padding: 1rem 2rem; border-radius: 30px; font-size: 1.1rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .btn-prev { color: var(--text-main); border: 1px solid var(--glass-border); background: transparent; }
+        .btn-prev:hover { background: var(--glass-bg); transform: scale(1.02); }
+        .btn-next { background: var(--gradient-text); color: #000; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); animation: pulseGlow 2s infinite; }
+        .btn-next:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 242, 254, 0.7); }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); } 50% { box-shadow: 0 0 25px rgba(0, 242, 254, 0.6); } }
+
+        /* ================= 3D PHONE SPLITTING ARCHITECTURE ================= */
+        #scene-3d { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 50; perspective: 1000px; }
+        
+        .phone-pivot {
+            position: absolute; top: 50%; left: 50%;
+            width: 180px; height: 360px;
+            margin-top: -180px; margin-left: -90px;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        /* Phone Faces */
+        .phone-face { position: absolute; display: flex; justify-content: center; align-items: center; border-radius: 25px; backface-visibility: hidden; }
+        .face-front, .face-back { width: 180px; height: 360px; border: 2px solid #333; background: #0a0a0a; }
+        .face-front { transform: translateZ(8px); box-shadow: inset 0 0 15px rgba(0,0,0,0.8); overflow: hidden;}
+        .face-back { transform: rotateY(180deg) translateZ(8px); background: linear-gradient(135deg, #111, #222); box-shadow: 0 0 40px rgba(0,242,254,0.1); }
+        .face-left, .face-right { width: 16px; height: 320px; background: #2a2a2a; border-radius: 0; top: 20px; }
+        .face-left { transform: rotateY(-90deg) translateZ(90px); }
+        .face-right { transform: rotateY(90deg) translateZ(90px); }
+        .face-top, .face-bottom { width: 140px; height: 16px; background: #2a2a2a; border-radius: 0; left: 20px; }
+        .face-top { transform: rotateX(90deg) translateZ(180px); }
+        .face-bottom { transform: rotateX(-90deg) translateZ(180px); }
+
+        /* Glass Screen Base */
+        .screen-glass {
+            width: 168px; height: 348px; background: #060b17; border-radius: 20px;
+            position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 70px; height: 15px; background: #000; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; z-index: 10; }
+
+        /* Screen UI Layers (Fading Logic) */
+        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 25px 12px 10px; display: flex; flex-direction: column; gap: 10px; opacity: 0; transition: opacity 0.5s ease; }
+        
+        /* Hero UI (Active initially on ALL phones) */
+        .ui-hero { display: flex; flex-direction: column; gap: 8px; }
+        .mock-header { width: 60%; height: 10px; background: var(--glass-bg); border-radius: 5px; margin-bottom: 5px; }
+        .mock-row { background: var(--glass-bg); border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.02); animation: scrollUp 4s linear infinite; }
+        .mock-row-col { display: flex; flex-direction: column; gap: 4px; }
+        .mock-line-1 { width: 40px; height: 8px; background: var(--gradient-text); border-radius: 4px; }
+        .mock-line-2 { width: 30px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; }
+        .mock-circle { width: 20px; height: 20px; border-radius: 50%; background: var(--glass-border); }
+        @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-45px); } }
+
+        /* Docked UI 1: Insights */
+        .ui-insights { background: radial-gradient(circle at top, rgba(0, 242, 254, 0.1), transparent); }
+        .ins-chart { display: flex; align-items: flex-end; justify-content: space-around; height: 80px; padding-bottom: 10px; border-bottom: 1px solid var(--glass-border); margin-top: 20px;}
+        .ins-bar { width: 20px; background: var(--gradient-text); border-radius: 4px 4px 0 0; }
+        
+        /* Docked UI 2: Metrics */
+        .ui-metrics { justify-content: center; align-items: center; background: radial-gradient(circle at center, rgba(79, 172, 254, 0.1), transparent); }
+        .met-ring { width: 80px; height: 80px; border-radius: 50%; border: 6px solid var(--glass-border); border-top-color: var(--cyan-light); border-right-color: var(--cyan-light); transform: rotate(45deg); box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); }
+        .met-text { font-size: 10px; color: var(--cyan-light); margin-top: 15px; font-weight: bold; }
+
+        /* Docked UI 3: Toggles */
+        .ui-toggles { padding-top: 40px; gap: 15px; }
+        .tog-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--glass-bg); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .tog-text { width: 50px; height: 8px; background: #fff; border-radius: 4px; opacity: 0.8; }
+        .tog-switch { width: 30px; height: 16px; background: var(--cyan-light); border-radius: 8px; position: relative; box-shadow: 0 0 10px rgba(0,242,254,0.3); }
+        .tog-knob { width: 12px; height: 12px; background: #fff; border-radius: 50%; position: absolute; top: 2px; right: 2px; }
+
+        /* Responsive Grid adjustments */
+        @media (max-width: 900px) {
+            .hero-text { max-width: 100%; text-align: center; }
+            .grid-container { grid-template-columns: 1fr; }
+            /* Hide 3D on mobile for performance/layout sanity, show regular grid */
+            #scene-3d { display: none; }
+            .feature-card { height: auto; opacity: 1 !important; transform: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="particles-bg"></div>
+
+     <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <div id="scene-3d">
+        <div class="phone-pivot" id="phone1">
+            <div class="phone-face face-front">
+                <div class="screen-glass">
+                    <div class="notch"></div>
+                    <div class="ui-layer ui-hero" id="heroUI1">
+                        <div class="mock-header"></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1"></div><div class="mock-line-2"></div></div><div class="mock-circle"></div></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1" style="width: 30px;"></div><div class="mock-line-2"></div></div><div class="mock-circle"></div></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1"></div><div class="mock-line-2" style="width: 20px;"></div></div><div class="mock-circle"></div></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1"></div><div class="mock-line-2"></div></div><div class="mock-circle"></div></div>
+                    </div>
+                    <div class="ui-layer ui-insights" id="specUI1">
+                        <div class="mock-header" style="width: 100%; text-align:center; color: #00f2fe; font-size: 10px;">Deep Insights</div>
+                        <div class="ins-chart">
+                            <div class="ins-bar" style="height: 40%;"></div>
+                            <div class="ins-bar" style="height: 70%;"></div>
+                            <div class="ins-bar" style="height: 90%;"></div>
+                            <div class="ins-bar" style="height: 50%;"></div>
+                        </div>
+                        <div class="mock-line-2" style="width: 80%; margin: 10px auto;"></div>
+                        <div class="mock-line-2" style="width: 60%; margin: 0 auto;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="phone-face face-back"></div><div class="phone-face face-left"></div><div class="phone-face face-right"></div><div class="phone-face face-top"></div><div class="phone-face face-bottom"></div>
+        </div>
+
+        <div class="phone-pivot" id="phone2">
+            <div class="phone-face face-front">
+                <div class="screen-glass">
+                    <div class="notch"></div>
+                    <div class="ui-layer ui-hero" id="heroUI2">
+                        <div class="mock-header"></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1"></div><div class="mock-line-2"></div></div><div class="mock-circle"></div></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1" style="width: 30px;"></div><div class="mock-line-2"></div></div><div class="mock-circle"></div></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1"></div><div class="mock-line-2" style="width: 20px;"></div></div><div class="mock-circle"></div></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1"></div><div class="mock-line-2"></div></div><div class="mock-circle"></div></div>
+                    </div>
+                    <div class="ui-layer ui-metrics" id="specUI2">
+                        <div class="met-ring"></div>
+                        <div class="met-text">85% Health Score</div>
+                        <div class="mock-line-2" style="width: 50%; margin-top: 20px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="phone-face face-back"></div><div class="phone-face face-left"></div><div class="phone-face face-right"></div><div class="phone-face face-top"></div><div class="phone-face face-bottom"></div>
+        </div>
+
+        <div class="phone-pivot" id="phone3">
+            <div class="phone-face face-front">
+                <div class="screen-glass">
+                    <div class="notch"></div>
+                    <div class="ui-layer ui-hero" id="heroUI3">
+                        <div class="mock-header"></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1"></div><div class="mock-line-2"></div></div><div class="mock-circle"></div></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1" style="width: 30px;"></div><div class="mock-line-2"></div></div><div class="mock-circle"></div></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1"></div><div class="mock-line-2" style="width: 20px;"></div></div><div class="mock-circle"></div></div>
+                        <div class="mock-row"><div class="mock-row-col"><div class="mock-line-1"></div><div class="mock-line-2"></div></div><div class="mock-circle"></div></div>
+                    </div>
+                    <div class="ui-layer ui-toggles" id="specUI3">
+                        <div class="tog-row"><div class="tog-text"></div><div class="tog-switch"><div class="tog-knob"></div></div></div>
+                        <div class="tog-row"><div class="tog-text" style="width: 40px;"></div><div class="tog-switch" style="background: rgba(255,255,255,0.2); box-shadow:none;"><div class="tog-knob" style="left:2px; right:auto;"></div></div></div>
+                        <div class="tog-row"><div class="tog-text" style="width: 60px;"></div><div class="tog-switch"><div class="tog-knob"></div></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="phone-face face-back"></div><div class="phone-face face-left"></div><div class="phone-face face-right"></div><div class="phone-face face-top"></div><div class="phone-face face-bottom"></div>
+        </div>
+    </div>
+
+    <main>
+        <section class="section-wrapper container">
+            <div class="hero-text">
+                <h1>Class Manager:<br><span class="text-gradient">Your Digital Ledger</span></h1>
+                <p>Manage every single class, section, assigned class teacher, and subject list from one centralized, lightning-fast hub. Total oversight has never looked this good.</p>
+            </div>
+        </section>
+
+        <section class="section-wrapper container" id="features-target">
+            <div class="grid-container">
+                <div class="glass-panel feature-card" id="box1">
+                    <div class="feature-icon-wrapper"><i class="fa-solid fa-users-viewfinder"></i></div>
+                    <h3>Deep Insights</h3>
+                    <p>View total students, assigned subjects, and dedicated class teachers at a single glance.</p>
+                </div>
+                <div class="glass-panel feature-card" id="box2">
+                    <div class="feature-icon-wrapper"><i class="fa-solid fa-chart-line"></i></div>
+                    <h3>Health Metrics</h3>
+                    <p>Track individual class academic performance and monitor real-time fee payment statuses.</p>
+                </div>
+                <div class="glass-panel feature-card" id="box3">
+                    <div class="feature-icon-wrapper"><i class="fa-solid fa-sliders"></i></div>
+                    <h3>One-Tap Control</h3>
+                    <p>Quickly activate or deactivate entire classes with a simple, secure toggle switch.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="highlight-section container">
+            <div class="glass-panel highlight-card">
+                <h2>Instant Answers, <span class="text-gradient">Zero Hassle.</span></h2>
+                <p>Say goodbye to heavy, physical class registers. If a parent calls asking about their child's assigned subjects or who their class teacher is, you no longer need to dig through dusty filing cabinets. Open the Paper Buddy app, and you can provide accurate answers in exactly two seconds.</p>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="glass-panel bottom-nav">
+                <a href="attendance.html" class="btn btn-prev">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Page (Attendance)
+                </a>
+                <a href="timetable.html" class="btn btn-next">
+                    Next Page: Timetable <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if mobile (disable 3D math if grid is stacked to avoid overlap issues)
+            if(window.innerWidth <= 900) return;
+
+            const phones = [
+                document.getElementById('phone1'),
+                document.getElementById('phone2'),
+                document.getElementById('phone3')
+            ];
+            
+            const boxes = [
+                document.getElementById('box1'),
+                document.getElementById('box2'),
+                document.getElementById('box3')
+            ];
+
+            const uis = [
+                { hero: document.getElementById('heroUI1'), spec: document.getElementById('specUI1') },
+                { hero: document.getElementById('heroUI2'), spec: document.getElementById('specUI2') },
+                { hero: document.getElementById('heroUI3'), spec: document.getElementById('specUI3') }
+            ];
+
+            const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
+
+            function updateSplittingScene() {
+                const scrollY = window.scrollY;
+                const maxScroll = document.body.scrollHeight - window.innerHeight;
+                let progress = Math.max(0, Math.min(1, scrollY / maxScroll));
+
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+
+                // Hero State: All phones stacked on the right side
+                const heroX = w * 0.25;
+                const heroY = 0;
+                const heroRotX = 10;
+                const heroRotY = -20;
+                const heroRotZ = 10;
+
+                // Define transition phases
+                // 0.0 -> 0.15: Stable at Hero
+                // 0.15 -> 0.45: Splitting & Moving to boxes
+                // 0.45 -> 1.0: Locked into box positions
+                let localP = 0;
+                if (progress > 0.15) {
+                    localP = (progress - 0.15) / 0.30;
+                }
+                localP = Math.max(0, Math.min(1, localP));
+
+                // Ease Out Cubic for smooth docking
+                const easeOut = 1 - Math.pow(1 - localP, 3);
+
+                phones.forEach((phone, index) => {
+                    const box = boxes[index];
+                    const rect = box.getBoundingClientRect();
+
+                    // Calculate target exact pixel position (center of target box)
+                    const targetX = (rect.left + rect.width / 2) - (w / 2);
+                    const targetY = (rect.top + rect.height / 2) - (h / 2);
+
+                    // Interpolate coordinates
+                    const currentX = lerp(heroX, targetX, easeOut);
+                    const currentY = lerp(heroY, targetY, easeOut);
+                    
+                    // Flatten rotations as they dock into the 2D grid
+                    const currentRotX = lerp(heroRotX, 0, easeOut);
+                    const currentRotY = lerp(heroRotY, 0, easeOut);
+                    const currentRotZ = lerp(heroRotZ, 0, easeOut);
+
+                    // Apply transform
+                    phone.style.transform = `
+                        translate3d(${currentX}px, ${currentY}px, 0)
+                        rotateX(${currentRotX}deg)
+                        rotateY(${currentRotY}deg)
+                        rotateZ(${currentRotZ}deg)
+                    `;
+
+                    // Handle UI Crossfading (Hero UI fades out, Specific UI fades in)
+                    if (easeOut > 0.3) {
+                        uis[index].hero.style.opacity = 0;
+                        uis[index].spec.style.opacity = 1;
+                    } else {
+                        uis[index].hero.style.opacity = 1;
+                        uis[index].spec.style.opacity = 0;
+                    }
+
+                    // Handle Box Fading
+                    // Boxes start fading at localP = 0.5, fully gone by 0.9
+                    let fadeP = (easeOut - 0.5) / 0.4;
+                    fadeP = Math.max(0, Math.min(1, fadeP));
+                    
+                    box.style.opacity = 1 - fadeP;
+                    box.style.transform = `scale(${1 - (fadeP * 0.1)})`; // Slight shrink
+                });
+            }
+
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        updateSplittingScene();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+
+            window.addEventListener('resize', updateSplittingScene);
+            
+            // Init UIs
+            uis.forEach(ui => { ui.hero.style.opacity = 1; ui.spec.style.opacity = 0; });
+            updateSplittingScene();
+        });
+    </script>
+</body>
+</html>

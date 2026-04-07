@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Grading & Analytics Engine</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & THEME SETUP
+           ========================================================================== */
+        :root {
+            /* Core Colors */
+            --bg-cosmic: #0A0F1C;
+            --bg-panel: rgba(16, 23, 40, 0.5);
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            
+            /* Gradients & Accents */
+            --cyan-primary: #00E5FF;
+            --cyan-secondary: #0077FF;
+            --purple-primary: #9D00FF;
+            --purple-secondary: #5B00FF;
+            
+            --grad-cyan-blue: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
+            --grad-purple-blue: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary));
+            
+            /* Status Colors */
+            --status-red: #FF3B30;
+            --status-green: #00E676;
+            --status-amber: #FFAB00;
+
+            /* Glassmorphism */
+            --glass-border: rgba(0, 229, 255, 0.15);
+            --glass-border-hover: rgba(0, 229, 255, 0.4);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            --blur-amount: blur(16px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-cosmic);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* Animated Cosmic Dot-Grid Background */
+        .cosmic-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(rgba(0, 229, 255, 0.15) 1px, transparent 1px),
+                radial-gradient(rgba(157, 0, 255, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px, 60px 60px;
+            background-position: 0 0, 20px 20px;
+            z-index: -1;
+            animation: cosmicDrift 60s linear infinite;
+        }
+
+        /* Ambient Glow Blobs */
+        .glow-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: pulseGlow 8s ease-in-out infinite alternate;
+        }
+        .glow-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: rgba(0, 229, 255, 0.15); }
+        .glow-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: rgba(91, 0, 255, 0.15); animation-delay: -4s; }
+
+        @keyframes cosmicDrift {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-40px); }
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        /* ==========================================================================
+           2. TYPOGRAPHY & UTILITIES
+           ========================================================================== */
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 700; }
+        p { color: var(--text-muted); }
+
+        .text-gradient {
+            background: var(--grad-cyan-blue);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .glass-card {
+            background: var(--bg-panel);
+            backdrop-filter: var(--blur-amount);
+            -webkit-backdrop-filter: var(--blur-amount);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           3. HEADER & NAVIGATION
+           ========================================================================== */
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 16px 0;
+            background: rgba(10, 15, 28, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        /* CSS Origami Bird Logo */
+        .origami-logo {
+            width: 36px; height: 36px;
+            position: relative;
+            filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.5));
+        }
+        .origami-logo::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 28px solid var(--cyan-primary);
+            transform: rotate(45deg);
+        }
+        .origami-logo::after {
+            content: ''; position: absolute; top: 5px; left: 5px;
+            border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 24px solid var(--cyan-secondary);
+            transform: rotate(-15deg);
+            opacity: 0.9;
+        }
+
+        .brand-name {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+        }
+
+        .badge-admin {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-download {
+            background: var(--grad-purple-blue);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(91, 0, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(91, 0, 255, 0.6);
+        }
+
+        /* ==========================================================================
+           4. HERO SECTION & 3D MOCKUP
+           ========================================================================== */
+        .hero {
+            padding: 140px 0 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero-sub {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            max-width: 750px;
+            margin: 0 auto 50px;
+        }
+
+        /* 3D Tablet Mockup */
+        .mockup-container {
+            perspective: 2000px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .tablet-device {
+            width: 900px;
+            max-width: 90%;
+            height: 500px;
+            background: #050811;
+            border-radius: 30px;
+            border: 12px solid #1C2436;
+            box-shadow: 
+                0 50px 100px rgba(0,0,0,0.8),
+                inset 0 0 0 2px rgba(255,255,255,0.05),
+                0 0 40px rgba(0, 229, 255, 0.15);
+            transform: rotateX(15deg) rotateY(0deg) translateY(0);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .tablet-device:hover {
+            transform: rotateX(5deg) rotateY(0deg) translateY(-10px);
+            box-shadow: 
+                0 60px 120px rgba(0,0,0,0.9),
+                inset 0 0 0 2px rgba(255,255,255,0.05),
+                0 0 60px rgba(0, 229, 255, 0.3);
+        }
+
+        .tablet-notch {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 100px; height: 15px;
+            background: #1C2436;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            z-index: 10;
+        }
+
+        .tablet-screen {
+            flex: 1;
+            background: linear-gradient(180deg, #0A0F1C 0%, #131B2F 100%);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Mockup Internals: Gradebook UI */
+        .gb-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 20px;
+        }
+
+        .gb-title { text-align: left; }
+        .gb-title h3 { font-size: 1.2rem; margin-bottom: 4px; }
+        .gb-title p { font-size: 0.8rem; color: var(--cyan-primary); }
+
+        .gb-avg {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 12px;
+            text-align: right;
+            transition: all 0.3s ease;
+        }
+        .gb-avg.highlight {
+            background: rgba(0, 230, 118, 0.2);
+            border-color: var(--status-green);
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.4);
+        }
+
+        .gb-avg span { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); }
+        .gb-avg strong { display: block; font-size: 1.6rem; color: var(--text-main); font-weight: 700; transition: color 0.3s;}
+        .gb-avg.highlight strong { color: var(--status-green); }
+
+        .gb-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .gb-table th { font-size: 0.8rem; color: var(--text-muted); padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .gb-table td { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 0.95rem; }
+        
+        .gb-cell {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 60px; height: 36px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .gb-cell.active {
+            border-color: var(--cyan-primary);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        .typing-cursor {
+            width: 2px; height: 18px; background: var(--text-main);
+            animation: blink 1s infinite;
+            display: none;
+        }
+        .gb-cell.active .typing-cursor { display: block; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Simulated Cursor */
+        .mouse-cursor {
+            position: absolute;
+            width: 24px; height: 24px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            z-index: 100;
+            top: 70%; left: 80%;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* ==========================================================================
+           5. ZERO ERRORS HIGHLIGHT SECTION
+           ========================================================================== */
+        .zero-errors {
+            padding: 100px 0;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .ze-text { flex: 1; }
+        .ze-text h2 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 20px; }
+        .ze-text p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; }
+
+        .ze-visual {
+            flex: 1;
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visual-card {
+            width: 100%;
+            max-width: 450px;
+            height: 100%;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .raw-score-col {
+            display: flex; flex-direction: column; gap: 10px; width: 40%;
+            border-right: 1px dashed rgba(255,255,255,0.1);
+            padding-right: 15px;
+        }
+
+        .raw-item {
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center;
+            font-family: monospace; font-size: 1.1rem; border: 1px solid transparent;
+            transition: all 0.4s ease;
+        }
+
+        .visual-card.animate .raw-item {
+            border-color: var(--cyan-primary);
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .glow-panel {
+            position: absolute;
+            right: -100%; top: 30px; bottom: 30px; width: 55%;
+            background: rgba(0, 229, 255, 0.05);
+            border-left: 2px solid var(--cyan-primary);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex; flex-direction: column; justify-content: center; gap: 20px;
+            transition: right 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: -10px 0 30px rgba(0, 229, 255, 0.1);
+        }
+
+        .visual-card.animate .glow-panel { right: 0; }
+
+        .gp-item { display: flex; flex-direction: column; gap: 5px; }
+        .gp-label { font-size: 0.7rem; color: var(--cyan-primary); text-transform: uppercase; letter-spacing: 1px; }
+        .gp-val { font-size: 1.4rem; font-weight: 700; color: #fff; }
+
+        /* ==========================================================================
+           6. CORE FEATURES GRID
+           ========================================================================== */
+        .features-grid {
+            padding: 80px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .feat-card {
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            cursor: default;
+        }
+
+        .feat-card:hover {
+            border-color: var(--glass-border-hover);
+            transform: translateY(-5px);
+        }
+
+        .feat-icon-box {
+            width: 70px; height: 70px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .feat-card h3 { font-size: 1.4rem; }
+
+        /* Feature Animations on Hover */
+        /* Card 1: Math Symbol */
+        .math-symbol { color: var(--cyan-primary); transition: all 0.4s; }
+        .feat-card:hover .math-symbol { text-shadow: 0 0 15px var(--cyan-primary); transform: scale(1.2); }
+        .feat-card:hover .icon-box-1 { background: rgba(0, 229, 255, 0.1); border-color: var(--cyan-primary); }
+
+        /* Card 2: Leaderboard */
+        .leaderboard-icon { color: var(--purple-primary); transition: all 0.4s; display: flex; flex-direction: column; gap: 4px; align-items: center;}
+        .lb-bar { width: 4px; background: currentColor; border-radius: 2px; transition: height 0.4s; }
+        .lb-bar:nth-child(1){height:10px;} .lb-bar:nth-child(2){height:20px;} .lb-bar:nth-child(3){height:15px;}
+        .feat-card:hover .lb-bar:nth-child(1){height:20px;} .feat-card:hover .lb-bar:nth-child(2){height:30px;} .feat-card:hover .lb-bar:nth-child(3){height:25px;}
+        .feat-card:hover .leaderboard-icon { color: #fff; filter: drop-shadow(0 0 10px var(--purple-primary)); transform: translateY(-5px); }
+        .feat-card:hover .icon-box-2 { background: rgba(157, 0, 255, 0.2); border-color: var(--purple-primary); }
+
+        /* Card 3: Missing Flag */
+        .missing-cell { width: 30px; height: 30px; border: 2px solid var(--text-muted); border-radius: 6px; position: relative; transition: all 0.4s; }
+        .warning-dot { 
+            position: absolute; top: -6px; right: -6px; width: 12px; height: 12px; 
+            background: var(--status-red); border-radius: 50%; opacity: 0;
+            box-shadow: 0 0 10px var(--status-red);
+        }
+        .feat-card:hover .missing-cell { border-color: var(--status-red); background: rgba(255, 59, 48, 0.1); }
+        .feat-card:hover .warning-dot { animation: pulseRed 1s infinite alternate; }
+        .feat-card:hover .icon-box-3 { border-color: rgba(255, 59, 48, 0.3); }
+
+        @keyframes pulseRed { 0% { opacity: 0.5; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+
+        /* ==========================================================================
+           7. THE ADVANTAGE SECTION
+           ========================================================================== */
+        .advantage-section {
+            padding: 80px 0;
+            margin: 60px 0;
+        }
+
+        .adv-box {
+            text-align: center;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .adv-box::before {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan-primary), transparent);
+        }
+        .adv-box::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan-primary), transparent);
+        }
+
+        .adv-box h2 { font-size: clamp(2rem, 3vw, 2.5rem); margin-bottom: 20px; }
+        .adv-box p { font-size: 1.15rem; color: var(--text-muted); max-width: 800px; margin: 0 auto; }
+
+        /* ==========================================================================
+           8. BOTTOM NAVIGATION
+           ========================================================================== */
+        .bottom-nav {
+            padding: 40px 0 100px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-glass-container {
+            display: flex;
+            gap: 20px;
+            padding: 15px 25px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pill-btn {
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.95rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pill-btn.next {
+            border-color: var(--cyan-primary);
+            animation: subtlePulse 3s infinite;
+        }
+
+        .pill-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: rgba(0, 229, 255, 0.1);
+            border-color: var(--cyan-primary);
+            box-shadow: 0 10px 20px rgba(0, 229, 255, 0.2);
+            color: #fff;
+        }
+
+        @keyframes subtlePulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 229, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+
+        /* ==========================================================================
+           9. RESPONSIVE DESIGN
+           ========================================================================== */
+        @media (max-width: 992px) {
+            .zero-errors { flex-direction: column; text-align: center; }
+            .raw-score-col { border-right: none; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 15px; width: 100%; flex-direction: row; justify-content: center;}
+            .glow-panel { top: auto; bottom: -100%; left: 0; right: 0; width: 100%; height: 50%; border-left: none; border-top: 2px solid var(--cyan-primary); flex-direction: row; flex-wrap: wrap; align-items: center;}
+            .visual-card.animate .glow-panel { bottom: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .tablet-device { height: 400px; transform: rotateX(5deg); }
+            .tablet-device:hover { transform: rotateX(2deg) translateY(-5px); }
+            .nav-glass-container { flex-direction: column; border-radius: 20px; padding: 20px; width: 100%; }
+            .pill-btn { text-align: center; }
+            .gb-table th:last-child, .gb-table td:last-child { display: none; /* Hide status column on small mobile to fit */ }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="cosmic-bg"></div>
+    <div class="glow-blob glow-1"></div>
+    <div class="glow-blob glow-2"></div>
+
+      <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <section class="hero container">
+        <div class="reveal">
+            <h1>Smart Grading & <br><span class="text-gradient">Analytics Engine</span></h1>
+            <p>A flawless digital gradebook for your entire institute. Enter marks instantly, eradicate calculation errors, and let the system do the heavy math for you.</p>
+        </div>
+
+        <div class="mockup-container reveal">
+            <div class="tablet-device">
+                <div class="tablet-notch"></div>
+                <div class="tablet-screen">
+                    <div class="gb-header">
+                        <div class="gb-title">
+                            <h3>Gradebook: Class 10-A</h3>
+                            <p>Subject: Mathematics | Mid-Term</p>
+                        </div>
+                        <div class="gb-avg" id="avg-badge">
+                            <span>Class Average</span>
+                            <strong id="avg-val">72%</strong>
+                        </div>
+                    </div>
+                    
+                    <table class="gb-table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Student Name</th>
+                                <th>Marks (100)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>01</td>
+                                <td>Aarav Sharma</td>
+                                <td>
+                                    <div class="gb-cell" id="target-cell">
+                                        <span id="typed-value"></span>
+                                        <div class="typing-cursor"></div>
+                                    </div>
+                                </td>
+                                <td><span id="status-val" style="color: var(--text-muted);">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>02</td>
+                                <td>Priya Singh</td>
+                                <td><div class="gb-cell">92</div></td>
+                                <td style="color: var(--status-green);">Evaluated</td>
+                            </tr>
+                            <tr>
+                                <td>03</td>
+                                <td>Rohan Desai</td>
+                                <td><div class="gb-cell">78</div></td>
+                                <td style="color: var(--status-green);">Evaluated</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mouse-cursor" id="sim-cursor"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="zero-errors container reveal">
+        <div class="ze-text">
+            <h2>Flawless Calculations.<br><span class="text-gradient">Zero Excel Headaches.</span></h2>
+            <p>Stop wasting hours on manual data entry and complex spreadsheet formulas. The system instantly auto-calculates averages and ranks students automatically, completely removing the risk of human error.</p>
+        </div>
+        <div class="ze-visual">
+            <div class="glass-card visual-card" id="calc-card">
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Raw Scores Input</div>
+                <div class="raw-score-col">
+                    <div class="raw-item">42/50</div>
+                    <div class="raw-item">38/50</div>
+                    <div class="raw-item">49/50</div>
+                </div>
+                
+                <div class="glow-panel">
+                    <div class="gp-item">
+                        <span class="gp-label">Total Percentage</span>
+                        <span class="gp-val">86.0%</span>
+                    </div>
+                    <div class="gp-item">
+                        <span class="gp-label">Class Rank</span>
+                        <span class="gp-val" style="color: var(--status-green);">#2</span>
+                    </div>
+                    <div class="gp-item">
+                        <span class="gp-label">Grade</span>
+                        <span class="gp-val" style="color: var(--cyan-primary);">A+</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-grid container">
+        <div class="glass-card feat-card reveal">
+            <div class="feat-icon-box icon-box-1">
+                <i class="fa-solid fa-calculator math-symbol"></i>
+            </div>
+            <h3>Real-Time Averages</h3>
+            <p>Instantly calculates individual percentages and class averages in real-time as marks are entered. Never touch a physical calculator again.</p>
+        </div>
+
+        <div class="glass-card feat-card reveal">
+            <div class="feat-icon-box icon-box-2">
+                <div class="leaderboard-icon">
+                    <i class="fa-solid fa-trophy" style="font-size: 1rem; margin-bottom: 2px;"></i>
+                    <div style="display:flex; gap:2px; align-items:flex-end; height: 20px;">
+                        <div class="lb-bar"></div><div class="lb-bar"></div><div class="lb-bar"></div>
+                    </div>
+                </div>
+            </div>
+            <h3>Automated Rank Sorting</h3>
+            <p>Sort the entire class list by rank or grade percentage with zero manual organization. Instantly identify top performers and those needing help.</p>
+        </div>
+
+        <div class="glass-card feat-card reveal">
+            <div class="feat-icon-box icon-box-3">
+                <div class="missing-cell">
+                    <div class="warning-dot"></div>
+                </div>
+            </div>
+            <h3>Missing Grade Flags</h3>
+            <p>Prevent incomplete results. The gradebook actively highlights empty cells with a glowing red alert so absolutely no student gets left behind.</p>
+        </div>
+    </section>
+
+    <section class="advantage-section container reveal">
+        <div class="adv-box">
+            <h2>The End of <span class="text-gradient">Red-Pen Math Mistakes.</span></h2>
+            <p>Teachers dread the end of the term because it means hours spent hunched over physical gradebooks, double-checking calculations. Paper Buddy’s digital gradebook eliminates human error entirely, guaranteeing perfectly calculated results and pristine reports every single time.</p>
+        </div>
+    </section>
+
+    <section class="bottom-nav container reveal">
+        <div class="nav-glass-container">
+            <a href="#" class="pill-btn">← Previous Page <span style="font-size:0.7em; font-weight:400; opacity:0.8; display:block;">(School Control Center)</span></a>
+            <a href="#" class="pill-btn next">Next Page: Report Cards → <span style="font-size:0.7em; font-weight:400; opacity:0.8; display:block;">(Automated Generation)</span></a>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            /* --- 1. Scroll Reveal Logic --- */
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+            
+            const revealObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('active');
+                    
+                    // Trigger calc animation if it's the zero-errors section
+                    if(entry.target.classList.contains('zero-errors')) {
+                        setTimeout(() => {
+                            document.getElementById('calc-card').classList.add('animate');
+                        }, 500);
+                    }
+                    
+                    observer.unobserve(entry.target);
+                });
+            }, revealOptions);
+
+            reveals.forEach(reveal => {
+                revealObserver.observe(reveal);
+            });
+
+            /* --- 2. Mockup Gradebook Automation Loop --- */
+            const cursor = document.getElementById('sim-cursor');
+            const cell = document.getElementById('target-cell');
+            const typedVal = document.getElementById('typed-value');
+            const statusVal = document.getElementById('status-val');
+            const avgBadge = document.getElementById('avg-badge');
+            const avgVal = document.getElementById('avg-val');
+
+            function runMockupAnimation() {
+                // Reset State
+                cursor.style.opacity = '0';
+                cursor.style.top = '70%';
+                cursor.style.left = '80%';
+                cursor.style.transform = 'scale(1)';
+                
+                cell.classList.remove('active');
+                typedVal.innerText = '';
+                statusVal.innerText = 'Pending';
+                statusVal.style.color = 'var(--text-muted)';
+                
+                avgBadge.classList.remove('highlight');
+                avgVal.innerText = '72%';
+
+                // Sequence
+                setTimeout(() => {
+                    // Move cursor in
+                    cursor.style.opacity = '1';
+                    cursor.style.top = '38%'; // Approximate position of the cell
+                    cursor.style.left = '52%';
+                }, 500);
+
+                setTimeout(() => {
+                    // Click
+                    cursor.style.transform = 'scale(0.8)';
+                    cursor.style.background = 'rgba(0, 229, 255, 0.5)';
+                }, 1300);
+
+                setTimeout(() => {
+                    // Release click, activate cell
+                    cursor.style.transform = 'scale(1)';
+                    cursor.style.background = 'rgba(255,255,255,0.2)';
+                    cell.classList.add('active');
+                    cursor.style.opacity = '0'; // Hide cursor while typing
+                }, 1600);
+
+                setTimeout(() => {
+                    // Type '8'
+                    typedVal.innerText = '8';
+                }, 2200);
+
+                setTimeout(() => {
+                    // Type '5'
+                    typedVal.innerText = '85';
+                }, 2500);
+
+                setTimeout(() => {
+                    // Done typing, update UI
+                    cell.classList.remove('active');
+                    statusVal.innerText = 'Evaluated';
+                    statusVal.style.color = 'var(--status-green)';
+                    
+                    // Flash Average
+                    avgBadge.classList.add('highlight');
+                    avgVal.innerText = '74%';
+                }, 3200);
+            }
+
+            // Start loop
+            runMockupAnimation();
+            setInterval(runMockupAnimation, 6000);
+        });
+    </script>
+</body>
+</html>

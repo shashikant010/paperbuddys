@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Admin Control Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           CSS VARIABLES & GLOBAL STYLES
+           ========================================= */
+        :root {
+            --bg-color: #0A0F1C;
+            --text-main: #FFFFFF;
+            --text-muted: #A0AEC0;
+            --cyan-primary: #00E5FF;
+            --cyan-secondary: #007BFF;
+            --purple-primary: #8A2BE2;
+            --purple-secondary: #4169E1;
+            
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(0, 229, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            
+            --cyan-gradient: linear-gradient(90deg, var(--cyan-primary), var(--cyan-secondary));
+            --purple-gradient: linear-gradient(90deg, var(--purple-primary), var(--purple-secondary));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Glowing Dots Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 200vw; height: 200vh;
+            background-image: radial-gradient(rgba(0, 229, 255, 0.2) 1.5px, transparent 1.5px);
+            background-size: 40px 40px;
+            z-index: -1;
+            animation: matrixDrift 100s linear infinite;
+        }
+
+        @keyframes matrixDrift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-50vw, -50vh); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .gradient-text {
+            background: var(--cyan-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* =========================================
+           HEADER
+           ========================================= */
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 16px 0;
+            background: rgba(10, 15, 28, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* CSS Drawn Origami Bird Logo */
+        .origami-bird {
+            width: 36px; height: 36px;
+            position: relative;
+            filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6));
+        }
+
+        .wing-top {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: var(--cyan-gradient);
+            clip-path: polygon(10% 50%, 50% 10%, 100% 40%, 60% 60%);
+        }
+
+        .wing-bottom {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: var(--purple-gradient);
+            clip-path: polygon(10% 50%, 60% 60%, 80% 90%, 30% 70%);
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .badge {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--cyan-primary);
+            color: var(--cyan-primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-download {
+            background: var(--purple-gradient);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.6);
+        }
+
+        /* =========================================
+           HERO SECTION & MOCKUP
+           ========================================= */
+        .hero {
+            padding: 140px 0 60px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            max-width: 700px;
+            margin: 0 auto 50px;
+        }
+
+        .mockup-wrapper {
+            perspective: 1500px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .tablet-mockup {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16/10;
+            background: #050811;
+            border-radius: 24px;
+            border: 12px solid #1C2538;
+            box-shadow: 
+                0 40px 80px rgba(0,0,0,0.8), 
+                inset 0 0 30px rgba(0, 229, 255, 0.1),
+                0 0 60px rgba(0, 229, 255, 0.2);
+            transform: rotateX(15deg) translateY(0);
+            transition: transform 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tablet-mockup:hover {
+            transform: rotateX(5deg) translateY(-10px);
+        }
+
+        .mockup-screen {
+            background: linear-gradient(180deg, #0A0F1C 0%, #111827 100%);
+            width: 100%; height: 100%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Mockup Internals Animation */
+        .mock-greeting {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: left;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 0.5s;
+        }
+
+        .mock-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            flex: 1;
+        }
+
+        .mock-widget {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            border-radius: 12px;
+            opacity: 0;
+            transform: translateY(20px);
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mock-widget::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0,229,255,0.1) 0%, transparent 60%);
+            animation: rotateGlow 4s linear infinite;
+        }
+
+        .mw-1 { animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1s; }
+        .mw-2 { animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1.2s; }
+        .mw-3 { animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1.4s; }
+        .mw-large { 
+            grid-column: 1 / -1; 
+            animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1.6s; 
+            display: flex; gap: 15px; flex-direction: column;
+        }
+
+        .mock-line {
+            height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1);
+            width: 100%;
+        }
+        .mock-line.short { width: 60%; background: rgba(0, 229, 255, 0.3); }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes popUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes rotateGlow { 100% { transform: rotate(360deg); } }
+
+        /* =========================================
+           HERO STAT CARD (SPLIT SECTION)
+           ========================================= */
+        .stat-section {
+            padding: 100px 0;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .stat-content p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .stat-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-stat-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated glowing border effect */
+        .hero-stat-card::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, var(--cyan-primary), transparent, var(--purple-primary), transparent);
+            z-index: -1;
+            border-radius: 18px;
+            background-size: 400%;
+            animation: borderGlow 6s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0 0; }
+            50% { background-position: 400% 0; }
+            100% { background-position: 0 0; }
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 15px;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .stat-value span.prefix, .stat-value span.suffix {
+            font-size: 1.5rem;
+            color: var(--cyan-primary);
+        }
+
+        /* =========================================
+           FEATURES GRID
+           ========================================= */
+        .features-grid {
+            padding: 60px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            padding: 40px 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.2);
+            border-color: rgba(0, 229, 255, 0.4);
+        }
+
+        .feature-anim-box {
+            height: 120px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Animations for Feature Boxes */
+        /* 1. Live Pulse Chart */
+        .live-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            height: 50px;
+        }
+        .bar {
+            width: 12px;
+            background: var(--cyan-primary);
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--cyan-primary);
+            animation: barPulse 1.5s infinite ease-in-out alternate;
+        }
+        .bar:nth-child(1) { height: 40%; animation-delay: 0s; }
+        .bar:nth-child(2) { height: 70%; animation-delay: 0.2s; }
+        .bar:nth-child(3) { height: 50%; animation-delay: 0.4s; }
+        .bar:nth-child(4) { height: 90%; animation-delay: 0.6s; }
+        .bar:nth-child(5) { height: 60%; animation-delay: 0.8s; }
+        
+        @keyframes barPulse { 0% { transform: scaleY(0.8); opacity: 0.7;} 100% { transform: scaleY(1.1); opacity: 1;} }
+
+        /* 2. Hovering Grid Icons */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .app-icon {
+            width: 30px; height: 30px;
+            background: rgba(138, 43, 226, 0.3);
+            border: 1px solid var(--purple-primary);
+            border-radius: 8px;
+            animation: floatIcon 3s infinite ease-in-out;
+        }
+        .app-icon:nth-child(2) { animation-delay: 0.5s; background: rgba(0, 229, 255, 0.2); border-color: var(--cyan-primary); }
+        .app-icon:nth-child(3) { animation-delay: 1s; background: rgba(0, 229, 255, 0.2); border-color: var(--cyan-primary); }
+        .app-icon:nth-child(4) { animation-delay: 1.5s; }
+
+        @keyframes floatIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+        /* 3. Sun/Moon Transition */
+        .greet-icon {
+            position: relative;
+            width: 60px; height: 60px;
+        }
+        .sun, .moon {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            transition: all 1s ease;
+        }
+        .sun {
+            background: #FFD700;
+            box-shadow: 0 0 20px #FFD700;
+            animation: rotateSun 10s linear infinite;
+        }
+        .moon {
+            background: #E2E8F0;
+            box-shadow: inset -10px -5px 0 0 #0A0F1C, 0 0 20px rgba(255,255,255,0.5);
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        
+        .feature-card:hover .sun { opacity: 0; transform: scale(0.5); }
+        .feature-card:hover .moon { opacity: 1; transform: scale(1); }
+
+        @keyframes rotateSun { 100% { transform: rotate(360deg); } }
+
+        /* =========================================
+           ADVANTAGE SECTION
+           ========================================= */
+        .advantage-section {
+            margin: 60px 0 100px;
+            padding: 80px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(0, 229, 255, 0.05) 0%, rgba(10, 15, 28, 0.8) 100%);
+            border-top: 1px solid var(--cyan-primary);
+            border-bottom: 1px solid var(--cyan-primary);
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.1);
+        }
+
+        .advantage-section h2 {
+            font-size: 2.8rem;
+            margin-bottom: 25px;
+        }
+
+        .advantage-section p {
+            max-width: 850px;
+            margin: 0 auto;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+        /* =========================================
+           BOTTOM NAVIGATION
+           ========================================= */
+        .bottom-nav {
+            display: flex;
+            justify-content: center;
+            padding-bottom: 80px;
+        }
+
+        .nav-pill-container {
+            padding: 10px;
+            border-radius: 60px;
+            display: inline-block;
+        }
+
+        .btn-next {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--cyan-primary);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+            animation: pulseGlow 2.5s infinite;
+        }
+
+        .btn-next::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--cyan-gradient);
+            border-radius: 50px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-next:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+            color: #0A0F1C;
+        }
+
+        .btn-next:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 229, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN
+           ========================================= */
+        @media (max-width: 992px) {
+            .stat-section {
+                flex-direction: column;
+                text-align: center;
+                gap: 40px;
+            }
+            .hero h1 { font-size: 3rem; }
+            .advantage-section h2 { font-size: 2.2rem; }
+            .tablet-mockup { aspect-ratio: 4/3; }
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2.2rem; }
+            .stat-value { font-size: 2.2rem; }
+            .btn-download { display: none; /* Hide on very small screens for space */ }
+            .tablet-mockup { transform: rotateX(5deg) translateY(0); }
+            .mock-grid { grid-template-columns: 1fr; }
+        }
+
+    </style>
+</head>
+<body>
+
+     <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <section class="hero container">
+        <div class="reveal">
+            <h1>School Control Center & <br><span class="gradient-text">Live Dashboard</span></h1>
+            <p>The ultimate command center for your institute. See the entire school’s health at a single glance with real-time data.</p>
+        </div>
+
+        <div class="mockup-wrapper reveal">
+            <div class="tablet-mockup">
+                <div class="mockup-screen">
+                    <div class="mock-greeting">Good Morning, Principal Sharma ✨</div>
+                    <div class="mock-grid">
+                        <div class="mock-widget mw-1">
+                            <div class="mock-line short" style="margin-bottom: 10px;"></div>
+                            <div class="mock-line" style="height: 20px;"></div>
+                        </div>
+                        <div class="mock-widget mw-2">
+                            <div class="mock-line short" style="margin-bottom: 10px;"></div>
+                            <div class="mock-line" style="height: 20px;"></div>
+                        </div>
+                        <div class="mock-widget mw-3">
+                            <div class="mock-line short" style="margin-bottom: 10px;"></div>
+                            <div class="mock-line" style="height: 20px;"></div>
+                        </div>
+                        <div class="mock-widget mw-large">
+                            <div class="mock-line short" style="width: 30%;"></div>
+                            <div class="mock-line" style="height: 60px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stat-section container reveal">
+        <div class="stat-content">
+            <h2 class="gradient-text">Instant Institute Overview.</h2>
+            <p>The second you open the app, the Hero Stat Card provides an instant, visually stunning summary of today's most critical metrics. No digging through menus, no calling the accounts department—just absolute, crystal-clear visibility.</p>
+        </div>
+        <div class="stat-visual">
+            <div class="hero-stat-card glass-panel">
+                <div class="stat-item">
+                    <div class="stat-label">Today's Attendance</div>
+                    <div class="stat-value">
+                        <span class="counter" data-target="94" data-duration="2000">0</span>
+                        <span class="suffix">%</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Fee Collections (Today)</div>
+                    <div class="stat-value">
+                        <span class="prefix">₹</span>
+                        <span class="counter" data-target="2.5" data-duration="2000" data-decimal="1">0.0</span>
+                        <span class="suffix">L</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Active Students</div>
+                    <div class="stat-value">
+                        <span class="counter" data-target="1205" data-duration="2000">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-grid container">
+        <div class="feature-card glass-panel reveal">
+            <div class="feature-anim-box">
+                <div class="live-chart">
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
+            </div>
+            <h3 class="gradient-text">Live Overview</h3>
+            <p>Instantly track attendance, fee collections, and total active students in real-time. Data flows seamlessly from classrooms to your dashboard.</p>
+        </div>
+
+        <div class="feature-card glass-panel reveal" style="transition-delay: 0.1s;">
+            <div class="feature-anim-box">
+                <div class="app-grid">
+                    <div class="app-icon"></div><div class="app-icon"></div>
+                    <div class="app-icon"></div><div class="app-icon"></div>
+                </div>
+            </div>
+            <h3 class="gradient-text">Quick-Action Shortcuts</h3>
+            <p>Jump to any crucial module instantly. Customize your dashboard with dynamic shortcuts to the communication and management tools you use most.</p>
+        </div>
+
+        <div class="feature-card glass-panel reveal" style="transition-delay: 0.2s;">
+            <div class="feature-anim-box">
+                <div class="greet-icon">
+                    <div class="sun"></div>
+                    <div class="moon"></div>
+                </div>
+            </div>
+            <h3 class="gradient-text">Personalized Greetings</h3>
+            <p>Start your day right with a premium, easy-to-read layout that greets you, adapts to the time of day, and intelligently highlights urgent pending tasks.</p>
+        </div>
+    </section>
+
+    <section class="advantage-section reveal">
+        <div class="container">
+            <h2 class="gradient-text">Stop Making Phone Calls for Data.</h2>
+            <p>Traditionally, principals have to call 5 different staff members just to get the day's attendance or fee collection numbers. Paper Buddy eliminates the wait. Everything you need to know is right on your phone or tablet in real-time, empowering you to make immediate, informed decisions.</p>
+        </div>
+    </section>
+
+    <div class="bottom-nav container reveal">
+        <div class="glass-panel nav-pill-container">
+            <a href="daily-collections.html" class="btn-next">Next Page: Daily Collections →</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Scroll Reveal Logic (Intersection Observer)
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const revealOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        
+                        // If the element contains counters, trigger them
+                        const counters = entry.target.querySelectorAll('.counter');
+                        if (counters.length > 0) {
+                            startCounters(counters);
+                        }
+                        
+                        observer.unobserve(entry.target); // Only animate once
+                    }
+                });
+            }, revealOptions);
+
+            revealElements.forEach(el => revealObserver.observe(el));
+
+            // 2. Animated Number Counters Logic
+            function startCounters(counters) {
+                counters.forEach(counter => {
+                    const target = parseFloat(counter.getAttribute('data-target'));
+                    const duration = parseInt(counter.getAttribute('data-duration')) || 2000;
+                    const isDecimal = counter.hasAttribute('data-decimal');
+                    
+                    let startTimestamp = null;
+                    
+                    const step = (timestamp) => {
+                        if (!startTimestamp) startTimestamp = timestamp;
+                        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                        
+                        // Easing function (easeOutQuart) for smoother stop
+                        const easeProgress = 1 - Math.pow(1 - progress, 4);
+                        const currentVal = easeProgress * target;
+                        
+                        if (isDecimal) {
+                            counter.innerText = currentVal.toFixed(1);
+                        } else {
+                            counter.innerText = Math.floor(currentVal).toLocaleString('en-IN'); // Format with commas
+                        }
+                        
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        } else {
+                            // Ensure final value is exact
+                            counter.innerText = isDecimal ? target.toFixed(1) : target.toLocaleString('en-IN');
+                        }
+                    };
+                    
+                    window.requestAnimationFrame(step);
+                });
+            }
+            
+        });
+    </script>
+</body>
+</html>

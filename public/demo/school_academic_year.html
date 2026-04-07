@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paper Buddy | Admin - School Profile</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      /* === CSS Variables === */
+      :root {
+        --bg-dark: #070c1a;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --text-main: #ffffff;
+        --text-muted: #a0aec0;
+        --cyan-light: #00f2fe;
+        --blue-deep: #4facfe;
+        --gradient-primary: linear-gradient(
+          135deg,
+          var(--cyan-light),
+          var(--blue-deep)
+        );
+      }
+
+      /* === Global Resets === */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        overflow-x: hidden;
+        line-height: 1.6;
+        background-image:
+          radial-gradient(
+            circle at 15% 50%,
+            rgba(0, 242, 254, 0.08),
+            transparent 25%
+          ),
+          radial-gradient(
+            circle at 85% 30%,
+            rgba(79, 172, 254, 0.08),
+            transparent 25%
+          );
+        background-attachment: fixed;
+        height: 380vh; /* Scroll depth for the 3D journey */
+      }
+
+      /* Ambient Particle Background */
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 1;
+        background: url('data:image/svg+xml;utf8,<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.3)"/><circle cx="150" cy="80" r="1.5" fill="rgba(255,255,255,0.2)"/><circle cx="300" cy="250" r="1" fill="rgba(255,255,255,0.4)"/><circle cx="80" cy="300" r="2" fill="rgba(0,242,254,0.3)"/><circle cx="350" cy="50" r="1" fill="rgba(79,172,254,0.3)"/></svg>');
+        animation: drift 100s linear infinite;
+      }
+      @keyframes drift {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 400px 400px;
+        }
+      }
+
+      /* === Typography & Layout Utilities === */
+      .text-gradient {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .glass-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* === Section Layouts === */
+      header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        padding: 1.5rem 0;
+        z-index: 100;
+        background: rgba(7, 12, 26, 0.8);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--glass-border);
+      }
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .logo i {
+        color: var(--cyan-light);
+      }
+
+      .section-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+      }
+
+      /* Hero */
+      .hero-text {
+        max-width: 50%;
+        padding-top: 100px;
+      }
+      .hero-text h1 {
+        font-size: 3.5rem;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+      }
+      .hero-text p {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+      }
+
+      /* Geofencing */
+      .geofence-section {
+        justify-content: flex-end;
+      }
+      .geofence-content {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .radar-card {
+        width: 350px;
+        height: 350px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        z-index: 60;
+        background: rgba(7, 12, 26, 0.6);
+      }
+      .geofence-text {
+        max-width: 45%;
+      }
+      .geofence-text h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+      .radar-center {
+        width: 20px;
+        height: 20px;
+        background: var(--cyan-light);
+        border-radius: 50%;
+        box-shadow: 0 0 20px var(--cyan-light);
+      }
+      .ripple {
+        position: absolute;
+        border: 2px solid var(--blue-deep);
+        border-radius: 50%;
+        animation: pulse 3s infinite;
+      }
+      .ripple:nth-child(2) {
+        animation-delay: 1s;
+      }
+      .ripple:nth-child(3) {
+        animation-delay: 2s;
+      }
+      @keyframes pulse {
+        0% {
+          width: 50px;
+          height: 50px;
+          opacity: 1;
+        }
+        100% {
+          width: 300px;
+          height: 300px;
+          opacity: 0;
+        }
+      }
+
+      /* Grid / Session */
+      .grid-section {
+        padding-top: 50px;
+      }
+      .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        width: 100%;
+      }
+      .grid-card {
+        padding: 3rem;
+        position: relative;
+        z-index: 60;
+        transition: border-color 0.3s ease;
+        will-change: opacity, transform;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 300px;
+      }
+      .grid-card:hover {
+        border-color: rgba(0, 242, 254, 0.4);
+      }
+      .card-icon {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        color: var(--cyan-light);
+      }
+
+      /* Footer Nav */
+      .bottom-nav {
+        margin: 100px auto;
+        padding: 2rem;
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+      }
+      .btn {
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        color: #fff;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn-prev {
+        border: 1px solid var(--glass-border);
+        background: transparent;
+      }
+      .btn-prev:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .btn-next {
+        background: var(--gradient-primary);
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        animation: glow 2s infinite;
+      }
+      @keyframes glow {
+        0%,
+        100% {
+          box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 30px rgba(0, 242, 254, 0.7);
+        }
+      }
+
+      /* === Reduced 3D Phone Architecture (200x420px) === */
+      #scene-3d {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 50;
+        perspective: 1000px;
+      }
+
+      .phone-pivot {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        /* Scaled down dimensions to look appropriate and fit in the box */
+        width: 200px;
+        height: 420px;
+        margin-top: -210px;
+        margin-left: -100px;
+        transform-style: preserve-3d;
+        will-change: transform;
+      }
+
+      .phone-face {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 30px;
+        backface-visibility: hidden;
+      }
+
+      .face-front,
+      .face-back {
+        width: 200px;
+        height: 420px;
+        border: 3px solid #333;
+        background: #0a0a0a;
+      }
+      .face-front {
+        transform: translateZ(8px);
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+        overflow: hidden;
+      }
+      .face-back {
+        transform: rotateY(180deg) translateZ(8px);
+        background: linear-gradient(135deg, #111, #222);
+        box-shadow: 0 0 40px rgba(0, 242, 254, 0.1);
+      }
+
+      .face-left,
+      .face-right {
+        width: 16px;
+        height: 380px;
+        background: #2a2a2a;
+        border-radius: 0;
+        top: 20px;
+      }
+      /* 100px is half of 200px width */
+      .face-left {
+        transform: rotateY(-90deg) translateZ(100px);
+      }
+      .face-right {
+        transform: rotateY(90deg) translateZ(100px);
+      }
+
+      .face-top,
+      .face-bottom {
+        width: 160px;
+        height: 16px;
+        background: #2a2a2a;
+        border-radius: 0;
+        left: 20px;
+      }
+      /* 210px is half of 420px height */
+      .face-top {
+        transform: rotateX(90deg) translateZ(210px);
+      }
+      .face-bottom {
+        transform: rotateX(-90deg) translateZ(210px);
+      }
+
+      /* Screen Elements */
+      .screen-glass {
+        width: 184px;
+        height: 404px;
+        background: #070c1a;
+        border-radius: 24px;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.05);
+      }
+      .notch {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70px;
+        height: 15px;
+        background: #000;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        z-index: 10;
+      }
+
+      .app-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        padding: 30px 15px 15px;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .app-screen.active {
+        opacity: 1;
+      }
+
+      /* UI Screen 1: Profile */
+      .ui-header {
+        height: 15px;
+        background: var(--glass-bg);
+        border-radius: 8px;
+        width: 70%;
+        margin-bottom: 5px;
+      }
+      .ui-row {
+        height: 35px;
+        background: var(--glass-bg);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .ui-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--blue-deep);
+      }
+      .ui-line {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+        flex: 1;
+      }
+      .ui-row.glow {
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        border-color: var(--cyan-light);
+      }
+
+      /* UI Screen 2: Map/Geofencing (Vertical layout) */
+      .ui-map-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+          45deg,
+          #070c1a,
+          #070c1a 10px,
+          #0a1128 10px,
+          #0a1128 20px
+        );
+        z-index: -1;
+      }
+      .ui-radar-ring {
+        width: 120px;
+        height: 120px;
+        border: 2px solid var(--cyan-light);
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: inset 0 0 15px rgba(0, 242, 254, 0.2);
+      }
+      .ui-pin {
+        width: 10px;
+        height: 10px;
+        background: var(--text-main);
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 10px #fff;
+      }
+
+      /* UI Screen 3: Replace Identity Box */
+      .ui-card-lg {
+        background: linear-gradient(
+          135deg,
+          rgba(79, 172, 254, 0.1),
+          rgba(0, 242, 254, 0.05)
+        );
+        border-radius: 12px;
+        padding: 20px 10px;
+        text-align: center;
+        border: 1px solid var(--cyan-light);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .ui-card-lg i {
+        font-size: 2.5rem;
+        color: var(--cyan-light);
+        margin-bottom: 15px;
+      }
+      .ui-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        text-align: center;
+      }
+      .ui-subtitle {
+        font-size: 10px;
+        color: var(--text-muted);
+        margin-top: 5px;
+        text-align: center;
+      }
+
+      .app-screen {
+        position: absolute;
+        top: 6%; /* adjust based on your phone frame */
+        left: 7%;
+        width: 86%;
+        height: 88%;
+        overflow: hidden;
+        border-radius: 28px; /* match phone inner radius */
+        background: black;
+      }
+
+      .screen-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* fills completely */
+        border-radius: 28px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="particles"></div>
+
+   <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <div id="scene-3d">
+      <div class="phone-pivot" id="phoneModel">
+        <div class="phone-face face-front">
+          <div class="screen-glass">
+            <div class="notch"></div>
+
+            <div class="app-screen active" id="screen1">
+              <img
+                src="screenshots/abc.jpeg"
+                alt="App Screenshot"
+                class="screen-image"
+              />
+            </div>
+            <div class="app-screen" id="screen2">
+              <div class="ui-map-bg"></div>
+              <div class="ui-radar-ring"></div>
+              <div class="ui-pin"></div>
+            </div>
+
+            <div class="app-screen" id="screen3" style="padding: 10px">
+              <div class="ui-card-lg">
+                <i class="fa-solid fa-shield-check"></i>
+                <div class="ui-title">Identity & Payments</div>
+                <div class="ui-subtitle">Secure Configuration Docked</div>
+                <div
+                  class="ui-line"
+                  style="
+                    background: rgba(0, 242, 254, 0.5);
+                    width: 40%;
+                    margin: 15px auto 0;
+                  "
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-face face-back"></div>
+        <div class="phone-face face-left"></div>
+        <div class="phone-face face-right"></div>
+        <div class="phone-face face-top"></div>
+        <div class="phone-face face-bottom"></div>
+      </div>
+    </div>
+
+    <main>
+      <section class="section-wrapper container">
+        <div class="hero-text">
+          <h1>
+            School Profile & <br /><span class="text-gradient"
+              >Academic Year</span
+            >
+          </h1>
+          <p>
+            Configure your school's identity, geographical location, and yearly
+            administrative sessions with absolute ease. Set it once, manage it
+            perfectly.
+          </p>
+        </div>
+      </section>
+
+      <section class="section-wrapper container geofence-section">
+        <div class="geofence-content">
+          <div class="glass-panel radar-card">
+            <div class="ripple"></div>
+            <div class="ripple"></div>
+            <div class="ripple"></div>
+            <div class="radar-center"></div>
+          </div>
+          <div class="geofence-text">
+            <h2 class="text-gradient">Smart Location-Based Check-in</h2>
+            <p>
+              Ensure foolproof accountability. Staff and faculty can only log
+              their attendance when they are physically inside the designated
+              school radius using their own devices.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-wrapper container grid-section">
+        <div class="grid-container">
+          <div class="glass-panel grid-card" id="identityBox">
+            <i class="fa-solid fa-shield-check card-icon"></i>
+            <h3>Identity & Payments</h3>
+            <p>
+              Set up your school's official branding, crest, and secure UPI
+              payment gateways in one unified dashboard.
+            </p>
+          </div>
+          <div class="glass-panel grid-card">
+            <i class="fa-solid fa-rotate card-icon"></i>
+            <h3>Session Management</h3>
+            <p>
+              Seamlessly transition between academic years without losing
+              historical data. Initialize new terms with a single click.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="container bottom-nav">
+        <a href="dashboard.html" class="btn btn-prev">← Previous Page</a>
+        <a href="class-management.html" class="btn btn-next"
+          >Next Page: Class Management →</a
+        >
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const phone = document.getElementById("phoneModel");
+        const identityBox = document.getElementById("identityBox");
+
+        const screens = [
+          document.getElementById("screen1"),
+          document.getElementById("screen2"),
+          document.getElementById("screen3"),
+        ];
+
+        const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
+
+        function updateScene() {
+          const scrollY = window.scrollY;
+          const maxScroll = document.body.scrollHeight - window.innerHeight;
+          let progress = Math.max(0, Math.min(1, scrollY / maxScroll));
+
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+
+          // Define standard scroll checkpoints in Absolute Pixel Offsets from center
+          const states = [
+            // 0: Hero Section (Right aligned, slightly angled)
+            {
+              p: 0.0,
+              x: w * 0.25,
+              y: 0,
+              rotX: 5,
+              rotY: -15,
+              rotZ: 5,
+              screen: 0,
+            },
+
+            // 1: Transition mid-point (Floating across)
+            {
+              p: 0.2,
+              x: 0,
+              y: h * 0.15,
+              rotX: 15,
+              rotY: 10,
+              rotZ: 15,
+              screen: 0,
+            },
+
+            // 2: Geofencing Section (Left aligned, 90 DEGREE VERTICAL = 0 rotZ, showing 3D edge)
+            {
+              p: 0.45,
+              x: -w * 0.25,
+              y: h * 0.1,
+              rotX: -5,
+              rotY: 35,
+              rotZ: 0,
+              screen: 1,
+            },
+          ];
+
+          let currentX = 0,
+            currentY = 0,
+            currentRotX = 0,
+            currentRotY = 0,
+            currentRotZ = 0;
+          let currentScreenIndex = 0;
+
+          if (progress <= states[2].p) {
+            // Stage 1: Interpolate through the first 3 fixed keyframes
+            let startFrame = states[0];
+            let endFrame = states[1];
+
+            if (progress > states[1].p) {
+              startFrame = states[1];
+              endFrame = states[2];
+            }
+
+            let localP =
+              (progress - startFrame.p) / (endFrame.p - startFrame.p);
+
+            currentX = lerp(startFrame.x, endFrame.x, localP);
+            currentY = lerp(startFrame.y, endFrame.y, localP);
+            currentRotX = lerp(startFrame.rotX, endFrame.rotX, localP);
+            currentRotY = lerp(startFrame.rotY, endFrame.rotY, localP);
+            currentRotZ = lerp(startFrame.rotZ, endFrame.rotZ, localP);
+
+            currentScreenIndex =
+              localP > 0.5 ? endFrame.screen : startFrame.screen;
+          } else {
+            // Stage 2: Dynamic Tracking & Docking (progress 0.45 to 1.00)
+            // We lerp from State 2 to the dynamic BoundingClientRect of the Identity Box.
+            const startFrame = states[2];
+
+            // The transition phase happens between 0.45 and 0.80. After 0.80, it stays docked.
+            let localP = (progress - 0.45) / 0.35;
+            localP = Math.max(0, Math.min(1, localP)); // Cap at 1
+
+            // Get exact screen coordinates of the box we are replacing
+            const boxRect = identityBox.getBoundingClientRect();
+
+            // Calculate pixel offset needed to move the phone (fixed center) to the box center
+            const targetX = boxRect.left + boxRect.width / 2 - w / 2;
+            const targetY = boxRect.top + boxRect.height / 2 - h / 2;
+
+            currentX = lerp(startFrame.x, targetX, localP);
+            currentY = lerp(startFrame.y, targetY, localP);
+
+            // Flatten out the rotations to perfectly match the 2D web layout
+            currentRotX = lerp(startFrame.rotX, 0, localP);
+            currentRotY = lerp(startFrame.rotY, 0, localP);
+            currentRotZ = lerp(startFrame.rotZ, 0, localP);
+
+            currentScreenIndex = localP > 0.5 ? 2 : 1; // Screen 3 acts as the box replacement
+          }
+
+          // Apply the calculated 3D transforms
+          phone.style.transform = `
+                    translate3d(${currentX}px, ${currentY}px, 0)
+                    rotateX(${currentRotX}deg)
+                    rotateY(${currentRotY}deg)
+                    rotateZ(${currentRotZ}deg)
+                `;
+
+          // Handle Screen Swapping
+          screens.forEach((screen, index) => {
+            if (index === currentScreenIndex) {
+              if (!screen.classList.contains("active"))
+                screen.classList.add("active");
+            } else {
+              screen.classList.remove("active");
+            }
+          });
+
+          // Handle Identity Box Disappearance
+          // Start fading the box slightly before the phone fully arrives (progress 0.65+)
+          if (progress > 0.65) {
+            let fadeP = (progress - 0.65) * 6.66; // Scales the 0.15 gap up to 1.0
+            let opacity = 1 - fadeP;
+
+            identityBox.style.opacity = Math.max(0, opacity);
+            identityBox.style.transform = `scale(${Math.max(0.9, 1 - fadeP * 0.1)})`; // Slight shrink
+            identityBox.style.pointerEvents = opacity < 0.5 ? "none" : "auto";
+          } else {
+            identityBox.style.opacity = 1;
+            identityBox.style.transform = "scale(1)";
+            identityBox.style.pointerEvents = "auto";
+          }
+        }
+
+        // High performance scroll listener
+        let ticking = false;
+        window.addEventListener("scroll", () => {
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              updateScene();
+              ticking = false;
+            });
+            ticking = true;
+          }
+        });
+
+        // Handle window resizing (recalculates docking target)
+        window.addEventListener("resize", updateScene);
+
+        // Initial Trigger
+        updateScene();
+      });
+    </script>
+  </body>
+</html>

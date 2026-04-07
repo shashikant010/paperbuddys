@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy - Fee Management & History</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === VARIABLES === */
+        :root {
+            --bg-dark: #0B0F19;
+            --text-main: #FFFFFF;
+            --text-sub: #A0ABC0;
+            --cyan-glow: #00FFFF;
+            --cyan-light: #87CEFA;
+            --red-alert: #FF4D4D;
+            --green-paid: #00E676;
+            --glass-bg: rgba(11, 15, 25, 0.4);
+            --glass-border: rgba(0, 255, 255, 0.15);
+            --panel-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        /* === GLOBAL RESET === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(circle at center, rgba(0, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-attachment: fixed;
+            line-height: 1.6;
+        }
+
+        /* === TYPOGRAPHY & GRADS === */
+        .cyan-gradient-text {
+            background: linear-gradient(90deg, var(--cyan-glow), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.2; margin-bottom: 1rem; }
+        h2 { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.3; margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        p { color: var(--text-sub); font-size: 1.1rem; margin-bottom: 1.5rem; }
+
+        /* === UI ELEMENTS === */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--panel-shadow);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section { padding: 6rem 0; }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === HEADER === */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .logo-cap {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--cyan-glow);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        .logo-cap::after {
+            content: ''; position: absolute;
+            width: 16px; height: 2px;
+            background: var(--cyan-glow);
+            bottom: -6px; right: -10px;
+            transform: rotate(-45deg);
+        }
+
+        .brand-text { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
+
+        /* === SECTION 1: HERO === */
+        .hero {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 4rem;
+        }
+        .hero p { max-width: 700px; margin: 0 auto 4rem auto; }
+
+        /* Animated Mobile Mockup */
+        .mobile-mockup {
+            width: 320px;
+            height: 650px;
+            background: #000;
+            border-radius: 40px;
+            border: 8px solid #1a2235;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+            transform: perspective(1000px) rotateX(10deg);
+            transition: transform 0.5s ease;
+        }
+        .mobile-mockup:hover { transform: perspective(1000px) rotateX(0deg) translateY(-10px); }
+        
+        .notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 130px; height: 25px; background: #1a2235;
+            border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .app-screen {
+            width: 100%; height: 100%; padding: 4rem 1.5rem 2rem;
+            background: linear-gradient(180deg, #0B0F19 0%, #111827 100%);
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+
+        .finance-card {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid var(--red-alert);
+            border-radius: 15px; padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.2);
+            animation: payStatusChange 8s infinite alternate;
+        }
+        .finance-card h4 { font-size: 0.9rem; margin-bottom: 5px; color: var(--text-sub);}
+        .finance-card .amount { font-size: 2.5rem; font-weight: 700; color: var(--red-alert); text-shadow: 0 0 10px rgba(255, 77, 77, 0.5); }
+        
+        .transaction-list { flex: 1; overflow: hidden; position: relative; margin-top: 1rem;}
+        .tx-item {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px; padding: 12px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.85rem;
+            animation: scrollList 10s infinite linear;
+        }
+        .tx-title { font-weight: 600; color: var(--text-main); }
+        .tx-date { font-size: 0.7rem; color: var(--text-sub); }
+        .tx-amt { color: var(--green-paid); font-weight: 600; }
+
+        @keyframes payStatusChange {
+            0%, 40% { background: rgba(255, 77, 77, 0.1); border-color: var(--red-alert); box-shadow: 0 0 20px rgba(255, 77, 77, 0.2); }
+            50%, 100% { background: rgba(0, 230, 118, 0.1); border-color: var(--green-paid); box-shadow: 0 0 20px rgba(0, 230, 118, 0.2); }
+        }
+        @keyframes scrollList {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
+        }
+
+        /* === SECTION 2: HERO FEATURE === */
+        .hero-feature {
+            display: flex; align-items: center; gap: 4rem; flex-wrap: wrap;
+        }
+        .feature-text { flex: 1; min-width: 300px; }
+        .feature-visual { flex: 1; min-width: 300px; display: flex; justify-content: center; }
+
+        .invoice-dashboard {
+            width: 100%; max-width: 450px; padding: 2.5rem; position: relative;
+        }
+        
+        .invoice-card {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 1.5rem; position: relative;
+            transform: translateY(20px); opacity: 0;
+            animation: popUpInvoice 4s infinite alternate ease-in-out;
+        }
+
+        .invoice-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem;}
+        .invoice-row.total { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; font-weight: 700; font-size: 1.1rem; color: var(--cyan-glow);}
+
+        .due-badge {
+            position: absolute; top: -15px; right: -15px;
+            background: var(--red-alert); color: #fff;
+            padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.6);
+            animation: pulseBadge 2s infinite;
+        }
+
+        @keyframes popUpInvoice {
+            0%, 20% { transform: translateY(30px); opacity: 0; }
+            40%, 100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pulseBadge {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 77, 77, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(255, 77, 77, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 77, 77, 0.4); }
+        }
+
+        /* === SECTION 3: FEATURES GRID === */
+        .features-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;
+        }
+
+        .grid-card {
+            padding: 2.5rem; text-align: center; transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .grid-card:hover { transform: translateY(-10px); border-color: var(--cyan-glow); }
+
+        .icon-wrapper { height: 90px; display: flex; justify-content: center; align-items: center; margin-bottom: 1.5rem; }
+
+        /* Icon Animations */
+        .anim-counter {
+            font-size: 2.5rem; font-weight: 700; color: var(--red-alert); text-shadow: 0 0 15px rgba(255, 77, 77, 0.5);
+            animation: pulseCounter 1.5s infinite alternate;
+        }
+        .anim-timeline {
+            display: flex; flex-direction: column; gap: 8px; position: relative;
+        }
+        .anim-timeline::before {
+            content:''; position:absolute; left: 8px; top:0; bottom:0; width:2px; background:rgba(255,255,255,0.1);
+        }
+        .timeline-dot {
+            width: 18px; height: 18px; border-radius: 50%; background: var(--green-paid); z-index: 1;
+            box-shadow: 0 0 10px var(--green-paid); display: flex; align-items: center; justify-content: center;
+            font-size: 10px; color: #000; font-weight: bold;
+        }
+        .timeline-dot:nth-child(2) { animation: fadeDot 3s infinite alternate; }
+        
+        .anim-receipt {
+            font-size: 3.5rem; color: var(--cyan-glow); filter: drop-shadow(0 0 15px rgba(0,255,255,0.4));
+            position: relative;
+        }
+        .anim-receipt::after {
+            content: '⬇'; position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            font-size: 1.5rem; color: #fff; animation: downloadArrow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseCounter { from { opacity: 0.8; } to { opacity: 1; transform: scale(1.05); } }
+        @keyframes fadeDot { 0%, 50% { opacity: 0.3; background: #fff; box-shadow: none; } 100% { opacity: 1; background: var(--green-paid); box-shadow: 0 0 10px var(--green-paid); } }
+        @keyframes downloadArrow { 0% { top: -30px; opacity: 0; } 50% { opacity: 1; } 100% { top: 10px; opacity: 0; } }
+
+        /* === SECTION 4: ADVANTAGE === */
+        .advantage-section {
+            text-align: center; padding: 4rem 2rem;
+            border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);
+            position: relative; overflow: hidden;
+        }
+        .advantage-section::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.03), transparent);
+            box-shadow: inset 0 0 50px rgba(0, 255, 255, 0.05); z-index: -1;
+        }
+        .advantage-section h2 { margin-bottom: 1.5rem; }
+        .advantage-section p { max-width: 800px; margin: 0 auto; }
+
+        /* === SECTION 5: NAV === */
+        .bottom-nav {
+            display: flex; justify-content: center; gap: 2rem; padding: 2rem; flex-wrap: wrap; border-radius: 50px;
+        }
+        .btn {
+            background: rgba(11, 15, 25, 0.7); border: 1px solid var(--glass-border); color: var(--text-main);
+            padding: 1.2rem 2.5rem; border-radius: 50px; font-size: 1rem; font-weight: 600;
+            text-decoration: none; transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.05); animation: pulseBtn 3s infinite alternate;
+        }
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02); border-color: var(--cyan-glow);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3); background: rgba(0, 255, 255, 0.05);
+            animation-play-state: paused;
+        }
+
+        @keyframes pulseBtn { from { box-shadow: 0 0 10px rgba(0, 255, 255, 0.05); } to { box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); } }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 900px) {
+            .hero-feature { flex-direction: column; text-align: center; }
+            .bottom-nav { flex-direction: column; }
+            .btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main>
+        <section class="container hero reveal">
+            <h1>Fee Management & <br><span class="cyan-gradient-text">Digital History</span></h1>
+            <p>A crystal-clear, transparent digital ledger of all paid and pending school fees, accessible right from the parent's pocket.</p>
+            
+            <div class="mobile-mockup">
+                <div class="notch"></div>
+                <div class="app-screen">
+                    <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem;">My Ledger</h3>
+                    
+                    <div class="finance-card">
+                        <h4>Total Balance</h4>
+                        <div class="amount" id="mockupAmount">₹450</div>
+                    </div>
+
+                    <div style="font-size: 0.85rem; font-weight: 600; margin-top: 1rem; color: var(--text-sub);">Recent Transactions</div>
+                    <div class="transaction-list">
+                        <div class="tx-item">
+                            <div><div class="tx-title">Term 1 Tuition</div><div class="tx-date">Sep 01, 2023</div></div>
+                            <div class="tx-amt">₹1,200</div>
+                        </div>
+                        <div class="tx-item">
+                            <div><div class="tx-title">Bus Fee (Sep)</div><div class="tx-date">Sep 05, 2023</div></div>
+                            <div class="tx-amt">₹150</div>
+                        </div>
+                        <div class="tx-item">
+                            <div><div class="tx-title">Library Fine</div><div class="tx-date">Oct 12, 2023</div></div>
+                            <div class="tx-amt">₹15</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container hero-feature reveal">
+            <div class="feature-text">
+                <h2>End the <span class="cyan-gradient-text">"What is my balance?"</span> Phone Calls.</h2>
+                <p>Save your accounts department from endless phone calls and manual ledger checks. By giving parents a live, real-time view of their exact pending balance, Paper Buddy drastically reduces late payments and administrative headaches.</p>
+            </div>
+            <div class="feature-visual">
+                <div class="glass-panel invoice-dashboard">
+                    <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 1.5rem;">Live Balance Breakdown</div>
+                    <div class="invoice-card">
+                        <div class="due-badge">Due in 3 Days</div>
+                        <div class="invoice-row"><span>Term 2 Tuition</span><span>₹1,200</span></div>
+                        <div class="invoice-row"><span>Transport (Nov)</span><span>₹150</span></div>
+                        <div class="invoice-row"><span>Annual Tech Fee</span><span>₹50</span></div>
+                        <div class="invoice-row total"><span>Total Outstanding</span><span>₹1,400</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-grid reveal">
+            <div class="glass-panel grid-card">
+                <div class="icon-wrapper">
+                    <div class="anim-counter">!</div>
+                </div>
+                <h3>Live Outstanding Dues</h3>
+                <p>Instantly display the total amount due with clear, automated reminders before the deadline hits.</p>
+            </div>
+            
+            <div class="glass-panel grid-card">
+                <div class="icon-wrapper">
+                    <div class="anim-timeline">
+                        <div class="timeline-dot">✓</div>
+                        <div class="timeline-dot">✓</div>
+                    </div>
+                </div>
+                <h3>Complete Payment History</h3>
+                <p>Parents can view a comprehensive, unalterable timeline of every past transaction made during the academic year.</p>
+            </div>
+
+            <div class="glass-panel grid-card">
+                <div class="icon-wrapper">
+                    <div class="anim-receipt">📄</div>
+                </div>
+                <h3>Instant Digital Receipts</h3>
+                <p>Eliminate lost paper receipts. Parents can view and download perfectly formatted digital receipts for every payment with a single tap.</p>
+            </div>
+        </section>
+
+        <section class="advantage-section reveal">
+            <div class="container">
+                <h2>Maximum Visibility. <br><span class="cyan-gradient-text">Faster Payments.</span></h2>
+                <p>The traditional method relies on printed fee booklets that are easily lost or ignored. Paper Buddy keeps dues highly visible and impossible to ignore. When parents know exactly what is due and when, schools get paid faster and on time.</p>
+            </div>
+        </section>
+
+        <section class="container">
+            <nav class="glass-panel bottom-nav reveal">
+                <a href="academic_calendar.html" class="btn">← Previous Page (Academic Calendar)</a>
+                <a href="community.html" class="btn">Next Page: Student Community →</a>
+            </nav>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Scroll Reveal Logic
+            const observerOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+            
+            setTimeout(() => {
+                const hero = document.querySelector('.hero.reveal');
+                if(hero) hero.classList.add('active');
+            }, 100);
+
+            // Mockup Value Sync Logic (Matches the CSS animation timing)
+            const amtElement = document.getElementById('mockupAmount');
+            setInterval(() => {
+                // The CSS animation is 8s infinite alternate.
+                // 0-4s = Due, 4-8s = Paid
+                if(amtElement.innerText === "₹450") {
+                    amtElement.innerText = "PAID";
+                } else {
+                    amtElement.innerText = "₹450";
+                }
+            }, 4000); // Toggle every 4 seconds to sync with CSS keyframes
+        });
+    </script>
+</body>
+</html>

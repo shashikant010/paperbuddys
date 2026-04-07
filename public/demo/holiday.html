@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Holidays & Ecosystem</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =====================================================================
+           GLOBAL VARIABLES & THEME
+        ===================================================================== */
+        :root {
+            --bg-dark: #0B0F19;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --cyan-primary: #00F2FE;
+            --cyan-secondary: #4FACFE;
+            --cyan-gradient: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
+            --border-subtle: rgba(0, 242, 254, 0.15);
+            --shadow-soft: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            
+            /* Status Colors */
+            --color-holiday: #FF3B30;
+            --color-exam: #F59E0B;
+            --color-event: #10B981;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ---------------------------------------------------------------------
+           BACKGROUND EFFECTS
+        --------------------------------------------------------------------- */
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(rgba(0, 242, 254, 0.15) 1px, transparent 1px);
+            background-size: 35px 35px; z-index: -2; pointer-events: none;
+            animation: bgDrift 90s linear infinite;
+        }
+
+        .ambient-glow {
+            position: fixed; width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,242,254,0.06) 0%, transparent 60%);
+            z-index: -1; pointer-events: none;
+        }
+        .glow-1 { top: -200px; left: -200px; }
+        .glow-2 { bottom: -200px; right: -200px; }
+        .glow-3 { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 800px; height: 800px; background: radial-gradient(circle, rgba(79,172,254,0.04) 0%, transparent 60%); }
+
+        @keyframes bgDrift {
+            0% { background-position: 0 0; } 100% { background-position: 350px 350px; }
+        }
+
+        /* ---------------------------------------------------------------------
+           UTILITY CLASSES
+        --------------------------------------------------------------------- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        .text-gradient { background: var(--cyan-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
+        .glass-panel {
+            background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle); border-radius: 20px; box-shadow: var(--shadow-soft);
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* =====================================================================
+           SECTION 1: HEADER & NAVIGATION
+        ===================================================================== */
+        header {
+            padding: 1.5rem 0; position: sticky; top: 0; z-index: 1000;
+            background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        }
+
+        .nav-inner { display: flex; align-items: center; }
+        .brand {
+            display: flex; align-items: center; gap: 12px; font-size: 1.5rem;
+            font-weight: 700; color: var(--text-main); text-decoration: none;
+        }
+
+        /* CSS Graduation Cap Logo */
+        .css-cap { position: relative; width: 34px; height: 24px; }
+        .css-cap-top {
+            position: absolute; top: 0; left: 0; width: 100%; height: 16px; background: var(--cyan-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .css-cap-base {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 10px; background: var(--cyan-secondary); border-radius: 0 0 4px 4px;
+        }
+        .css-cap-tassel {
+            position: absolute; right: 4px; top: 8px; width: 2px; height: 14px;
+            background: var(--cyan-primary); transform: rotate(-15deg);
+        }
+
+        /* =====================================================================
+           SECTION 1: HERO (CENTERED LAYOUT + MOCKUP)
+        ===================================================================== */
+        .hero { padding: 5rem 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        
+        .hero-text { max-width: 800px; margin-bottom: 4rem; z-index: 10;}
+        .hero-text h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 1rem; font-weight: 700; }
+        .hero-text p { font-size: 1.4rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* 3D Mobile Mockup */
+        .hero-visual { width: 100%; display: flex; justify-content: center; perspective: 1200px; }
+        
+        .phone-mockup {
+            width: 320px; height: 650px; background: #06090F;
+            border: 4px solid #1A2235; border-radius: 45px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 242, 254, 0.15);
+            position: relative; transform-style: preserve-3d;
+            transform: rotateX(15deg) rotateY(-10deg) rotateZ(2deg);
+            animation: floatPhone 6s ease-in-out infinite; padding: 12px; display: flex; flex-direction: column;
+        }
+
+        .phone-notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 110px; height: 28px; background: #000; border-radius: 0 0 14px 14px; z-index: 10;
+        }
+
+        .phone-screen {
+            background: #0B101C; flex: 1; border-radius: 32px; position: relative; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column;
+        }
+
+        /* Calendar App UI Inside Phone */
+        .cal-header { padding: 40px 20px 20px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .cal-month-title { width: 120px; height: 14px; background: var(--cyan-gradient); border-radius: 7px; margin: 0 auto; opacity: 0.8; }
+        
+        /* Swipe Animation Container */
+        .cal-swipe-container { flex: 1; display: flex; width: 200%; animation: swipeMonth 8s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+        .cal-view { width: 50%; padding: 20px; flex-shrink: 0;}
+
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
+        .cal-day-header { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 10px; }
+        .cal-cell { aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; position: relative; background: rgba(255,255,255,0.02);}
+        
+        /* Glowing Event Dots */
+        .event-dot { position: absolute; bottom: 2px; width: 4px; height: 4px; border-radius: 50%; opacity: 0; }
+        .dot-red { background: var(--color-holiday); box-shadow: 0 0 8px var(--color-holiday); }
+        .dot-amber { background: var(--color-exam); box-shadow: 0 0 8px var(--color-exam); }
+        .dot-green { background: var(--color-event); box-shadow: 0 0 8px var(--color-event); }
+
+        /* Current Month Active Events Animation */
+        .cal-view-active .event-dot { animation: popDot 4s infinite 1s; }
+        .cal-view-active .cal-cell:nth-child(12) .dot-red { animation-delay: 1.2s; }
+        .cal-view-active .cal-cell:nth-child(18) .dot-amber { animation-delay: 1.4s; }
+        .cal-view-active .cal-cell:nth-child(25) .dot-green { animation-delay: 1.6s; }
+
+        @keyframes floatPhone {
+            0%, 100% { transform: rotateX(15deg) rotateY(-10deg) rotateZ(2deg) translateY(0); }
+            50% { transform: rotateX(12deg) rotateY(-15deg) rotateZ(0deg) translateY(-20px); box-shadow: 20px 40px 80px rgba(0,0,0,0.9), inset 0 0 25px rgba(0, 242, 254, 0.2); }
+        }
+        @keyframes swipeMonth {
+            0%, 45% { transform: translateX(0); }
+            50%, 95% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes popDot { 0%, 20% { opacity: 0; transform: scale(0); } 30%, 90% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0); } }
+
+        /* =====================================================================
+           SECTION 2: CALENDAR FEATURES GRID
+        ===================================================================== */
+        .features-section { padding: 6rem 0; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
+
+        .feature-card {
+            padding: 3rem 2.5rem; display: flex; flex-direction: column;
+            position: relative; overflow: hidden; cursor: pointer;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+        }
+
+        .feature-card::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+            background: var(--cyan-gradient); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px); border-color: rgba(0, 242, 254, 0.4);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.15);
+        }
+        .feature-card:hover::before { transform: scaleX(1); }
+
+        .f-icon-container {
+            width: 70px; height: 70px; border-radius: 16px;
+            background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.8rem; color: var(--cyan-primary); margin-bottom: 2rem; position: relative;
+        }
+
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; color: #fff; }
+        .feature-card p { font-size: 1.05rem; color: var(--text-muted); flex: 1; }
+
+        /* Hover Animations for Cards */
+        /* Card 1: Custom Tags */
+        .anim-tag { position: absolute; right: -5px; bottom: -5px; font-size: 1rem; color: var(--color-exam); opacity: 0; transform: scale(0.5); transition: all 0.3s; }
+        .feature-card:hover .anim-tag { opacity: 1; transform: scale(1); text-shadow: 0 0 10px var(--color-exam); }
+        
+        /* Card 2: Multi-Day Row */
+        .anim-row-cal { display: flex; gap: 2px; margin-top: 5px; }
+        .anim-row-cell { width: 6px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 1px; transition: background 0.3s ease; }
+        .feature-card:hover .anim-row-cell { background: var(--cyan-primary); box-shadow: 0 0 5px var(--cyan-primary); }
+        .feature-card:hover .anim-row-cell:nth-child(1) { transition-delay: 0s; }
+        .feature-card:hover .anim-row-cell:nth-child(2) { transition-delay: 0.1s; }
+        .feature-card:hover .anim-row-cell:nth-child(3) { transition-delay: 0.2s; }
+
+        /* Card 3: Toggle Switch */
+        .anim-toggle { width: 30px; height: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; position: absolute; bottom: 10px; right: -15px; transition: 0.4s; padding: 2px; }
+        .anim-toggle-knob { width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: 0.4s; }
+        .feature-card:hover .anim-toggle { background: var(--cyan-primary); box-shadow: 0 0 10px var(--cyan-primary); }
+        .feature-card:hover .anim-toggle-knob { transform: translateX(14px); }
+
+
+        /* =====================================================================
+           SECTION 3: THE ADVANTAGE
+        ===================================================================== */
+        .advantage-section { padding: 4rem 0 8rem; text-align: center; }
+        
+        .advantage-banner {
+            padding: 5rem 3rem; border-radius: 30px; position: relative; overflow: hidden;
+            background: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, rgba(11, 15, 25, 0.6) 100%);
+            border-top: 1px solid rgba(0, 242, 254, 0.3); border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        }
+        
+        .advantage-banner h2 { font-size: 3rem; margin-bottom: 1.5rem; font-weight: 700; }
+        .advantage-banner p { font-size: 1.2rem; color: var(--text-muted); max-width: 850px; margin: 0 auto; line-height: 1.8; }
+
+
+        /* =====================================================================
+           SECTION 4: THE GRAND FINALE (ECOSYSTEM FLOW)
+        ===================================================================== */
+        .ecosystem-section { padding: 6rem 0 8rem; position: relative; }
+        
+        .eco-header { text-align: center; margin-bottom: 5rem; }
+        .eco-header h2 { font-size: 3.5rem; font-weight: 700; letter-spacing: -1px; }
+
+        .eco-flow {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            position: relative; max-width: 1000px; margin: 0 auto;
+        }
+
+        /* Animated Dashed Connecting Line */
+        .eco-line {
+            position: absolute; top: 80px; left: 100px; right: 100px; height: 2px;
+            background: linear-gradient(90deg, var(--cyan-primary) 50%, transparent 50%);
+            background-size: 15px 2px; z-index: 0; opacity: 0.5;
+            animation: dashScroll 2s linear infinite;
+        }
+        @keyframes dashScroll { 0% { background-position: 0 0; } 100% { background-position: 30px 0; } }
+
+        .eco-step {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            text-align: center; position: relative; z-index: 10; padding: 0 20px;
+        }
+
+        .eco-icon-box {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: rgba(11, 15, 25, 0.9); border: 2px solid var(--cyan-primary);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.2), inset 0 0 20px rgba(0, 242, 254, 0.1);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2.5rem; color: var(--text-main); margin-bottom: 2rem;
+            position: relative; transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        
+        /* Step Specific Animations */
+        .eco-step:hover .eco-icon-box { transform: translateY(-10px); box-shadow: 0 0 50px rgba(0, 242, 254, 0.4), inset 0 0 30px rgba(0, 242, 254, 0.3); }
+        
+        .step-1-anim i { text-shadow: 0 0 15px var(--cyan-primary); }
+        .step-2-anim i { animation: bounceCheck 2s infinite ease-in-out; }
+        .step-3-anim { position: relative; }
+        .notif-bubble {
+            position: absolute; top: -5px; right: -5px; width: 16px; height: 16px;
+            background: var(--color-holiday); border-radius: 50%;
+            border: 2px solid var(--bg-dark); opacity: 0; animation: popNotif 3s infinite 1s;
+        }
+
+        @keyframes bounceCheck { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); color: var(--cyan-primary); text-shadow: 0 0 15px var(--cyan-primary);} }
+        @keyframes popNotif { 0%, 20% { transform: scale(0); opacity: 0;} 30%, 90% { transform: scale(1); opacity: 1; box-shadow: 0 0 10px var(--color-holiday);} 100% { transform: scale(0); opacity: 0;} }
+
+        .eco-step h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; color: var(--cyan-primary); }
+        .eco-step p { font-size: 1rem; color: var(--text-muted); line-height: 1.6; }
+
+
+        /* =====================================================================
+           SECTION 5: FINAL CTA & NAVIGATION
+        ===================================================================== */
+        .cta-section { padding: 4rem 0 8rem; display: flex; justify-content: center; }
+        
+        .cta-container {
+            display: inline-flex; gap: 2rem; padding: 2rem;
+            border-radius: 80px; background: rgba(11, 15, 25, 0.7);
+            backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap; justify-content: center; align-items: center;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem; border-radius: 50px; text-decoration: none;
+            font-weight: 600; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-prev {
+            background: rgba(255,255,255,0.03); color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-prev:hover {
+            background: rgba(255,255,255,0.08); color: var(--text-main);
+            transform: translateX(-5px); border-color: rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-cta {
+            background: var(--cyan-gradient); color: #000;
+            border: none; box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+            animation: pulseCTA 2s infinite alternate;
+            font-size: 1.2rem; letter-spacing: 0.5px;
+        }
+        .btn-cta:hover {
+            background: linear-gradient(135deg, #fff, var(--cyan-primary));
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.8);
+            transform: scale(1.05) translateY(-2px); animation: none;
+        }
+
+        @keyframes pulseCTA {
+            0% { box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); transform: scale(1); }
+            100% { box-shadow: 0 0 30px rgba(0, 242, 254, 0.7); transform: scale(1.02); }
+        }
+
+        /* =====================================================================
+           RESPONSIVE DESIGN
+        ===================================================================== */
+        @media (max-width: 1024px) {
+            .hero { padding: 4rem 0; }
+            .hero-text h1 { font-size: 3.2rem; }
+            .phone-mockup { transform: rotateY(0) rotateX(0) rotateZ(0); animation: floatMobile 6s ease-in-out infinite; }
+            .eco-flow { flex-direction: column; gap: 4rem; align-items: center; }
+            .eco-line { 
+                top: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 100%;
+                background: linear-gradient(180deg, var(--cyan-primary) 50%, transparent 50%); background-size: 2px 15px;
+                animation: dashScrollVert 2s linear infinite;
+            }
+            @keyframes dashScrollVert { 0% { background-position: 0 0; } 100% { background-position: 0 30px; } }
+            @keyframes floatMobile { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 2.5rem; }
+            .advantage-banner h2 { font-size: 2.2rem; }
+            .eco-header h2 { font-size: 2.5rem; }
+            .cta-container { flex-direction: column; width: 100%; border-radius: 30px; padding: 1.5rem; gap: 1rem;}
+            .btn { justify-content: center; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+     <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main>
+        <section class="container hero">
+            <div class="hero-text reveal">
+                <h1>Smart Academic Calendar</h1>
+                <p class="text-gradient" style="font-size: 1.6rem; font-weight: 500; margin-bottom: 2rem;">A beautiful, interactive yearly calendar displaying all holidays and events, right in everyone's pocket.</p>
+                <p>Keep your entire institution perfectly synchronized. Plan the academic year once, and publish it instantly to every teacher, student, and parent app simultaneously.</p>
+            </div>
+
+            <div class="hero-visual reveal" style="transition-delay: 0.2s;">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        
+                        <div class="cal-header">
+                            <div class="cal-month-title"></div>
+                        </div>
+
+                        <div class="cal-swipe-container">
+                            
+                            <div class="cal-view cal-view-active">
+                                <div class="cal-grid" style="grid-template-rows: repeat(1, 8px);">
+                                    <div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div>
+                                </div>
+                                <div class="cal-grid">
+                                    <script>
+                                        for(let i=0; i<35; i++) {
+                                            let dot = '';
+                                            if(i === 11) dot = '<div class="event-dot dot-red"></div>';
+                                            if(i === 17) dot = '<div class="event-dot dot-amber"></div>';
+                                            if(i === 24) dot = '<div class="event-dot dot-green"></div>';
+                                            document.write(`<div class="cal-cell">${dot}</div>`);
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+
+                            <div class="cal-view">
+                                <div class="cal-grid" style="grid-template-rows: repeat(1, 8px);">
+                                    <div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div><div class="cal-day-header"></div>
+                                </div>
+                                <div class="cal-grid">
+                                    <script>
+                                        for(let i=0; i<35; i++) { document.write(`<div class="cal-cell"></div>`); }
+                                    </script>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-section">
+            <div class="grid-container">
+                
+                <div class="glass-panel feature-card reveal">
+                    <div class="f-icon-container">
+                        <i class="fa-solid fa-tags"></i>
+                        <i class="fa-solid fa-tag anim-tag"></i>
+                    </div>
+                    <h3>Custom Event Tags</h3>
+                    <p>Effortlessly add and categorize custom dates. Distinguish between Public Holidays, Exam Weeks, Sports Days, and specific School Events visually.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.1s;">
+                    <div class="f-icon-container" style="flex-direction: column; gap: 4px;">
+                        <i class="fa-regular fa-calendar" style="font-size: 1.5rem;"></i>
+                        <div class="anim-row-cal">
+                            <div class="anim-row-cell"></div><div class="anim-row-cell"></div><div class="anim-row-cell"></div>
+                        </div>
+                    </div>
+                    <h3>Smart Multi-Day Logic</h3>
+                    <p>Select a start date and an end date, and the system auto-calculates multi-day holidays instantly, blocking them out across all related schedules.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.2s;">
+                    <div class="f-icon-container">
+                        <i class="fa-solid fa-filter"></i>
+                        <div class="anim-toggle"><div class="anim-toggle-knob"></div></div>
+                    </div>
+                    <h3>Focus Filters</h3>
+                    <p>A one-tap "Hide Weekends" or "Exam Only" filter to declutter the calendar view, allowing administrators and parents to focus strictly on what matters.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="container advantage-section reveal">
+            <div class="glass-panel advantage-banner">
+                <h2 class="text-gradient">Never Lose the Calendar Again.</h2>
+                <p>Parents constantly lose or forget printed school calendars. With Paper Buddy, the school’s exact holiday and academic event schedule is permanently accessible on every parent and student's phone, and updated in real-time if sudden changes occur.</p>
+            </div>
+        </section>
+
+        <section class="container ecosystem-section">
+            <div class="eco-header reveal">
+                <h2 class="text-gradient">The Paper Buddy Ecosystem</h2>
+                <p style="color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 1rem auto 0;">One unified platform. Zero data silos. Total synchronization.</p>
+            </div>
+
+            <div class="eco-flow">
+                <div class="eco-line"></div>
+
+                <div class="eco-step reveal" style="transition-delay: 0.1s;">
+                    <div class="eco-icon-box step-1-anim">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3>1. Control Center</h3>
+                    <p>The Admin uses the master dashboard to configure infrastructure—setting up classes, transport routes, fee structures, and admitting students securely.</p>
+                </div>
+
+                <div class="eco-step reveal" style="transition-delay: 0.3s;">
+                    <div class="eco-icon-box step-2-anim">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+                    <h3>2. Teacher App</h3>
+                    <p>Teachers simply open their linked profiles on their phones to mark live attendance, check daily timetables, and upload exam marks in seconds.</p>
+                </div>
+
+                <div class="eco-step reveal" style="transition-delay: 0.5s;">
+                    <div class="eco-icon-box step-3-anim">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        <div class="notif-bubble"></div>
+                    </div>
+                    <h3>3. Instant Updates</h3>
+                    <p>Students & Parents receive automated, real-time updates on their devices—from fee payment receipts to exam date sheets and daily attendance alerts.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="container cta-section reveal">
+            <div class="cta-container">
+                <a href="performance.html" class="btn btn-prev">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Page (Performance)
+                </a>
+                <a href="exam_result.html" class="btn btn-cta">
+                    Exams
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Scroll Reveal Logic
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            revealElements.forEach(el => revealObserver.observe(el));
+        });
+    </script>
+</body>
+</html>

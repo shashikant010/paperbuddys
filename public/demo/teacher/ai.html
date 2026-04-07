@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | AI Paper Editor & Quiz Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === GLOBAL & VARIABLES === */
+        :root {
+            --bg-dark: #0B0F19;
+            --bg-panel: rgba(11, 15, 25, 0.6);
+            --cyan-primary: #00E5FF;
+            --blue-light: #4D9BFF;
+            --text-main: #FFFFFF;
+            --text-muted: #A0AEC0;
+            --glass-border: rgba(0, 229, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            /* Glowing cyan dot-grid matrix */
+            background-image: radial-gradient(rgba(0, 229, 255, 0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+            background-position: center top;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* === UTILITIES === */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--cyan-primary), var(--blue-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--bg-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === HEADER === */
+        header {
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            fill: none;
+            stroke: var(--cyan-primary);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6));
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: var(--cyan-primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* === HERO SECTION === */
+        .hero {
+            text-align: center;
+            padding: 80px 0 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Tablet Mockup */
+        .tablet-mockup-container {
+            perspective: 1200px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .tablet-mockup {
+            width: 100%;
+            max-width: 700px;
+            height: 450px;
+            background: #05080E;
+            border-radius: 24px;
+            border: 12px solid #1A2035;
+            box-shadow: 
+                -20px 30px 60px rgba(0,0,0,0.8),
+                0 0 30px rgba(0, 229, 255, 0.15), 
+                inset 0 0 20px rgba(0, 229, 255, 0.1);
+            transform: rotateX(15deg) rotateY(-5deg);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.5s ease;
+        }
+
+        .tablet-mockup:hover {
+            transform: rotateX(5deg) rotateY(0deg) scale(1.02);
+        }
+
+        .tablet-screen {
+            background: linear-gradient(135deg, #0B0F19 0%, #111827 100%);
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .editor-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .btn-save {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--cyan-primary);
+            color: var(--cyan-primary);
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save.glow {
+            background: var(--cyan-primary);
+            color: #000;
+            box-shadow: 0 0 15px var(--cyan-primary);
+        }
+
+        .editor-body {
+            flex: 1;
+            font-family: monospace;
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            text-align: left;
+            position: relative;
+        }
+
+        .ai-text-highlight {
+            color: var(--cyan-primary);
+            text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+        }
+
+        .mock-cursor {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: transparent;
+            border-top: 8px solid var(--text-main);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            transform: rotate(-30deg);
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+            pointer-events: none;
+            opacity: 0;
+            z-index: 10;
+        }
+
+        /* === PDF EXPORT SECTION === */
+        .pdf-section {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .pdf-card {
+            max-width: 800px;
+            margin: 40px auto 0;
+            padding: 50px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-export {
+            background: linear-gradient(90deg, var(--cyan-primary), var(--blue-light));
+            color: #0B0F19;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            z-index: 2;
+        }
+
+        .btn-export:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.6);
+        }
+
+        .a4-paper-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .a4-paper {
+            width: 210px;
+            height: 297px;
+            background: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+            position: absolute;
+            bottom: -300px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: bottom 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #333;
+            text-align: center;
+        }
+
+        .a4-paper.slide-up {
+            bottom: 10px;
+        }
+
+        .a4-header {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .a4-logo {
+            width: 30px;
+            height: 30px;
+            background: #eee;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+        }
+
+        .a4-title { font-size: 0.6rem; font-weight: 700; }
+        .a4-subtitle { font-size: 0.4rem; color: #666; display: flex; justify-content: space-between; margin-top: 5px; }
+        .a4-line { height: 4px; background: #eee; border-radius: 2px; margin-bottom: 4px; width: 100%; }
+        .a4-line.short { width: 60%; }
+
+        /* === Z-PATTERN SECTION (QUIZZES) === */
+        .z-pattern-section {
+            padding: 80px 0;
+        }
+
+        .z-row {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 100px;
+        }
+
+        .z-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .z-row.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .z-content {
+            flex: 1;
+        }
+
+        .z-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .z-content p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .z-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        /* Mobile Quiz Mockup */
+        .mobile-mockup {
+            width: 260px;
+            height: 520px;
+            background: #05080E;
+            border-radius: 36px;
+            border: 8px solid #1A2035;
+            box-shadow: -15px 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(0, 229, 255, 0.1);
+            transform: rotateY(-15deg);
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .quiz-timer-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .quiz-timer-fill {
+            height: 100%;
+            background: var(--cyan-primary);
+            width: 100%;
+            box-shadow: 0 0 10px var(--cyan-primary);
+            animation: timerShrink 10s linear infinite;
+        }
+
+        .quiz-question {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .quiz-option {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .quiz-option.active {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: var(--cyan-primary);
+            color: var(--cyan-primary);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+        }
+
+        /* Leaderboard Visual */
+        .leaderboard-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 350px;
+        }
+
+        .podium-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 15px;
+            height: 180px;
+            margin-top: 20px;
+        }
+
+        .podium-bar {
+            width: 60px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            transition: height 1s ease;
+        }
+
+        .podium-bar.gold { height: 120px; border-color: var(--cyan-primary); background: rgba(0, 229, 255, 0.2); box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); }
+        .podium-bar.silver { height: 90px; }
+        .podium-bar.bronze { height: 70px; }
+
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-dark);
+            border: 2px solid var(--cyan-primary);
+            border-radius: 50%;
+            position: absolute;
+            top: -25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* === ADVANTAGE SECTION === */
+        .advantage-section {
+            margin: 60px 0 100px;
+            padding: 80px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(0, 229, 255, 0.05) 0%, rgba(11, 15, 25, 0.8) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.1);
+        }
+
+        .advantage-section h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .advantage-section p {
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+        /* === PAGE NAVIGATION === */
+        .page-nav {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            padding: 24px;
+            margin-bottom: 60px;
+            border-radius: 50px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .nav-btn {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--cyan-primary);
+            color: var(--text-main);
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .nav-btn.pulse {
+            animation: btnPulse 2s infinite;
+        }
+
+        .nav-subtext {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* === ANIMATIONS === */
+        @keyframes timerShrink {
+            0% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        @keyframes btnPulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 229, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 900px) {
+            .z-row, .z-row.reverse {
+                flex-direction: column;
+                text-align: center;
+                gap: 40px;
+            }
+            .hero h1 { font-size: 2.8rem; }
+            .tablet-mockup { transform: rotateX(5deg) rotateY(0deg); height: 400px; }
+            .advantage-section h2 { font-size: 2.4rem; }
+            .page-nav { flex-direction: column; border-radius: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <section class="hero container">
+        <div class="fade-in">
+            <h1>AI Paper Editor & <br><span class="gradient-text">Instant Generation</span></h1>
+            <p>Watch the AI generate an entire, perfectly balanced question paper in seconds. Review, edit, and finalize without ever opening MS Word.</p>
+        </div>
+
+        <div class="tablet-mockup-container fade-in">
+            <div class="tablet-mockup">
+                <div class="tablet-screen">
+                    <div class="editor-header">
+                        <div class="editor-title">Generating: Grade 10 Science Mid-Term</div>
+                        <div class="btn-save" id="mock-save-btn">Save Draft</div>
+                    </div>
+                    <div class="editor-body">
+                        <div id="ai-typing-container"></div>
+                        <div class="mock-cursor" id="mock-cursor"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pdf-section container">
+        <div class="fade-in">
+            <h2 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 15px;">Instant, School-Branded PDFs</h2>
+            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">From draft to printer in one click. Instantly export a perfectly formatted, school-branded PDF. No more typing, no formatting struggles, and no hunting for questions.</p>
+        </div>
+
+        <div class="glass-panel pdf-card fade-in">
+            <button class="btn-export" id="btn-export">Export to PDF</button>
+            <div class="a4-paper-container">
+                <div class="a4-paper" id="a4-paper">
+                    <div class="a4-header">
+                        <div class="a4-logo"></div>
+                        <div class="a4-title">ST. XAVIER'S HIGH SCHOOL</div>
+                        <div class="a4-subtitle">
+                            <span>Time: 2 Hours</span>
+                            <span>Max Marks: 50</span>
+                        </div>
+                    </div>
+                    <div style="text-align: left; font-size: 0.5rem; font-weight: bold; margin-bottom: 5px;">Section A: Multiple Choice</div>
+                    <div class="a4-line"></div>
+                    <div class="a4-line"></div>
+                    <div class="a4-line short"></div>
+                    <div style="margin-top: 10px;"></div>
+                    <div class="a4-line"></div>
+                    <div class="a4-line"></div>
+                    <div class="a4-line short" style="width: 40%;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="z-pattern-section container">
+        
+        <div class="z-row fade-in">
+            <div class="z-content">
+                <h2 class="gradient-text">Instant Interactive Quizzes</h2>
+                <p>Conduct surprise tests without spending the night before writing questions. Generate a complete, interactive digital quiz based on a single topic instantly, pushed directly to student devices.</p>
+            </div>
+            <div class="z-visual">
+                <div class="mobile-mockup">
+                    <div style="font-size: 0.8rem; color: var(--cyan-primary); text-align: center;">Science Quiz: Kinematics</div>
+                    <div class="quiz-timer-bar">
+                        <div class="quiz-timer-fill"></div>
+                    </div>
+                    <div class="quiz-question">Q3. What is the SI unit of acceleration?</div>
+                    <div class="quiz-option">A) m/s</div>
+                    <div class="quiz-option active">B) m/s²</div>
+                    <div class="quiz-option">C) km/h</div>
+                    <div class="quiz-option">D) m/s³</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="z-row reverse fade-in">
+            <div class="z-content">
+                <h2 class="gradient-text">Automated Leaderboards & Analytics</h2>
+                <p>The system grades the quizzes instantly, generating live leaderboards to gamify learning and providing deep analytics on overall class performance to identify learning gaps.</p>
+            </div>
+            <div class="z-visual">
+                <div class="glass-panel leaderboard-card">
+                    <div style="text-align: center; font-weight: 600;">Live Class Leaderboard</div>
+                    <div class="podium-container">
+                        <div class="podium-bar silver" id="bar-silver">
+                            <div class="avatar-circle">S2</div>
+                        </div>
+                        <div class="podium-bar gold" id="bar-gold">
+                            <div class="avatar-circle">S1</div>
+                        </div>
+                        <div class="podium-bar bronze" id="bar-bronze">
+                            <div class="avatar-circle">S3</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="container fade-in">
+        <div class="advantage-section">
+            <h2 class="gradient-text">4 Hours to 4 Minutes.</h2>
+            <p>Paper setting used to be a grueling, weekend-stealing chore. Paper Buddy reduces paper-setting time from 4 hours to 4 minutes. Take your weekends back and focus on what you do best: teaching.</p>
+        </div>
+    </section>
+
+    <div class="container fade-in">
+        <div class="glass-panel page-nav">
+            <a href="paper-setup-blueprint.html" class="nav-btn">
+                ← Previous Page
+                <span class="nav-subtext">(Paper Setup & Blueprint)</span>
+            </a>
+            <a href="student_attendance.html" class="nav-btn pulse">
+                Next Page →
+                <span class="nav-subtext">(Student Attendace Screen)</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // 1. Scroll Reveal Intersection Observer
+            const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+
+            // 2. AI Tablet Typing & Editing Animation Logic
+            const typingContainer = document.getElementById('ai-typing-container');
+            const mockCursor = document.getElementById('mock-cursor');
+            const saveBtn = document.getElementById('mock-save-btn');
+            
+            const aiText = "Q1. Explain the process of photosynthesis.\n\nQ2. Calculate the velocity of... [AI generating...]\n\n";
+            const replacementText = "Q2. Calculate the terminal velocity of...";
+            
+            async function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            async function runTabletAnimation() {
+                while(true) {
+                    // Reset
+                    typingContainer.innerHTML = "";
+                    mockCursor.style.opacity = "0";
+                    mockCursor.style.top = "0";
+                    mockCursor.style.left = "0";
+                    saveBtn.classList.remove('glow');
+
+                    await sleep(1000);
+
+                    // Type initial text
+                    for (let i = 0; i < aiText.length; i++) {
+                        typingContainer.innerHTML += aiText.charAt(i).replace('\n', '<br>');
+                        await sleep(30);
+                    }
+
+                    await sleep(1000);
+
+                    // Move cursor to edit
+                    mockCursor.style.opacity = "1";
+                    mockCursor.style.transition = "top 1s ease, left 1s ease";
+                    mockCursor.style.top = "50px"; 
+                    mockCursor.style.left = "180px";
+
+                    await sleep(1200);
+
+                    // Edit text (Highlight -> Replace)
+                    typingContainer.innerHTML = "Q1. Explain the process of photosynthesis.<br><br><span class='ai-text-highlight'>" + replacementText + "</span><br><br>";
+                    
+                    await sleep(1000);
+
+                    // Move cursor to save button
+                    mockCursor.style.top = "-40px";
+                    mockCursor.style.left = "600px";
+
+                    await sleep(1000);
+
+                    // Click Save
+                    saveBtn.classList.add('glow');
+                    mockCursor.style.transform = "rotate(-30deg) scale(0.8)";
+                    
+                    await sleep(300);
+                    mockCursor.style.transform = "rotate(-30deg) scale(1)";
+
+                    await sleep(3000); // Hold final state before loop
+                }
+            }
+            
+            // Start tablet animation
+            runTabletAnimation();
+
+
+            // 3. PDF Export Animation
+            const exportBtn = document.getElementById('btn-export');
+            const a4Paper = document.getElementById('a4-paper');
+
+            exportBtn.addEventListener('click', () => {
+                a4Paper.classList.remove('slide-up');
+                // Trigger reflow
+                void a4Paper.offsetWidth;
+                a4Paper.classList.add('slide-up');
+            });
+
+
+            // 4. Leaderboard Simple Pulse Animation
+            const bars = [document.getElementById('bar-silver'), document.getElementById('bar-gold'), document.getElementById('bar-bronze')];
+            setInterval(() => {
+                bars.forEach(bar => {
+                    const originalHeight = bar.style.height || getComputedStyle(bar).height;
+                    const numHeight = parseInt(originalHeight);
+                    // Slight bounce effect
+                    bar.style.height = (numHeight + (Math.random() * 10 - 5)) + 'px';
+                    setTimeout(() => {
+                        bar.style.height = originalHeight;
+                    }, 500);
+                });
+            }, 2000);
+
+        });
+    </script>
+</body>
+</html>

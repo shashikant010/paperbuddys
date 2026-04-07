@@ -1,0 +1,169 @@
+/* --- Dashboard Layout & Wrapper --- */
+.dashboard-wrapper {
+    display: flex;
+    width: 90%;
+    max-width: 1600px;
+    height: 80vh;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    z-index: 10; /* Keep above canvas */
+    position: relative;
+}
+
+/* --- Background Canvas for Flowing Sparkline --- */
+.background-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none; /* Let clicks pass through to UI */
+    opacity: 0.4;
+}
+
+/* --- Simulated App Screen Updates for Dashboard --- */
+.app-dashboard-screen {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    color: var(--text-primary);
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.app-avatar-placeholder {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 2px solid var(--accent);
+}
+
+.app-widget {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 15px;
+    backdrop-filter: blur(5px);
+}
+
+.progress-bar-mini {
+    width: 100%; height: 8px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+}
+
+.app-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.action-btn {
+    width: 45px; height: 45px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    display: flex; justify-content: center; align-items: center;
+    transition: 0.3s;
+}
+
+/* --- Bento Box CSS Grid --- */
+.bento-grid-section {
+    width: 60%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto 1fr auto;
+    gap: 20px;
+    height: 90%;
+}
+
+.bento-box {
+    background: var(--glass-background);
+    border: var(--glass-border);
+    border-radius: 20px;
+    padding: 25px;
+    backdrop-filter: var(--glass-blur);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy hover */
+}
+
+/* Hyper-Animation on Hover */
+.bento-box:hover {
+    transform: translateY(-8px) scale(1.03);
+    border-color: rgba(255,255,255,0.4);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(255,0,127,0.3);
+    z-index: 5;
+}
+
+.box-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    color: var(--accent);
+}
+
+/* Box 1: Greeting */
+.greeting-box {
+    grid-column: span 2;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,0,127,0.05));
+}
+.greeting-box h2 { font-size: 2.5rem; margin-bottom: 5px; }
+.bento-icon-bg { position: absolute; right: -20px; bottom: -20px; font-size: 8rem; opacity: 0.05; }
+
+/* Box 2: Attendance SVG Circle */
+.circular-progress-container { position: relative; width: 120px; height: 120px; margin: 0 auto; }
+.circular-progress { width: 100%; height: 100%; transform: rotate(-90deg); }
+.circular-progress circle { fill: none; stroke-width: 8; stroke-linecap: round; }
+.circular-progress .bg { stroke: rgba(255,255,255,0.1); }
+.circular-progress .progress {
+    stroke: #00ffcc;
+    stroke-dasharray: 251; /* 2 * pi * r */
+    transition: stroke-dashoffset 1.5s ease-out;
+    filter: drop-shadow(0 0 8px rgba(0,255,204,0.6));
+}
+.progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5rem; font-weight: bold; }
+
+/* Box 3: Transit Tracker */
+.transit-visual { position: relative; width: 100%; height: 4px; background: rgba(255,255,255,0.2); margin: 30px 0; border-radius: 2px; }
+.pulsing-dot { position: absolute; top: -6px; left: 60%; width: 16px; height: 16px; background: #ffcc00; border-radius: 50%; box-shadow: 0 0 15px #ffcc00; animation: pulseDot 1.5s infinite; }
+.stop-dot { position: absolute; top: -4px; right: 0; width: 12px; height: 12px; background: #fff; border-radius: 50%; }
+.transit-status { text-align: center; font-size: 0.9rem; color: var(--text-secondary); }
+
+@keyframes pulseDot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.7; } }
+
+/* Box 4: Analytics */
+.analytics-box { grid-column: span 2; height: 180px; }
+.bento-canvas { width: 100%; height: 100px; }
+
+/* --- Navigation Container --- */
+.nav-buttons-container {
+    position: fixed; bottom: 30px;
+    width: 90%; max-width: 1600px;
+    display: flex; justify-content: space-between;
+    z-index: 20;
+}
+
+.glass-btn {
+    padding: 12px 25px; border-radius: 30px;
+    background: var(--glass-background); border: var(--glass-border);
+    color: #fff; text-decoration: none; font-weight: bold;
+    backdrop-filter: blur(10px); transition: 0.3s; position: relative; overflow: hidden;
+}
+.glass-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255,0.2); }

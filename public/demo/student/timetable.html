@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Live Interactive Timetable</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ==========================================================================
+           1. CORE THEME & RESET
+           ========================================================================== */
+        :root {
+            --bg-color: #0A0F1C;
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --cyan-light: #00F0FF;
+            --cyan-dark: #0077FF;
+            --purple-light: #B245FF;
+            --purple-dark: #5B00FF;
+            --live-green: #39FF14;
+            
+            --grad-cyan: linear-gradient(135deg, var(--cyan-light), var(--cyan-dark));
+            --grad-purple: linear-gradient(135deg, var(--purple-light), var(--purple-dark));
+            
+            --glass-bg: rgba(16, 23, 40, 0.4);
+            --glass-border: rgba(0, 240, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Cosmic Matrix Background */
+        .cosmic-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(0, 240, 255, 0.15) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -2;
+            animation: moveGrid 60s linear infinite;
+        }
+
+        .ambient-mesh {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 10% 10%, rgba(91, 0, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(0, 240, 255, 0.1) 0%, transparent 40%);
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 800px 800px; }
+        }
+
+        /* ==========================================================================
+           UTILITIES
+           ========================================================================== */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        
+        .text-gradient-cyan {
+            background: var(--grad-cyan);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--glass-shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* ==========================================================================
+           HEADER
+           ========================================================================== */
+        header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 15px 0; background: rgba(10, 15, 28, 0.85);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+
+        .logo-box { display: flex; align-items: center; gap: 12px; text-decoration: none; color: white; }
+        
+        .logo-icon {
+            width: 32px; height: 32px; position: relative;
+            filter: drop-shadow(0 0 8px var(--cyan-light));
+        }
+        .logo-icon::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            border-left: 16px solid transparent; border-right: 16px solid transparent; border-bottom: 26px solid var(--cyan-light);
+            transform: rotate(45deg);
+        }
+
+        .logo-text { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.5px; }
+
+        .btn-download {
+            background: var(--grad-purple); color: white; padding: 10px 24px;
+            border-radius: 50px; text-decoration: none; font-weight: 600;
+            font-size: 0.9rem; box-shadow: 0 4px 15px rgba(178, 69, 255, 0.4);
+            transition: 0.3s; border: none;
+        }
+        .btn-download:hover { transform: scale(1.05); }
+
+        /* ==========================================================================
+           HERO SECTION
+           ========================================================================== */
+        .hero { padding: 160px 0 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+
+        .hero-content h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 20px; }
+        .hero-content p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px; }
+
+        /* Mobile Mockup Animation */
+        .mockup-wrapper { perspective: 1000px; display: flex; justify-content: center; }
+
+        .mobile-device {
+            width: 280px; height: 580px; background: #050811; border: 10px solid #1A2235;
+            border-radius: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            position: relative; transform: rotateY(-15deg) rotateX(10deg); overflow: hidden;
+        }
+
+        .screen-content {
+            height: 100%; width: 100%; background: linear-gradient(180deg, #0A0F1C 0%, #151B2E 100%);
+            padding: 20px; display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .mock-status-bar { height: 20px; display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 10px; }
+
+        .class-card-mock {
+            padding: 15px; border-radius: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            position: relative; overflow: hidden; transform: translateY(0); transition: 0.5s;
+        }
+
+        .class-card-mock.live {
+            border: 1px solid var(--live-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+            animation: cardFloat 3s ease-in-out infinite alternate;
+        }
+
+        .badge-live {
+            background: var(--live-green); color: #000; font-size: 9px; font-weight: 800;
+            padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .class-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .class-detail { font-size: 11px; color: var(--text-muted); }
+
+        .period-stack { display: flex; flex-direction: column; gap: 10px; }
+
+        @keyframes cardFloat { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* ==========================================================================
+           LIVE HIGHLIGHT (SECTION 2)
+           ========================================================================== */
+        .live-highlight { padding: 100px 0; display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: center; }
+
+        .live-text h2 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 25px; }
+
+        .visual-display {
+            height: 350px; display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+
+        .clock-ring {
+            width: 150px; height: 150px; border-radius: 50%;
+            border: 2px dashed var(--cyan-light); position: absolute; left: 0;
+            animation: rotate 20s linear infinite;
+        }
+
+        .period-switcher {
+            width: 320px; height: 180px; position: relative; overflow: hidden;
+        }
+
+        .period-item {
+            position: absolute; width: 100%; top: 0; left: 0; padding: 30px;
+            transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .item-prev { transform: translateY(-100%); opacity: 0; }
+        .item-active { transform: translateY(0); opacity: 1; border: 2px solid var(--live-green); }
+        .item-next { transform: translateY(100%); opacity: 0; }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ==========================================================================
+           FEATURES GRID
+           ========================================================================== */
+        .features-grid { padding: 80px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .feat-card { padding: 40px 30px; overflow: hidden; position: relative; }
+        
+        .feat-card:hover { border-color: var(--cyan-light); transform: translateY(-10px); }
+
+        .feat-icon-area { height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+        
+        .feat-card i { font-size: 2.5rem; transition: 0.4s; }
+        .feat-card:hover i { transform: scale(1.2); color: var(--cyan-light); filter: drop-shadow(0 0 10px var(--cyan-light)); }
+
+        .feat-card h3 { font-size: 1.4rem; margin-bottom: 15px; }
+
+        /* Icon-Specific Animations */
+        .fa-cloud-arrow-up { animation: spinSync 4s linear infinite paused; }
+        .feat-card:hover .fa-cloud-arrow-up { animation-play-state: running; }
+        @keyframes spinSync { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ==========================================================================
+           WHY SECTION
+           ========================================================================== */
+        .advantage-box {
+            text-align: center; padding: 80px 40px; margin: 100px 0;
+            background: linear-gradient(180deg, rgba(0, 240, 255, 0.05) 0%, rgba(10, 15, 28, 0.5) 100%);
+            border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);
+        }
+        .advantage-box h2 { font-size: clamp(2rem, 3vw, 2.5rem); margin-bottom: 25px; }
+        .advantage-box p { max-width: 850px; margin: 0 auto; font-size: 1.2rem; color: var(--text-muted); }
+
+        /* ==========================================================================
+           NAVIGATION (BOTTOM)
+           ========================================================================== */
+        .bottom-nav { padding: 40px 0 100px; display: flex; justify-content: center; }
+        .nav-pill-container { padding: 15px 30px; display: flex; gap: 20px; border-radius: 100px; background: rgba(16, 23, 40, 0.8); }
+
+        .pill-btn {
+            padding: 14px 32px; border-radius: 50px; text-decoration: none;
+            color: white; font-weight: 600; font-size: 0.95rem; border: 1px solid var(--glass-border);
+            transition: 0.3s; background: rgba(0,0,0,0.4); display: flex; align-items: center; gap: 10px;
+        }
+        .pill-btn.next { border-color: var(--cyan-light); animation: pulseBtn 2s infinite; }
+        .pill-btn:hover { transform: scale(1.05); background: rgba(0,240,255,0.1); border-color: white; }
+
+        @keyframes pulseBtn {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
+            50% { box-shadow: 0 0 20px 5px rgba(0, 240, 255, 0); }
+        }
+
+        /* ==========================================================================
+           RESPONSIVE
+           ========================================================================== */
+        @media (max-width: 992px) {
+            .hero, .live-highlight { grid-template-columns: 1fr; text-align: center; }
+            .hero-content { order: 1; }
+            .mockup-wrapper { order: 2; }
+            .visual-display { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cosmic-bg"></div>
+    <div class="ambient-mesh"></div>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <main>
+        <section class="container hero">
+            <div class="hero-content reveal">
+                <h1>Live Interactive & <br><span class="text-gradient-cyan">Dynamic Timetable</span></h1>
+                <p>Your daily schedule, reimagined. A living, breathing classroom guide that ensures every student is exactly where they need to be, with exactly what they need to learn.</p>
+                <div style="display:flex; gap:15px; justify-content: center; margin-top: 20px;">
+                    <span class="badge-admin glass-card" style="font-size: 0.75rem; padding: 8px 20px;">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Real-time Sync
+                    </span>
+                    <span class="badge-admin glass-card" style="font-size: 0.75rem; padding: 8px 20px;">
+                        <i class="fa-solid fa-link"></i> Resource Linked
+                    </span>
+                </div>
+            </div>
+            
+            <div class="mockup-wrapper reveal">
+                <div class="mobile-device">
+                    <div class="screen-content">
+                        <div class="mock-status-bar">
+                            <span>09:41</span>
+                            <span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
+                        </div>
+                        
+                        <div style="font-size: 16px; font-weight: 800; margin-bottom: 5px;">Today's Schedule</div>
+                        
+                        <div class="class-card-mock live">
+                            <div class="badge-live">LIVE NOW</div>
+                            <div class="class-name">Mathematics (Calculus)</div>
+                            <div class="class-detail"><i class="fa-solid fa-location-dot"></i> Room 102 • Prof. Sarah J.</div>
+                        </div>
+
+                        <div class="period-stack">
+                            <div class="class-card-mock">
+                                <div class="class-name">Physics - Lab A</div>
+                                <div class="class-detail"><i class="fa-solid fa-clock"></i> 10:45 AM • Dr. Alan Grant</div>
+                            </div>
+                            <div class="class-card-mock">
+                                <div class="class-name">History of Arts</div>
+                                <div class="class-detail"><i class="fa-solid fa-clock"></i> 11:30 AM • Ms. Emily White</div>
+                            </div>
+                            <div class="class-card-mock" style="opacity: 0.4;">
+                                <div class="class-name">Lunch Break</div>
+                                <div class="class-detail"><i class="fa-solid fa-clock"></i> 12:15 PM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container live-highlight reveal">
+            <div class="live-text">
+                <h2>Never Lose Your Place. <br><span class="text-gradient-cyan">Never Be Late.</span></h2>
+                <p>Paper timetables get lost, crumbled, or become outdated the moment a substitution happens. Paper Buddy provides a 100% accurate, live-syncing schedule. Students see which class is 'Live' right now, who is teaching, and exactly which room to go to—instantly updated by the school administration.</p>
+            </div>
+            <div class="visual-display">
+                <div class="clock-ring"></div>
+                <div class="glass-card period-switcher">
+                    <div id="period1" class="period-item item-active">
+                        <div class="badge-live">IN PROGRESS</div>
+                        <h3>Math - Grade 10</h3>
+                        <p>Room 304 • Period ends in 12m</p>
+                    </div>
+                    <div id="period2" class="period-item item-next">
+                        <div style="font-size: 10px; color: var(--cyan-light); font-weight: 700;">NEXT UP</div>
+                        <h3>Chemistry Lab</h3>
+                        <p>Floor 2 • Period starts at 11:00</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-grid">
+            <div class="glass-card feat-card reveal">
+                <div class="feat-icon-area"><i class="fa-solid fa-file-pdf"></i></div>
+                <h3>Integrated Study Materials</h3>
+                <p>One-tap access to class resources. Each period card links directly to the specific notes, PDFs, or videos needed for that classroom hour.</p>
+            </div>
+
+            <div class="glass-panel feat-card reveal" style="transition-delay: 0.1s;">
+                <div class="feat-icon-area"><i class="fa-solid fa-chalkboard-user"></i></div>
+                <h3>Teacher & Venue Details</h3>
+                <p>Eliminate venue confusion. View assigned teachers and room numbers for every period, including real-time substitution updates.</p>
+            </div>
+
+            <div class="glass-panel feat-card reveal" style="transition-delay: 0.2s;">
+                <div class="feat-icon-area"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <h3>Instant Update Sync</h3>
+                <p>Global schedule changes reflect on every student's phone in milliseconds. No more room-to-room physical announcements.</p>
+            </div>
+        </section>
+
+        <section class="advantage-box reveal">
+            <div class="container">
+                <h2>The End of <span class="text-gradient-cyan">Static Scheduling.</span></h2>
+                <p>A school is a moving machine, and its schedule should be too. By providing an interactive, resource-linked timetable, Paper Buddy reduces transition-time friction, eliminates confusion during substitutions, and ensures students come to every class prepared with the right digital materials in hand.</p>
+            </div>
+        </section>
+
+        <section class="bottom-nav reveal">
+            <div class="nav-pill-container glass-card">
+                <a href="bus.html" class="pill-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Bus Tracking
+                </a>
+                <a href="exam_result.html" class="pill-btn next">
+                    Exam Results <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Scroll Reveal Logic
+            const reveals = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            reveals.forEach(el => observer.observe(el));
+
+            // Section 2: Period Switcher Animation
+            let state = 0;
+            const p1 = document.getElementById('period1');
+            const p2 = document.getElementById('period2');
+
+            setInterval(() => {
+                if(state === 0) {
+                    p1.className = 'period-item item-prev';
+                    p2.className = 'period-item item-active';
+                    state = 1;
+                } else {
+                    p1.className = 'period-item item-active';
+                    p2.className = 'period-item item-next';
+                    state = 0;
+                }
+            }, 4000);
+
+            // 3D Parallax effect on mobile mockup
+            const device = document.querySelector('.mobile-device');
+            document.addEventListener('mousemove', (e) => {
+                const x = (window.innerWidth / 2 - e.pageX) / 50;
+                const y = (window.innerHeight / 2 - e.pageY) / 50;
+                device.style.transform = `rotateY(${x - 15}deg) rotateX(${y + 10}deg)`;
+            });
+        });
+    </script>
+</body>
+</html>

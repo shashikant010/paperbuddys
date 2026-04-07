@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Smart Schedule</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- GLOBAL VARIABLES & RESET --- */
+        :root {
+            --bg-dark: #0B0F19;
+            --bg-darker: #070a11;
+            --cyan-primary: #00e5ff;
+            --blue-secondary: #0077ff;
+            --purple-accent: #b300ff;
+            --text-main: #ffffff;
+            --text-muted: #a0aec0;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(0, 229, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            /* Subtle, glowing cyan dot-grid matrix */
+            background-image: radial-gradient(rgba(0, 229, 255, 0.15) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: 0 0;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- UTILITY CLASSES --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--cyan-primary), var(--blue-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            fill: none;
+            stroke: var(--cyan-primary);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6));
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            background: rgba(0, 229, 255, 0.05);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: var(--cyan-primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 80px 0 40px;
+            gap: 50px;
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero-text p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- 3D MOBILE MOCKUP --- */
+        .hero-visual {
+            perspective: 1200px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-mockup {
+            width: 320px;
+            height: 650px;
+            background: var(--bg-darker);
+            border-radius: 45px;
+            border: 8px solid #1a233a;
+            box-shadow: 
+                -30px 30px 60px rgba(0,0,0,0.9),
+                0 0 30px rgba(0, 229, 255, 0.15), 
+                inset 0 0 20px rgba(0, 229, 255, 0.1);
+            transform: rotateY(-10deg) rotateX(10deg);
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .phone-mockup:hover {
+            transform: rotateY(0deg) rotateX(5deg) scale(1.02);
+        }
+
+        .phone-notch {
+            width: 120px;
+            height: 25px;
+            background: #1a233a;
+            border-radius: 0 0 15px 15px;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #0a0f18 0%, #0d1424 100%);
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            padding: 40px 20px 20px;
+            background: rgba(11, 15, 25, 0.9);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+            z-index: 5;
+        }
+        
+        .app-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Animated Timeline inside Phone */
+        .timeline-scroll-area {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            padding: 0 15px;
+        }
+
+        .timeline-track {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px 0;
+            animation: infiniteScroll 15s linear infinite;
+        }
+
+        .time-block {
+            display: flex;
+            gap: 15px;
+            position: relative;
+        }
+
+        .time-block::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 25px;
+            bottom: -35px;
+            width: 2px;
+            background: rgba(0, 229, 255, 0.2);
+            z-index: 0;
+        }
+
+        .time-block:last-child::before { display: none; }
+
+        .time-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            min-width: 45px;
+            padding-top: 5px;
+        }
+
+        .subject-card {
+            flex: 1;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px;
+            z-index: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-cyan { box-shadow: inset 4px 0 0 var(--cyan-primary); border-color: rgba(0,229,255,0.2); }
+        .tag-purple { box-shadow: inset 4px 0 0 var(--purple-accent); border-color: rgba(179,0,255,0.2); }
+        .tag-blue { box-shadow: inset 4px 0 0 var(--blue-secondary); border-color: rgba(0,119,255,0.2); }
+
+        .subject-card h4 { font-size: 0.9rem; margin-bottom: 2px; }
+        .subject-card p { font-size: 0.7rem; color: var(--text-muted); }
+
+        .glowing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cyan-primary);
+            box-shadow: 0 0 10px var(--cyan-primary);
+            position: absolute;
+            left: -20px;
+            top: 10px;
+        }
+
+        /* --- Z-PATTERN SECTION --- */
+        .z-section {
+            padding: 100px 0;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .z-text {
+            flex: 1;
+        }
+
+        .z-text h2 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .z-text p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .z-visual {
+            flex: 1;
+            position: relative;
+        }
+
+        .timeline-card {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.05), transparent);
+            animation: sweep 4s infinite linear;
+        }
+
+        .fake-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .fake-row:hover {
+            background: rgba(0, 229, 255, 0.05);
+            border-color: rgba(0, 229, 255, 0.2);
+            transform: translateX(10px);
+        }
+
+        .fake-time { font-weight: 600; color: var(--text-muted); width: 60px;}
+        
+        .glow-tag {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .glow-cyan { background: rgba(0, 229, 255, 0.1); color: var(--cyan-primary); border: 1px solid var(--cyan-primary); box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+        .glow-purple { background: rgba(179, 0, 255, 0.1); color: var(--purple-accent); border: 1px solid var(--purple-accent); box-shadow: 0 0 15px rgba(179, 0, 255, 0.2); }
+        .glow-blue { background: rgba(0, 119, 255, 0.1); color: var(--blue-secondary); border: 1px solid var(--blue-secondary); box-shadow: 0 0 15px rgba(0, 119, 255, 0.2); }
+
+        /* --- FEATURES GRID --- */
+        .features {
+            padding: 60px 0 100px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            padding: 40px 30px;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.15);
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+
+        .icon-box {
+            width: 70px;
+            height: 70px;
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.1);
+        }
+
+        .icon-box svg {
+            width: 34px;
+            height: 34px;
+            stroke: var(--cyan-primary);
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* SVG Animations on Hover */
+        .feature-card:hover .icon-scroll path { animation: bounceY 1s infinite alternate; }
+        .feature-card:hover .icon-calendar rect.jump { animation: flashGlow 1.5s infinite; }
+        .feature-card:hover .icon-tags path { animation: stackIn 1.5s infinite alternate; }
+
+        /* --- ADVANTAGE SECTION --- */
+        .advantage {
+            margin: 60px 0 100px;
+            padding: 80px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(0,229,255,0.03) 0%, rgba(0,119,255,0.08) 100%);
+            border-top: 1px solid var(--cyan-primary);
+            border-bottom: 1px solid var(--cyan-primary);
+            box-shadow: 0 0 60px rgba(0, 229, 255, 0.1);
+            position: relative;
+        }
+
+        .advantage h2 {
+            font-size: 3rem;
+            margin-bottom: 25px;
+        }
+
+        .advantage p {
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        /* --- NAVIGATION BOTTOM --- */
+        .page-nav {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            padding: 30px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--cyan-primary);
+            color: var(--text-main);
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 229, 255, 0.15);
+            border-radius: 50px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.3);
+            border-color: #fff;
+        }
+
+        .nav-btn:hover::before { opacity: 1; }
+
+        .btn-next {
+            animation: pulseShadow 2s infinite;
+        }
+
+        /* --- KEYFRAMES --- */
+        @keyframes infiniteScroll {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+        @keyframes bounceY {
+            0% { transform: translateY(-3px); }
+            100% { transform: translateY(3px); }
+        }
+        @keyframes flashGlow {
+            0%, 100% { fill: transparent; stroke: var(--cyan-primary); }
+            50% { fill: rgba(0, 229, 255, 0.5); stroke: #fff; }
+        }
+        @keyframes stackIn {
+            0% { transform: translateY(5px); opacity: 0.7; }
+            100% { transform: translateY(-2px); opacity: 1; }
+        }
+        @keyframes pulseShadow {
+            0% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 229, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .z-section { flex-direction: column; text-align: center; padding: 60px 0; }
+            .hero-text h1 { font-size: 3rem; }
+            .advantage h2 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+      <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <section class="container hero">
+        <div class="hero-text fade-in">
+            <h1>Smart Schedule & <br> <span class="gradient-text">Interactive Timetable</span></h1>
+            <p>A beautifully scrollable, dynamic timeline for your entire week or month, putting your schedule directly in your pocket.</p>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="phone-mockup">
+                <div class="phone-notch"></div>
+                <div class="phone-screen">
+                    <div class="app-header">
+                        <h3>My Schedule</h3>
+                    </div>
+                    <div class="timeline-scroll-area">
+                        <div class="timeline-track">
+                            <div class="time-block">
+                                <div class="time-label">08:00</div>
+                                <div class="subject-card tag-cyan">
+                                    <h4>Grade 10 Science</h4>
+                                    <p>Lab Room 302</p>
+                                </div>
+                            </div>
+                            <div class="time-block">
+                                <div class="time-label">09:15</div>
+                                <div class="subject-card tag-purple">
+                                    <h4>Grade 12 Physics</h4>
+                                    <p>Main Hall</p>
+                                </div>
+                            </div>
+                            <div class="time-block">
+                                <div class="time-label">10:30</div>
+                                <div class="subject-card tag-blue" style="background: rgba(0,119,255,0.1);">
+                                    <h4>Staff Meeting</h4>
+                                    <p>Conference Room A</p>
+                                </div>
+                            </div>
+                            <div class="time-block">
+                                <div class="time-label">11:45</div>
+                                <div class="subject-card tag-cyan">
+                                    <h4>Grade 9 Biology</h4>
+                                    <p>Room 104</p>
+                                </div>
+                            </div>
+                            
+                            <div class="time-block">
+                                <div class="time-label">08:00</div>
+                                <div class="subject-card tag-cyan">
+                                    <h4>Grade 10 Science</h4>
+                                    <p>Lab Room 302</p>
+                                </div>
+                            </div>
+                            <div class="time-block">
+                                <div class="time-label">09:15</div>
+                                <div class="subject-card tag-purple">
+                                    <h4>Grade 12 Physics</h4>
+                                    <p>Main Hall</p>
+                                </div>
+                            </div>
+                            <div class="time-block">
+                                <div class="time-label">10:30</div>
+                                <div class="subject-card tag-blue" style="background: rgba(0,119,255,0.1);">
+                                    <h4>Staff Meeting</h4>
+                                    <p>Conference Room A</p>
+                                </div>
+                            </div>
+                            <div class="time-block">
+                                <div class="time-label">11:45</div>
+                                <div class="subject-card tag-cyan">
+                                    <h4>Grade 9 Biology</h4>
+                                    <p>Room 104</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container z-section">
+        <div class="z-text fade-in">
+            <h2 class="gradient-text">Visual Clarity at a Glance</h2>
+            <p>Experience a timeline view that is as beautiful as it is functional. Visual tags instantly identify different subjects, rooms, and responsibilities without requiring you to read tiny text.</p>
+        </div>
+        <div class="z-visual fade-in">
+            <div class="glass-panel timeline-card">
+                <div class="fake-row">
+                    <div class="fake-time">09:00</div>
+                    <div class="glow-tag glow-cyan">Science - Grade 10</div>
+                </div>
+                <div class="fake-row" style="transform: translateX(15px); border-color: rgba(179,0,255,0.3);">
+                    <div class="fake-time">10:30</div>
+                    <div class="glow-tag glow-purple">Mathematics - Grade 11</div>
+                </div>
+                <div class="fake-row">
+                    <div class="fake-time">11:45</div>
+                    <div class="glow-tag glow-blue">Free Period / Grading</div>
+                </div>
+                <div class="fake-row">
+                    <div class="fake-time">13:00</div>
+                    <div class="glow-tag glow-cyan">Biology Lab - Grade 12</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container features">
+        <div class="grid-container">
+            
+            <div class="glass-panel feature-card fade-in">
+                <div class="icon-box">
+                    <svg class="icon-scroll" viewBox="0 0 24 24">
+                        <path d="M12 5v14M19 12l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M19 5l-7-7-7 7" stroke-linecap="round" stroke-linejoin="round" style="animation-delay: 0.5s"/>
+                    </svg>
+                </div>
+                <h3>Infinite Scrolling</h3>
+                <p>Fluidly scroll through your daily agenda or expand out to view the entire week's obligations in one seamless motion.</p>
+            </div>
+
+            <div class="glass-panel feature-card fade-in">
+                <div class="icon-box">
+                    <svg class="icon-calendar" viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <path d="M16 2v4M8 2v4M3 10h18"/>
+                        <rect class="jump" x="7" y="14" width="3" height="3" rx="0.5"/>
+                        <rect x="14" y="14" width="3" height="3" rx="0.5"/>
+                    </svg>
+                </div>
+                <h3>Seamless Date Jumping</h3>
+                <p>Easily jump between specific dates using a smart, interactive mini-calendar. Planning ahead has never been this fast.</p>
+            </div>
+
+            <div class="glass-panel feature-card fade-in">
+                <div class="icon-box">
+                    <svg class="icon-tags" viewBox="0 0 24 24">
+                        <path d="M7 7h10v2H7z" rx="1"/>
+                        <path d="M5 11h14v2H5z" rx="1"/>
+                        <path d="M3 15h18v2H3z" rx="1"/>
+                    </svg>
+                </div>
+                <h3>Smart Subject Tags</h3>
+                <p>Visual, color-coded tags for different subjects and periods so your brain processes your schedule instantly.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="advantage">
+        <div class="container fade-in">
+            <h2 class="gradient-text">Eradicate the Staff-Room Whiteboard.</h2>
+            <p>No more crowding around a messy staff-room whiteboard or constantly asking the academic coordinator for your exact periods. Teachers know exactly where they need to be, long before the bell even rings.</p>
+        </div>
+    </section>
+
+    <div class="container glass-panel page-nav">
+        <a href="#" class="nav-btn">← Previous Page <br><span style="font-size: 0.8em; font-weight: 400; opacity: 0.8;">(Teacher Home Dashboard)</span></a>
+        <a href="class_list.html" class="nav-btn btn-next">Next Page → <br><span style="font-size: 0.8em; font-weight: 400; opacity: 0.8;">(class list)</span></a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Simple Intersection Observer to fade in elements on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = "1";
+                        entry.target.style.transform = "translateY(0)";
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Apply initial states and observe
+            document.querySelectorAll('.fade-in').forEach((el) => {
+                el.style.opacity = "0";
+                el.style.transform = "translateY(20px)";
+                el.style.transition = "opacity 0.6s ease-out, transform 0.6s ease-out";
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

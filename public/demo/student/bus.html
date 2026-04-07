@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Live School Bus Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables */
+        :root {
+            --bg-dark: #0B0F19;
+            --cyan-glow: #00FFFF;
+            --cyan-light: #87CEFA;
+            --glass-bg: rgba(11, 15, 25, 0.4);
+            --glass-border: rgba(0, 255, 255, 0.15);
+            --text-main: #FFFFFF;
+            --text-muted: #A0AABF;
+        }
+
+        /* Global & Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Glowing Cyan Dot-Grid Matrix */
+            background-image: radial-gradient(circle at center, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-attachment: fixed;
+        }
+
+        /* Typography & Gradients */
+        .cyan-gradient-text {
+            background: linear-gradient(90deg, var(--cyan-glow), var(--cyan-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        h1 { font-size: 3rem; line-height: 1.2; margin-bottom: 1rem; }
+        h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        p { color: var(--text-muted); line-height: 1.6; font-size: 1.1rem; }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header / Nav */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 5%;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .cap-icon {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--cyan-glow);
+            border-radius: 4px;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+        .cap-icon::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 2px;
+            background: var(--cyan-glow);
+            bottom: -5px;
+            right: -10px;
+            transform: rotate(-45deg);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 6rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .hero p {
+            max-width: 600px;
+            margin: 0 auto 3rem auto;
+        }
+
+        /* Animated Mobile Mockup */
+        .mobile-mockup {
+            width: 320px;
+            height: 650px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 8px solid #222;
+            border-radius: 40px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1), 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .mobile-notch {
+            width: 120px;
+            height: 25px;
+            background: #222;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+        .app-screen {
+            width: 100%;
+            height: 100%;
+            padding: 4rem 1.5rem 2rem 1.5rem;
+            position: relative;
+            background: linear-gradient(180deg, rgba(11,15,25,1) 0%, rgba(0,30,50,0.8) 100%);
+        }
+
+        /* Map Animation Inside Mockup */
+        .map-route {
+            height: 100%;
+            border-left: 3px dashed rgba(0, 255, 255, 0.3);
+            margin-left: 20px;
+            position: relative;
+        }
+        .animated-bus {
+            font-size: 2rem;
+            position: absolute;
+            left: -18px;
+            top: 10%;
+            animation: driveRoute 6s infinite ease-in-out;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.8));
+        }
+        .eta-tooltip {
+            position: absolute;
+            left: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--cyan-glow);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--cyan-glow);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            animation: followBus 6s infinite ease-in-out;
+        }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #00FF00;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00FF00;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Hero Feature: Passed Stop Alert */
+        .alert-section {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            margin-bottom: 6rem;
+        }
+        .alert-text { flex: 1; }
+        .alert-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+        .alert-card {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+        }
+        .map-pin {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            font-size: 2.5rem;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 10px rgba(255, 50, 50, 0.8));
+        }
+        .passing-bus {
+            position: absolute;
+            top: 40%;
+            left: -10%;
+            font-size: 2.5rem;
+            transform: translateY(-50%);
+            animation: passStop 5s infinite linear;
+        }
+        .push-notification {
+            background: rgba(0, 30, 30, 0.9);
+            border: 1px solid var(--cyan-glow);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+            transform: translateY(150%);
+            opacity: 0;
+            animation: popNotification 5s infinite ease-out;
+        }
+        .push-notification h4 { color: var(--cyan-glow); margin-bottom: 4px; font-size: 0.9rem;}
+        .push-notification p { font-size: 0.8rem; margin:0; color: #fff; }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 6rem;
+        }
+        .feature-card {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--cyan-glow);
+        }
+        .icon-container {
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 3rem;
+        }
+        
+        /* Specific Icon Animations */
+        .radar-icon { animation: pulseRadar 2s infinite; filter: drop-shadow(0 0 15px var(--cyan-glow)); }
+        .timeline-dots { display: flex; flex-direction: column; gap: 8px; }
+        .timeline-dots div { width: 12px; height: 12px; border-radius: 50%; background: var(--glass-border); border: 1px solid var(--cyan-glow); }
+        .timeline-dots div:nth-child(1) { animation: lightUp 3s infinite 0s; }
+        .timeline-dots div:nth-child(2) { animation: lightUp 3s infinite 1s; }
+        .timeline-dots div:nth-child(3) { animation: lightUp 3s infinite 2s; }
+        .phone-icon { animation: vibratePhone 0.2s infinite alternate; color: var(--cyan-glow); filter: drop-shadow(0 0 10px var(--cyan-glow)); }
+
+        /* Advantage Section */
+        .advantage-section {
+            text-align: center;
+            margin-bottom: 6rem;
+            border-top: 2px solid transparent;
+            border-bottom: 2px solid transparent;
+            background-image: linear-gradient(var(--bg-dark), var(--bg-dark)), linear-gradient(90deg, transparent, var(--cyan-glow), transparent);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+
+        /* Footer Nav Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+        }
+        .btn {
+            background: var(--glass-bg);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--cyan-glow);
+            color: var(--text-main);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+            animation: subtlePulse 3s infinite;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        /* Keyframes */
+        @keyframes driveRoute {
+            0% { top: 10%; }
+            50% { top: 80%; }
+            100% { top: 10%; }
+        }
+        @keyframes followBus {
+            0% { top: 10%; }
+            50% { top: 80%; }
+            100% { top: 10%; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px #00FF00; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        @keyframes passStop {
+            0% { left: -10%; }
+            30% { left: 50%; transform: translate(-50%, -50%); }
+            40% { left: 50%; transform: translate(-50%, -50%); } /* Pause at stop slightly */
+            100% { left: 110%; }
+        }
+        @keyframes popNotification {
+            0%, 35% { transform: translateY(150%); opacity: 0; }
+            40%, 80% { transform: translateY(0); opacity: 1; }
+            85%, 100% { transform: translateY(150%); opacity: 0; }
+        }
+        @keyframes pulseRadar {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+        @keyframes lightUp {
+            0%, 100% { background: var(--glass-border); box-shadow: none; }
+            50% { background: var(--cyan-glow); box-shadow: 0 0 15px var(--cyan-glow); }
+        }
+        @keyframes vibratePhone {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+        }
+        @keyframes subtlePulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.1); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .alert-section { flex-direction: column; text-align: center; }
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 2rem; }
+            .nav-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+       <header>    
+  <div class="container nav-inner">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      
+      <img 
+        src="../assets/paper_buddy_logo.png" 
+        alt="Paper Buddy Logo"
+        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
+      >
+
+      <span style="font-size:18px;font-weight:600;color:white;">
+        Paper Buddy
+      </span>
+
+    </a>
+  </div>
+</header>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Live School Bus Tracker & <br><span class="cyan-gradient-text">Route Monitor</span></h1>
+            <p>Give parents ultimate peace of mind. Show the exact live location of the student's school bus on an interactive, real-time map.</p>
+            
+            <div class="mobile-mockup">
+                <div class="mobile-notch"></div>
+                <div class="app-screen">
+                    <div class="map-route">
+                        <div class="animated-bus">🚌</div>
+                        <div class="eta-tooltip">
+                            <div class="pulse-dot"></div>
+                            ETA: 4 mins
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="alert-section" id="feature-alert">
+            <div class="alert-text">
+                <h2><span class="cyan-gradient-text">Never Miss</span> the Bus Again.</h2>
+                <p>Total transparency for parents. The system automatically alerts the parent the exact moment the bus has passed their specific designated stop, eliminating guesswork.</p>
+            </div>
+            <div class="alert-visual">
+                <div class="glass-panel alert-card">
+                    <div class="map-pin">📍</div>
+                    <div class="passing-bus">🚌</div>
+                    <div class="push-notification">
+                        <h4>Paper Buddy Alert</h4>
+                        <p>✅ The bus has passed your specific stop.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-grid">
+            <div class="glass-panel feature-card">
+                <div class="icon-container radar-icon">🌐</div>
+                <h3>Real-Time Moving Map</h3>
+                <p>Watch the bus move live with an accurate Estimated Time of Arrival (ETA) updated in minutes.</p>
+            </div>
+            
+            <div class="glass-panel feature-card">
+                <div class="icon-container">
+                    <div class="timeline-dots">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                <h3>Clear Route Indicators</h3>
+                <p>View a clean timeline of all upcoming stops so parents know exactly where the bus is on its route.</p>
+            </div>
+
+            <div class="glass-panel feature-card">
+                <div class="icon-container phone-icon">📞</div>
+                <h3>Quick-Call Driver</h3>
+                <p>A dedicated, one-tap button to call the assigned bus driver instantly in case of an emergency.</p>
+            </div>
+        </section>
+
+        <section class="glass-panel advantage-section">
+            <h2>End the <span class="cyan-gradient-text">Anxious Morning</span> Phone Calls.</h2>
+            <p>Eliminate the flood of anxious morning phone calls to the school reception asking, "Where is the bus?" or "Did the bus leave already?". Paper Buddy empowers parents with real-time tracking, acting as a massive stress reliever and building trust in your institution.</p>
+        </section>
+
+        <nav class="glass-panel" style="padding: 1rem; border-radius: 50px;">
+            <div class="nav-buttons">
+                <a href="homework_and_assignment.html" class="btn">← Previous Page (homework&Assignment)</a>
+                <a href="timetable.html" class="btn">Next Page: Timetable→</a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            const sectionsToAnimate = document.querySelectorAll('section');
+            
+            sectionsToAnimate.forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
