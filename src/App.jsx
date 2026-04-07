@@ -243,21 +243,26 @@ const Navbar = () => {
                Privacy Policy
            </Link>
 
-            <a 
-  href="/demo/index.html" 
-  target="_blank" 
-  rel="noreferrer"
-  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all"
->
-  Get Demo
-</a>
-              <a href={APK_DOWNLOAD_LINK} target="_blank" rel="noreferrer" className="bg-gradient-to-r from-accent-purple to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] inline-block transform hover:-translate-y-0.5">
-                Download App
-              </a>
+           <div className="flex gap-4">
+  <a 
+    href="/demo/index.html" 
+    target="_blank" 
+    rel="noreferrer"
+    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all"
+  >
+    Get Demo
+  </a>
+
+  <a 
+    href={APK_DOWNLOAD_LINK} 
+    target="_blank" 
+    rel="noreferrer" 
+    className="bg-gradient-to-r from-accent-purple to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] inline-block transform hover:-translate-y-0.5"
+  >
+    Download App
+  </a>
+</div>
            
-           <a href={APK_DOWNLOAD_LINK} target="_blank" rel="noreferrer" className="block w-full text-center bg-gradient-to-r from-accent-purple to-blue-600 text-white px-5 py-3 mt-4 rounded-lg font-bold">
-             Download App
-           </a>
         </div>
       )}
     </motion.nav>
