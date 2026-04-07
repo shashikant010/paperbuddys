@@ -3,29 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paper Buddy | Admin Control Center</title>
+    <title>Paper Buddy | Teacher Home Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* =========================================
-           CSS VARIABLES & GLOBAL STYLES
-           ========================================= */
+        /* ==========================================================================
+           GLOBAL VARIABLES & THEME SETTINGS
+           ========================================================================== */
         :root {
-            --bg-color: #0A0F1C;
+            /* Colors */
+            --bg-dark: #0B0F19;
+            --bg-darker: #06090f;
             --text-main: #FFFFFF;
-            --text-muted: #A0AEC0;
-            --cyan-primary: #00E5FF;
-            --cyan-secondary: #007BFF;
-            --purple-primary: #8A2BE2;
-            --purple-secondary: #4169E1;
+            --text-muted: #94A3B8;
+            --cyan-primary: #00f2fe;
+            --cyan-secondary: #4facfe;
+            --cyan-glow: rgba(0, 242, 254, 0.4);
+            --alert-green: #10b981;
+            --alert-coral: #ff6b6b;
             
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(0, 229, 255, 0.15);
+            /* UI Elements */
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(0, 242, 254, 0.15);
             --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             
-            --cyan-gradient: linear-gradient(90deg, var(--cyan-primary), var(--cyan-secondary));
-            --purple-gradient: linear-gradient(90deg, var(--purple-primary), var(--purple-secondary));
+            /* Gradients */
+            --cyan-gradient: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
         }
 
         * {
@@ -36,781 +42,671 @@
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
-            position: relative;
+            line-height: 1.6;
         }
 
-        /* Animated Glowing Dots Background */
+        /* --------------------------------------------------------------------------
+           BACKGROUND EFFECTS
+           -------------------------------------------------------------------------- */
         body::before {
             content: '';
             position: fixed;
-            top: 0; left: 0; width: 200vw; height: 200vh;
-            background-image: radial-gradient(rgba(0, 229, 255, 0.2) 1.5px, transparent 1.5px);
-            background-size: 40px 40px;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(var(--cyan-primary) 1px, transparent 1px);
+            background-size: 35px 35px;
+            opacity: 0.08;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.04) 0%, transparent 60%);
+            border-radius: 50%;
             z-index: -1;
-            animation: matrixDrift 100s linear infinite;
+            pointer-events: none;
         }
+        .glow-1 { top: -200px; left: -200px; }
+        .glow-2 { bottom: -200px; right: -200px; }
 
-        @keyframes matrixDrift {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(-50vw, -50vh); }
-        }
-
+        /* --------------------------------------------------------------------------
+           UTILITIES
+           -------------------------------------------------------------------------- */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 2rem;
         }
 
-        .gradient-text {
+        .text-gradient {
             background: var(--cyan-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
         }
 
-        /* Glassmorphism Utilities */
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
+            border-radius: 20px;
             box-shadow: var(--glass-shadow);
         }
 
-        /* Scroll Reveal Utility */
+        /* Scroll Reveal Animation */
         .reveal {
             opacity: 0;
             transform: translateY(40px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-
         .reveal.active {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* =========================================
-           HEADER
-           ========================================= */
+        /* ==========================================================================
+           SECTION 1: HEADER & NAVIGATION
+           ========================================================================== */
         header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
             z-index: 1000;
-            padding: 16px 0;
-            background: rgba(10, 15, 28, 0.7);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
         }
 
-        .nav-container {
+        .nav-wrapper {
             display: flex;
-            justify-content: space-between;
             align-items: center;
         }
 
-        .logo-group {
+        .brand-logo {
             display: flex;
             align-items: center;
             gap: 12px;
-        }
-
-        /* CSS Drawn Origami Bird Logo */
-        .origami-bird {
-            width: 36px; height: 36px;
-            position: relative;
-            filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6));
-        }
-
-        .wing-top {
-            position: absolute;
-            width: 100%; height: 100%;
-            background: var(--cyan-gradient);
-            clip-path: polygon(10% 50%, 50% 10%, 100% 40%, 60% 60%);
-        }
-
-        .wing-bottom {
-            position: absolute;
-            width: 100%; height: 100%;
-            background: var(--purple-gradient);
-            clip-path: polygon(10% 50%, 60% 60%, 80% 90%, 30% 70%);
-        }
-
-        .logo-text {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .badge {
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px solid var(--cyan-primary);
-            color: var(--cyan-primary);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-download {
-            background: var(--purple-gradient);
-            color: #fff;
-            padding: 10px 24px;
-            border-radius: 50px;
+            color: var(--text-main);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+            letter-spacing: 0.5px;
         }
 
-        .btn-download:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.6);
+        /* CSS-Drawn Graduation Cap */
+        .css-cap { position: relative; width: 36px; height: 24px; }
+        .cap-top {
+            position: absolute; top: 0; left: 0; width: 100%; height: 16px;
+            background: var(--cyan-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .cap-base {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 10px; background: var(--cyan-secondary);
+            border-radius: 0 0 4px 4px;
+        }
+        .cap-tassel {
+            position: absolute; right: 4px; top: 8px; width: 2px; height: 14px;
+            background: var(--cyan-primary); transform: rotate(-15deg);
         }
 
-        /* =========================================
-           HERO SECTION & MOCKUP
-           ========================================= */
+        /* ==========================================================================
+           SECTION 1: HERO (CENTER ALIGNED + MOCKUP)
+           ========================================================================== */
         .hero {
-            padding: 140px 0 60px;
+            padding: 5rem 0 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
         }
 
-        .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            line-height: 1.1;
-            margin-bottom: 20px;
-            letter-spacing: -1px;
+        .hero-text {
+            max-width: 850px;
+            margin-bottom: 4rem;
+            z-index: 10;
         }
 
-        .hero p {
+        .hero-text h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
             color: var(--text-muted);
-            font-size: clamp(1rem, 2vw, 1.2rem);
+            margin-bottom: 2rem;
             max-width: 700px;
-            margin: 0 auto 50px;
+            margin-inline: auto;
         }
 
-        .mockup-wrapper {
-            perspective: 1500px;
+        /* 3D Mobile Mockup */
+        .hero-visual {
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-top: 20px;
+            perspective: 1200px;
         }
 
-        .tablet-mockup {
-            width: 100%;
-            max-width: 800px;
-            aspect-ratio: 16/10;
-            background: #050811;
-            border-radius: 24px;
-            border: 12px solid #1C2538;
-            box-shadow: 
-                0 40px 80px rgba(0,0,0,0.8), 
-                inset 0 0 30px rgba(0, 229, 255, 0.1),
-                0 0 60px rgba(0, 229, 255, 0.2);
-            transform: rotateX(15deg) translateY(0);
-            transition: transform 0.5s ease;
+        .phone-mockup {
+            width: 320px;
+            height: 640px;
+            background: var(--bg-darker);
+            border: 4px solid #1A2235;
+            border-radius: 45px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 0 20px rgba(0, 242, 254, 0.15);
             position: relative;
-            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: rotateX(12deg) rotateY(-15deg) rotateZ(3deg);
+            animation: floatPhone 6s ease-in-out infinite;
+            padding: 12px;
             display: flex;
             flex-direction: column;
         }
 
-        .tablet-mockup:hover {
-            transform: rotateX(5deg) translateY(-10px);
+        .phone-notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 26px; background: #000;
+            border-radius: 0 0 14px 14px; z-index: 10;
         }
 
-        .mockup-screen {
-            background: linear-gradient(180deg, #0A0F1C 0%, #111827 100%);
-            width: 100%; height: 100%;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .phone-screen {
+            background: #0B101C;
+            flex: 1; border-radius: 32px;
+            position: relative; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column;
+            padding: 40px 20px 20px;
+            background: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, transparent 40%);
         }
 
-        /* Mockup Internals Animation */
-        .mock-greeting {
-            font-size: 1.2rem;
-            font-weight: 600;
-            text-align: left;
-            opacity: 0;
-            animation: fadeIn 1s ease forwards 0.5s;
+        /* App Screen Internal UI & Animations */
+        .app-greeting {
+            display: flex; align-items: center; gap: 15px; margin-bottom: 30px;
+            opacity: 0; animation: fadeInDown 1s forwards 0.5s;
+        }
+        .app-avatar {
+            width: 50px; height: 50px; border-radius: 50%; background: var(--cyan-gradient);
+            display: flex; justify-content: center; align-items: center; font-size: 1.2rem; color: var(--bg-dark); font-weight: bold;
+        }
+        .app-greet-text { flex: 1; }
+        .app-greet-h { width: 100%; height: 12px; background: #fff; border-radius: 6px; margin-bottom: 6px; }
+        .app-greet-p { width: 60%; height: 8px; background: var(--text-muted); border-radius: 4px; }
+
+        .app-section-title { width: 40%; height: 10px; background: var(--cyan-primary); border-radius: 5px; margin-bottom: 15px; opacity: 0; animation: fadeIn 1s forwards 1s;}
+
+        .app-schedule { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+        .app-sched-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;
+            transform: translateX(120%); opacity: 0;
+        }
+        .sc-1 { animation: slideInRight 0.8s forwards 1.2s; border-left: 3px solid var(--cyan-primary); }
+        .sc-2 { animation: slideInRight 0.8s forwards 1.4s; border-left: 3px solid var(--text-muted); }
+        .sc-lines { display: flex; flex-direction: column; gap: 6px; flex: 1; margin-right: 15px; }
+        .sc-l1 { width: 70%; height: 8px; background: #fff; border-radius: 4px; }
+        .sc-l2 { width: 40%; height: 6px; background: var(--text-muted); border-radius: 3px; }
+        .sc-time { font-size: 0.7rem; font-weight: 600; color: var(--cyan-primary); }
+
+        .app-cta {
+            margin-top: auto; padding: 15px; text-align: center; border-radius: 16px;
+            background: var(--cyan-gradient); color: var(--bg-dark); font-weight: 700;
+            box-shadow: 0 0 20px var(--cyan-glow); opacity: 0;
+            animation: fadeInUp 1s forwards 2s, pulseAppBtn 2s infinite 3s;
         }
 
-        .mock-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            flex: 1;
+        /* Keyframes */
+        @keyframes floatPhone {
+            0%, 100% { transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg) translateY(0); }
+            50% { transform: rotateX(12deg) rotateY(-12deg) rotateZ(2deg) translateY(-20px); box-shadow: 20px 50px 80px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 242, 254, 0.2); }
         }
+        @keyframes fadeInDown { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes slideInRight { 0% { transform: translateX(120%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        @keyframes pulseAppBtn { 0%, 100% { box-shadow: 0 0 15px var(--cyan-glow); } 50% { box-shadow: 0 0 30px var(--cyan-glow); } }
 
-        .mock-widget {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(0, 229, 255, 0.1);
-            border-radius: 12px;
-            opacity: 0;
-            transform: translateY(20px);
-            padding: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mock-widget::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(0,229,255,0.1) 0%, transparent 60%);
-            animation: rotateGlow 4s linear infinite;
-        }
-
-        .mw-1 { animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1s; }
-        .mw-2 { animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1.2s; }
-        .mw-3 { animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1.4s; }
-        .mw-large { 
-            grid-column: 1 / -1; 
-            animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1.6s; 
-            display: flex; gap: 15px; flex-direction: column;
-        }
-
-        .mock-line {
-            height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1);
-            width: 100%;
-        }
-        .mock-line.short { width: 60%; background: rgba(0, 229, 255, 0.3); }
-
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes popUp { to { opacity: 1; transform: translateY(0); } }
-        @keyframes rotateGlow { 100% { transform: rotate(360deg); } }
-
-        /* =========================================
-           HERO STAT CARD (SPLIT SECTION)
-           ========================================= */
-        .stat-section {
-            padding: 100px 0;
+        /* ==========================================================================
+           SECTION 2: CLASS PERFORMANCE & ANALYTICS (SPLIT)
+           ========================================================================== */
+        .feature-split {
+            padding: 6rem 0;
             display: flex;
             align-items: center;
-            gap: 60px;
+            justify-content: space-between;
+            gap: 4rem;
         }
 
-        .stat-content {
+        .feature-text {
             flex: 1;
         }
 
-        .stat-content h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+        .feature-text h2 {
+            font-size: 2.8rem;
             line-height: 1.2;
+            margin-bottom: 1.5rem;
         }
 
-        .stat-content p {
+        .feature-text p {
+            font-size: 1.15rem;
             color: var(--text-muted);
-            font-size: 1.1rem;
-            line-height: 1.7;
+            margin-bottom: 2rem;
         }
 
-        .stat-visual {
-            flex: 1;
+        .feature-visual {
+            flex: 1.2;
             display: flex;
             justify-content: center;
+            position: relative;
         }
 
-        .hero-stat-card {
+        .dashboard-card {
             width: 100%;
-            max-width: 450px;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+            max-width: 550px;
+            padding: 2.5rem;
             position: relative;
             overflow: hidden;
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.8), rgba(0, 242, 254, 0.05));
+            display: flex; flex-direction: column; gap: 2rem;
         }
 
-        /* Animated glowing border effect */
-        .hero-stat-card::before {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(45deg, var(--cyan-primary), transparent, var(--purple-primary), transparent);
-            z-index: -1;
-            border-radius: 18px;
-            background-size: 400%;
-            animation: borderGlow 6s linear infinite;
-            opacity: 0.5;
-        }
+        /* Analytics Dashboard Internal UI */
+        .dash-title { font-size: 1.2rem; font-weight: 600; color: #fff; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .dash-title span { font-size: 0.9rem; color: var(--cyan-light); font-weight: 500; }
 
-        @keyframes borderGlow {
-            0% { background-position: 0 0; }
-            50% { background-position: 400% 0; }
-            100% { background-position: 0 0; }
+        .chart-container {
+            display: flex; align-items: flex-end; gap: 15px; height: 180px;
+            padding: 20px; background: rgba(0,0,0,0.3); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
         }
+        .chart-grid-line { position: absolute; left: 0; width: 100%; height: 1px; background: rgba(255,255,255,0.05); }
+        .cgl-1 { top: 25%; } .cgl-2 { top: 50%; } .cgl-3 { top: 75%; }
 
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 15px;
+        .chart-bar {
+            flex: 1; background: rgba(255,255,255,0.1); border-radius: 6px 6px 0 0; position: relative;
+            display: flex; justify-content: center; align-items: flex-end; padding-bottom: 10px;
         }
-
-        .stat-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
+        .chart-bar-fill {
+            position: absolute; bottom: 0; left: 0; width: 100%; border-radius: 6px 6px 0 0;
+            background: var(--cyan-gradient); box-shadow: 0 0 15px var(--cyan-glow);
+            transform-origin: bottom; transform: scaleY(0);
         }
+        .reveal.active .cb-1 { animation: growBar 1.5s forwards ease-out 0.2s; }
+        .reveal.active .cb-2 { animation: growBar 1.5s forwards ease-out 0.4s; background: linear-gradient(135deg, var(--alert-coral), #ff4757); box-shadow: 0 0 15px rgba(255,107,107,0.4); }
+        .reveal.active .cb-3 { animation: growBar 1.5s forwards ease-out 0.6s; }
+        .reveal.active .cb-4 { animation: growBar 1.5s forwards ease-out 0.8s; background: linear-gradient(135deg, var(--alert-green), #2ed573); box-shadow: 0 0 15px rgba(16,185,129,0.4); }
 
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+        .dash-tags { display: flex; gap: 15px; }
+        .d-tag {
+            flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            padding: 15px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px;
+            opacity: 0; transform: translateY(20px);
         }
+        .reveal.active .dt-1 { animation: slideUpFade 0.8s forwards 1.2s; }
+        .reveal.active .dt-2 { animation: slideUpFade 0.8s forwards 1.4s; }
+        
+        .dt-header { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+        .dt-1 .dt-header { color: var(--alert-green); }
+        .dt-2 .dt-header { color: var(--alert-coral); }
+        .dt-student { width: 100%; height: 8px; background: rgba(255,255,255,0.8); border-radius: 4px; }
+        .dt-student.short { width: 70%; background: rgba(255,255,255,0.4); }
 
-        .stat-value {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: #fff;
-            text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
-            display: flex;
-            align-items: baseline;
-            gap: 5px;
-        }
+        @keyframes growBar { 0% { transform: scaleY(0); } 100% { transform: scaleY(1); } }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
 
-        .stat-value span.prefix, .stat-value span.suffix {
-            font-size: 1.5rem;
-            color: var(--cyan-primary);
-        }
-
-        /* =========================================
-           FEATURES GRID
-           ========================================= */
+        /* ==========================================================================
+           SECTION 3: CORE FEATURES GRID
+           ========================================================================== */
         .features-grid {
-            padding: 60px 0;
+            padding: 5rem 0;
+        }
+
+        .grid-wrapper {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
+            gap: 2.5rem;
         }
 
         .feature-card {
-            padding: 40px 30px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
             position: relative;
             overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: default;
+        }
+
+        .feature-card::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+            background: var(--cyan-gradient); transform: scaleX(0); transform-origin: right; transition: transform 0.5s ease;
         }
 
         .feature-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.2);
-            border-color: rgba(0, 229, 255, 0.4);
+            border-color: rgba(0, 242, 254, 0.4);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.15);
+        }
+        .feature-card:hover::before { transform: scaleX(1); transform-origin: left; }
+
+        .f-icon {
+            width: 70px; height: 70px; border-radius: 18px;
+            background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; color: var(--cyan-light);
+            margin-bottom: 2rem; position: relative;
+            transition: all 0.3s ease;
         }
 
-        .feature-anim-box {
-            height: 120px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; color: #fff; }
+        .feature-card p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; flex: 1; }
 
-        .feature-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 12px;
-        }
+        /* Card Hover Animations */
+        /* Card 1: Clock merging with Calendar */
+        .icon-layer { position: absolute; transition: all 0.4s ease; }
+        .il-clock { opacity: 1; transform: scale(1) rotate(0deg); }
+        .il-cal { opacity: 0; transform: scale(0.5) translateY(20px); color: #fff; }
+        .feature-card:hover .il-clock { opacity: 0; transform: scale(1.5) rotate(90deg); }
+        .feature-card:hover .il-cal { opacity: 1; transform: scale(1) translateY(0); text-shadow: 0 0 15px var(--cyan-light); }
 
-        .feature-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
+        /* Card 2: Upload Arrow to Document */
+        .il-up { opacity: 1; transform: translateY(0); }
+        .il-doc { opacity: 0; transform: translateY(-20px); color: #fff; }
+        .feature-card:hover .il-up { opacity: 0; transform: translateY(20px); }
+        .feature-card:hover .il-doc { opacity: 1; transform: translateY(0); text-shadow: 0 0 15px var(--cyan-light); }
 
-        /* Animations for Feature Boxes */
-        /* 1. Live Pulse Chart */
-        .live-chart {
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            height: 50px;
-        }
-        .bar {
-            width: 12px;
-            background: var(--cyan-primary);
-            border-radius: 4px;
-            box-shadow: 0 0 10px var(--cyan-primary);
-            animation: barPulse 1.5s infinite ease-in-out alternate;
-        }
-        .bar:nth-child(1) { height: 40%; animation-delay: 0s; }
-        .bar:nth-child(2) { height: 70%; animation-delay: 0.2s; }
-        .bar:nth-child(3) { height: 50%; animation-delay: 0.4s; }
-        .bar:nth-child(4) { height: 90%; animation-delay: 0.6s; }
-        .bar:nth-child(5) { height: 60%; animation-delay: 0.8s; }
-        
-        @keyframes barPulse { 0% { transform: scaleY(0.8); opacity: 0.7;} 100% { transform: scaleY(1.1); opacity: 1;} }
+        /* Card 3: Checklist with Checkmarks */
+        .il-list { color: var(--cyan-light); }
+        .il-check-grp { position: absolute; display: flex; flex-direction: column; gap: 4px; top: 22px; left: 35px; }
+        .il-check { font-size: 0.6rem; color: var(--alert-green); opacity: 0; transform: scale(0.5); transition: all 0.3s ease; text-shadow: 0 0 8px rgba(16,185,129,0.8); }
+        .feature-card:hover .il-check:nth-child(1) { opacity: 1; transform: scale(1); transition-delay: 0.1s; }
+        .feature-card:hover .il-check:nth-child(2) { opacity: 1; transform: scale(1); transition-delay: 0.3s; }
+        .feature-card:hover .il-check:nth-child(3) { opacity: 1; transform: scale(1); transition-delay: 0.5s; }
 
-        /* 2. Hovering Grid Icons */
-        .app-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .app-icon {
-            width: 30px; height: 30px;
-            background: rgba(138, 43, 226, 0.3);
-            border: 1px solid var(--purple-primary);
-            border-radius: 8px;
-            animation: floatIcon 3s infinite ease-in-out;
-        }
-        .app-icon:nth-child(2) { animation-delay: 0.5s; background: rgba(0, 229, 255, 0.2); border-color: var(--cyan-primary); }
-        .app-icon:nth-child(3) { animation-delay: 1s; background: rgba(0, 229, 255, 0.2); border-color: var(--cyan-primary); }
-        .app-icon:nth-child(4) { animation-delay: 1.5s; }
-
-        @keyframes floatIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-        /* 3. Sun/Moon Transition */
-        .greet-icon {
-            position: relative;
-            width: 60px; height: 60px;
-        }
-        .sun, .moon {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            transition: all 1s ease;
-        }
-        .sun {
-            background: #FFD700;
-            box-shadow: 0 0 20px #FFD700;
-            animation: rotateSun 10s linear infinite;
-        }
-        .moon {
-            background: #E2E8F0;
-            box-shadow: inset -10px -5px 0 0 #0A0F1C, 0 0 20px rgba(255,255,255,0.5);
-            opacity: 0;
-            transform: scale(0.5);
-        }
-        
-        .feature-card:hover .sun { opacity: 0; transform: scale(0.5); }
-        .feature-card:hover .moon { opacity: 1; transform: scale(1); }
-
-        @keyframes rotateSun { 100% { transform: rotate(360deg); } }
-
-        /* =========================================
-           ADVANTAGE SECTION
-           ========================================= */
-        .advantage-section {
-            margin: 60px 0 100px;
-            padding: 80px 20px;
+        /* ==========================================================================
+           SECTION 4: ADVANTAGE SECTION
+           ========================================================================== */
+        .advantage {
+            padding: 6rem 0;
             text-align: center;
-            background: linear-gradient(180deg, rgba(0, 229, 255, 0.05) 0%, rgba(10, 15, 28, 0.8) 100%);
-            border-top: 1px solid var(--cyan-primary);
-            border-bottom: 1px solid var(--cyan-primary);
-            box-shadow: 0 0 50px rgba(0, 229, 255, 0.1);
         }
 
-        .advantage-section h2 {
-            font-size: 2.8rem;
-            margin-bottom: 25px;
+        .adv-panel {
+            padding: 5rem 3rem;
+            background: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, rgba(11, 15, 25, 0.4) 100%);
+            border-top: 1px solid rgba(0, 242, 254, 0.3);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            border-radius: 30px;
+            box-shadow: inset 0 20px 50px -20px rgba(0, 242, 254, 0.15);
         }
 
-        .advantage-section p {
-            max-width: 850px;
-            margin: 0 auto;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            line-height: 1.8;
-        }
+        .adv-panel h2 { font-size: 3rem; margin-bottom: 1.5rem; font-weight: 700; }
+        .adv-panel p { font-size: 1.2rem; color: var(--text-muted); max-width: 850px; margin: 0 auto; line-height: 1.8; }
 
-        /* =========================================
-           BOTTOM NAVIGATION
-           ========================================= */
+        /* ==========================================================================
+           SECTION 5: BOTTOM NAVIGATION
+           ========================================================================== */
         .bottom-nav {
+            padding: 2rem 0 8rem;
             display: flex;
             justify-content: center;
-            padding-bottom: 80px;
         }
 
         .nav-pill-container {
-            padding: 10px;
+            display: inline-flex; gap: 1.5rem; padding: 1.5rem 2rem;
             border-radius: 60px;
-            display: inline-block;
+            background: rgba(11, 15, 25, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap; justify-content: center;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem; border-radius: 40px; text-decoration: none;
+            font-weight: 500; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-prev {
+            background: rgba(255,255,255,0.03); color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-prev:hover {
+            background: rgba(255,255,255,0.08); color: var(--text-main);
+            transform: translateX(-5px); border-color: rgba(0, 242, 254, 0.4);
         }
 
         .btn-next {
-            display: inline-block;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--cyan-primary);
-            color: #fff;
-            padding: 16px 40px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
-            animation: pulseGlow 2.5s infinite;
+            background: rgba(0, 242, 254, 0.05); color: var(--cyan-light);
+            border: 1px solid var(--cyan-light);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            animation: pulseNav 2.5s infinite alternate;
         }
-
-        .btn-next::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--cyan-gradient);
-            border-radius: 50px;
-            opacity: 0;
-            z-index: -1;
-            transition: opacity 0.3s ease;
-        }
-
         .btn-next:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
-            color: #0A0F1C;
+            background: var(--cyan-gradient); color: #000; font-weight: 600;
+            border-color: transparent; box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+            transform: scale(1.05) translateX(5px); animation: none;
         }
 
-        .btn-next:hover::before {
-            opacity: 1;
+        @keyframes pulseNav {
+            0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); }
+            100% { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); }
         }
 
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4); }
-            70% { box-shadow: 0 0 0 20px rgba(0, 229, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
-        }
-
-        /* =========================================
+        /* ==========================================================================
            RESPONSIVE DESIGN
-           ========================================= */
-        @media (max-width: 992px) {
-            .stat-section {
-                flex-direction: column;
-                text-align: center;
-                gap: 40px;
-            }
-            .hero h1 { font-size: 3rem; }
-            .advantage-section h2 { font-size: 2.2rem; }
-            .tablet-mockup { aspect-ratio: 4/3; }
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            .feature-split { flex-direction: column; text-align: center; gap: 4rem; }
+            .feature-text { max-width: 100%; }
+            .dashboard-card { max-width: 100%; }
         }
 
-        @media (max-width: 600px) {
-            .hero h1 { font-size: 2.2rem; }
-            .stat-value { font-size: 2.2rem; }
-            .btn-download { display: none; /* Hide on very small screens for space */ }
-            .tablet-mockup { transform: rotateX(5deg) translateY(0); }
-            .mock-grid { grid-template-columns: 1fr; }
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 2.8rem; }
+            .feature-text h2 { font-size: 2.4rem; }
+            .adv-panel h2 { font-size: 2.2rem; }
+            
+            .phone-mockup { transform: rotateY(0) rotateX(0) rotateZ(0); animation: floatMobile 6s ease-in-out infinite; max-width: 300px; height: 600px;}
+            @keyframes floatMobile { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+            
+            .nav-pill-container { flex-direction: column; width: 100%; border-radius: 20px; padding: 1.5rem; gap: 1rem; }
+            .btn { justify-content: center; width: 100%; }
+            
+            .dash-tags { flex-direction: column; }
         }
-
     </style>
 </head>
 <body>
 
-     <header>    
-  <div class="container nav-inner">
-    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-      
-      <img 
-        src="../assets/paper_buddy_logo.png" 
-        alt="Paper Buddy Logo"
-        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
-      >
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
 
-      <span style="font-size:18px;font-weight:600;color:white;">
-        Paper Buddy
-      </span>
-
-    </a>
-  </div>
-</header>
-
-    <section class="hero container">
-        <div class="reveal">
-            <h1>School Control Center & <br><span class="gradient-text">Live Dashboard</span></h1>
-            <p>The ultimate command center for your institute. See the entire school’s health at a single glance with real-time data.</p>
+    <header>
+        <div class="container nav-wrapper">
+            <a href="#" class="brand-logo">
+                <div class="css-cap">
+                    <div class="cap-top"></div>
+                    <div class="cap-base"></div>
+                    <div class="cap-tassel"></div>
+                </div>
+                Paper Buddy
+            </a>
         </div>
+    </header>
 
-        <div class="mockup-wrapper reveal">
-            <div class="tablet-mockup">
-                <div class="mockup-screen">
-                    <div class="mock-greeting">Good Morning, Principal Sharma ✨</div>
-                    <div class="mock-grid">
-                        <div class="mock-widget mw-1">
-                            <div class="mock-line short" style="margin-bottom: 10px;"></div>
-                            <div class="mock-line" style="height: 20px;"></div>
+    <main>
+        <section class="container hero">
+            <div class="hero-text reveal">
+                <h1>Teacher Dashboard & <br><span class="text-gradient">Class Analytics</span></h1>
+                <p>The ultimate command center for educators. Manage daily schedules, share resources, and track class performance from one beautifully designed hub.</p>
+            </div>
+
+            <div class="hero-visual reveal" style="transition-delay: 0.2s;">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        
+                        <div class="app-greeting">
+                            <div class="app-avatar">SK</div>
+                            <div class="app-greet-text">
+                                <div class="app-greet-h"></div>
+                                <div class="app-greet-p"></div>
+                            </div>
                         </div>
-                        <div class="mock-widget mw-2">
-                            <div class="mock-line short" style="margin-bottom: 10px;"></div>
-                            <div class="mock-line" style="height: 20px;"></div>
+
+                        <div class="app-section-title"></div>
+
+                        <div class="app-schedule">
+                            <div class="app-sched-card sc-1">
+                                <div class="sc-lines">
+                                    <div class="sc-l1"></div>
+                                    <div class="sc-l2"></div>
+                                </div>
+                                <div class="sc-time">09:00 AM</div>
+                            </div>
+                            <div class="app-sched-card sc-2">
+                                <div class="sc-lines">
+                                    <div class="sc-l1" style="width: 50%;"></div>
+                                    <div class="sc-l2" style="width: 80%;"></div>
+                                </div>
+                                <div class="sc-time" style="color: var(--text-muted);">10:00 AM</div>
+                            </div>
                         </div>
-                        <div class="mock-widget mw-3">
-                            <div class="mock-line short" style="margin-bottom: 10px;"></div>
-                            <div class="mock-line" style="height: 20px;"></div>
+
+                        <div class="app-cta">
+                            Take Attendance
                         </div>
-                        <div class="mock-widget mw-large">
-                            <div class="mock-line short" style="width: 30%;"></div>
-                            <div class="mock-line" style="height: 60px;"></div>
-                        </div>
+
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="stat-section container reveal">
-        <div class="stat-content">
-            <h2 class="gradient-text">Instant Institute Overview.</h2>
-            <p>The second you open the app, the Hero Stat Card provides an instant, visually stunning summary of today's most critical metrics. No digging through menus, no calling the accounts department—just absolute, crystal-clear visibility.</p>
-        </div>
-        <div class="stat-visual">
-            <div class="hero-stat-card glass-panel">
-                <div class="stat-item">
-                    <div class="stat-label">Today's Attendance</div>
-                    <div class="stat-value">
-                        <span class="counter" data-target="94" data-duration="2000">0</span>
-                        <span class="suffix">%</span>
+        <section class="container feature-split">
+            <div class="feature-text reveal">
+                <h2 class="text-gradient">Live Academic Pulse & Analytics</h2>
+                <p>Empower your teaching with data. Teachers can instantly view the academic health of their assigned classes, track average subject scores, and rapidly identify students who need extra support before the final exams even begin.</p>
+            </div>
+            
+            <div class="feature-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel dashboard-card">
+                    
+                    <div class="dash-title">
+                        Class 10-A Science Average
+                        <span>88% <i class="fa-solid fa-arrow-trend-up"></i></span>
                     </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Fee Collections (Today)</div>
-                    <div class="stat-value">
-                        <span class="prefix">₹</span>
-                        <span class="counter" data-target="2.5" data-duration="2000" data-decimal="1">0.0</span>
-                        <span class="suffix">L</span>
+                    
+                    <div class="chart-container">
+                        <div class="chart-grid-line cgl-1"></div>
+                        <div class="chart-grid-line cgl-2"></div>
+                        <div class="chart-grid-line cgl-3"></div>
+                        
+                        <div class="chart-bar"><div class="chart-bar-fill cb-1" style="height: 65%;"></div></div>
+                        <div class="chart-bar"><div class="chart-bar-fill cb-2" style="height: 45%;"></div></div>
+                        <div class="chart-bar"><div class="chart-bar-fill cb-3" style="height: 75%;"></div></div>
+                        <div class="chart-bar"><div class="chart-bar-fill cb-4" style="height: 88%;"></div></div>
                     </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Active Students</div>
-                    <div class="stat-value">
-                        <span class="counter" data-target="1205" data-duration="2000">0</span>
+
+                    <div class="dash-tags">
+                        <div class="d-tag dt-1">
+                            <div class="dt-header"><i class="fa-solid fa-star"></i> Top Performers</div>
+                            <div class="dt-student"></div>
+                            <div class="dt-student short"></div>
+                        </div>
+                        <div class="d-tag dt-2">
+                            <div class="dt-header"><i class="fa-solid fa-triangle-exclamation"></i> Needs Attention</div>
+                            <div class="dt-student short"></div>
+                            <div class="dt-student"></div>
+                        </div>
                     </div>
+
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="features-grid container">
-        <div class="feature-card glass-panel reveal">
-            <div class="feature-anim-box">
-                <div class="live-chart">
-                    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <section class="container features-grid">
+            <div class="grid-wrapper">
+                
+                <div class="glass-panel feature-card reveal">
+                    <div class="f-icon">
+                        <i class="fa-regular fa-clock icon-layer il-clock"></i>
+                        <i class="fa-regular fa-calendar-check icon-layer il-cal"></i>
+                    </div>
+                    <h3>Smart Daily Timetable</h3>
+                    <p>Instantly know which class is next. The dynamic timetable updates in real-time, showing specific room numbers, subject assignments, and proxy duties clearly.</p>
                 </div>
-            </div>
-            <h3 class="gradient-text">Live Overview</h3>
-            <p>Instantly track attendance, fee collections, and total active students in real-time. Data flows seamlessly from classrooms to your dashboard.</p>
-        </div>
 
-        <div class="feature-card glass-panel reveal" style="transition-delay: 0.1s;">
-            <div class="feature-anim-box">
-                <div class="app-grid">
-                    <div class="app-icon"></div><div class="app-icon"></div>
-                    <div class="app-icon"></div><div class="app-icon"></div>
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.1s;">
+                    <div class="f-icon">
+                        <i class="fa-solid fa-cloud-arrow-up icon-layer il-up"></i>
+                        <i class="fa-solid fa-file-pdf icon-layer il-doc"></i>
+                    </div>
+                    <h3>One-Tap Resource Sharing</h3>
+                    <p>Upload daily assignments, PDF notes, and educational video links directly from the dashboard straight into the students' digital backpacks securely.</p>
                 </div>
-            </div>
-            <h3 class="gradient-text">Quick-Action Shortcuts</h3>
-            <p>Jump to any crucial module instantly. Customize your dashboard with dynamic shortcuts to the communication and management tools you use most.</p>
-        </div>
 
-        <div class="feature-card glass-panel reveal" style="transition-delay: 0.2s;">
-            <div class="feature-anim-box">
-                <div class="greet-icon">
-                    <div class="sun"></div>
-                    <div class="moon"></div>
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.2s;">
+                    <div class="f-icon">
+                        <i class="fa-solid fa-list-ul icon-layer il-list"></i>
+                        <div class="il-check-grp">
+                            <i class="fa-solid fa-check il-check"></i>
+                            <i class="fa-solid fa-check il-check"></i>
+                            <i class="fa-solid fa-check il-check"></i>
+                        </div>
+                    </div>
+                    <h3>Pending Tasks Alert</h3>
+                    <p>Never miss a deadline. The dashboard intelligently flags pending duties like unmarked attendance or ungraded exams in a clear, priority-based list.</p>
                 </div>
+
             </div>
-            <h3 class="gradient-text">Personalized Greetings</h3>
-            <p>Start your day right with a premium, easy-to-read layout that greets you, adapts to the time of day, and intelligently highlights urgent pending tasks.</p>
-        </div>
-    </section>
+        </section>
 
-    <section class="advantage-section reveal">
-        <div class="container">
-            <h2 class="gradient-text">Stop Making Phone Calls for Data.</h2>
-            <p>Traditionally, principals have to call 5 different staff members just to get the day's attendance or fee collection numbers. Paper Buddy eliminates the wait. Everything you need to know is right on your phone or tablet in real-time, empowering you to make immediate, informed decisions.</p>
-        </div>
-    </section>
+        <section class="container advantage">
+            <div class="glass-panel adv-panel reveal">
+                <h2 class="text-gradient">Less Administration, More Teaching.</h2>
+                <p>Teachers spend up to 30% of their day on manual paperwork, physical registers, and repetitive data entry. The Paper Buddy Teacher App completely automates the administrative burden—from one-tap attendance to instant grade calculations—giving educators their time back to do what they do best: inspire students.</p>
+            </div>
+        </section>
 
-    <div class="bottom-nav container reveal">
-        <div class="glass-panel nav-pill-container">
-            <a href="daily-collections.html" class="btn-next">Next Page: Daily Collections →</a>
-        </div>
-    </div>
+        <section class="container bottom-nav reveal">
+            <div class="nav-pill-container">
+                <a href="../student/profile.html" class="btn btn-prev">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Page (Student App Profile)
+                </a>
+                <a href="student_attendance.html" class="btn btn-next">
+                    Class Attendance <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+    </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // 1. Scroll Reveal Logic (Intersection Observer)
+        document.addEventListener("DOMContentLoaded", () => {
             const revealElements = document.querySelectorAll('.reveal');
             
-            const revealOptions = {
-                threshold: 0.15,
-                rootMargin: "0px 0px -50px 0px"
-            };
-
-            const revealObserver = new IntersectionObserver((entries, observer) => {
+            const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('active');
-                        
-                        // If the element contains counters, trigger them
-                        const counters = entry.target.querySelectorAll('.counter');
-                        if (counters.length > 0) {
-                            startCounters(counters);
-                        }
-                        
-                        observer.unobserve(entry.target); // Only animate once
+                        // Optional: observer.unobserve(entry.target); 
                     }
                 });
-            }, revealOptions);
+            }, {
+                root: null,
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            });
 
-            revealElements.forEach(el => revealObserver.observe(el));
-
-            // 2. Animated Number Counters Logic
-            function startCounters(counters) {
-                counters.forEach(counter => {
-                    const target = parseFloat(counter.getAttribute('data-target'));
-                    const duration = parseInt(counter.getAttribute('data-duration')) || 2000;
-                    const isDecimal = counter.hasAttribute('data-decimal');
-                    
-                    let startTimestamp = null;
-                    
-                    const step = (timestamp) => {
-                        if (!startTimestamp) startTimestamp = timestamp;
-                        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                        
-                        // Easing function (easeOutQuart) for smoother stop
-                        const easeProgress = 1 - Math.pow(1 - progress, 4);
-                        const currentVal = easeProgress * target;
-                        
-                        if (isDecimal) {
-                            counter.innerText = currentVal.toFixed(1);
-                        } else {
-                            counter.innerText = Math.floor(currentVal).toLocaleString('en-IN'); // Format with commas
-                        }
-                        
-                        if (progress < 1) {
-                            window.requestAnimationFrame(step);
-                        } else {
-                            // Ensure final value is exact
-                            counter.innerText = isDecimal ? target.toFixed(1) : target.toLocaleString('en-IN');
-                        }
-                    };
-                    
-                    window.requestAnimationFrame(step);
-                });
-            }
-            
+            revealElements.forEach(el => observer.observe(el));
         });
     </script>
 </body>

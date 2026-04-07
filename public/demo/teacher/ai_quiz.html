@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | AI Quiz Generator & Analytics</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & THEME SETUP
+        ========================================================================== */
+        :root {
+            /* Colors */
+            --bg-dark: #0B0F19;
+            --bg-panel: rgba(11, 15, 25, 0.6);
+            --text-main: #FFFFFF;
+            --text-muted: #8b9bb4;
+            --cyan-primary: #00f2fe;
+            --cyan-secondary: #4facfe;
+            --cyan-gradient: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
+            --alert-red: #FF4D4F;
+            --alert-amber: #F59E0B;
+            --success-green: #10B981;
+            
+            /* Glassmorphism */
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(0, 242, 254, 0.15);
+            --glass-hover-border: rgba(0, 242, 254, 0.4);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --blur: blur(16px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --------------------------------------------------------------------------
+           BACKGROUND EFFECTS
+        -------------------------------------------------------------------------- */
+        /* Subtle Cyan Dot-Grid Matrix */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(rgba(0, 242, 254, 0.15) 1px, transparent 1px);
+            background-size: 35px 35px;
+            opacity: 0.8;
+            z-index: -2;
+            pointer-events: none;
+            animation: moveGrid 60s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 350px 350px; }
+        }
+
+        /* Ambient Glowing Orbs */
+        .ambient-glow {
+            position: fixed;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-top-left { top: -200px; left: -200px; }
+        .glow-bottom-right { bottom: -200px; right: -200px; background: radial-gradient(circle, rgba(79, 172, 254, 0.05) 0%, transparent 60%); }
+
+        /* --------------------------------------------------------------------------
+           UTILITIES
+        -------------------------------------------------------------------------- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .text-gradient {
+            background: var(--cyan-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           2. HEADER & NAVIGATION
+        ========================================================================== */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        /* CSS-Drawn Graduation Cap */
+        .css-cap { position: relative; width: 36px; height: 24px; }
+        .cap-top {
+            position: absolute; top: 0; left: 0; width: 100%; height: 16px;
+            background: var(--cyan-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .cap-base {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 10px; background: var(--cyan-secondary);
+            border-radius: 0 0 4px 4px;
+        }
+        .cap-tassel {
+            position: absolute; right: 4px; top: 8px; width: 2px; height: 14px;
+            background: var(--cyan-primary); transform: rotate(-15deg);
+        }
+
+        /* ==========================================================================
+           3. HERO SECTION (CENTERED + 3D MOCKUP)
+        ========================================================================== */
+        .hero {
+            padding: 5rem 0 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-text {
+            max-width: 900px;
+            margin-bottom: 4rem;
+            z-index: 10;
+        }
+
+        .hero-text h1 {
+            font-size: 3.8rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 750px;
+            margin-inline: auto;
+        }
+
+        /* 3D Mobile/Tablet Mockup */
+        .hero-visual {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            perspective: 1200px;
+        }
+
+        .tablet-mockup {
+            width: 400px;
+            height: 600px;
+            background: #05080E;
+            border: 4px solid #1A2235;
+            border-radius: 35px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 0 25px rgba(0, 242, 254, 0.15);
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg);
+            animation: floatTablet 6s ease-in-out infinite;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tablet-notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 20px; background: #000;
+            border-radius: 0 0 12px 12px; z-index: 10;
+        }
+
+        .tablet-screen {
+            background: #0B101C;
+            flex: 1; border-radius: 24px;
+            position: relative; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Screen 1: AI Input Phase */
+        .screen-ai-input {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 40px 20px; display: flex; flex-direction: column;
+            opacity: 1; animation: screenTransition 12s infinite;
+        }
+
+        .mock-header {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 30px;
+        }
+        .mock-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--cyan-gradient); display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: bold; color: #000; }
+        .mock-greeting { width: 140px; height: 12px; background: rgba(255,255,255,0.8); border-radius: 6px; }
+
+        .mock-input-box {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 15px;
+            box-shadow: inset 0 0 20px rgba(0, 242, 254, 0.05);
+        }
+        
+        .mock-typing {
+            font-size: 0.9rem; color: var(--cyan-light);
+            white-space: nowrap; overflow: hidden; border-right: 2px solid var(--cyan-light);
+            width: 0; animation: typingAnim 12s infinite;
+        }
+
+        .mock-magic-btn {
+            align-self: flex-end; background: var(--cyan-gradient); width: 40px; height: 40px;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #000;
+            box-shadow: 0 0 15px var(--cyan-glow); opacity: 0; transform: scale(0.5);
+            animation: magicWandPop 12s infinite;
+        }
+
+        /* Screen 2: Analytics Dashboard Phase */
+        .screen-dashboard {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 40px 20px; display: flex; flex-direction: column; align-items: center;
+            background: linear-gradient(180deg, rgba(0,242,254,0.05) 0%, transparent 100%);
+            opacity: 0; animation: screenTransitionRev 12s infinite;
+        }
+
+        .dash-title { width: 160px; height: 14px; background: rgba(255,255,255,0.2); border-radius: 7px; margin-bottom: 40px; }
+
+        .circular-progress { position: relative; width: 180px; height: 180px; margin-bottom: 30px;}
+        .circ-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .circ-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 12; }
+        .circ-fill {
+            fill: none; stroke: var(--cyan-light); stroke-width: 12; stroke-dasharray: 440; stroke-dashoffset: 440; stroke-linecap: round;
+            filter: drop-shadow(0 0 10px var(--cyan-light));
+            animation: fillCircle 12s infinite;
+        }
+        .circ-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .circ-val { font-size: 2.2rem; font-weight: 700; color: #fff; line-height: 1.2; text-shadow: 0 0 15px var(--cyan-glow);}
+        .circ-lbl { font-size: 0.75rem; color: var(--cyan-light); text-transform: uppercase; letter-spacing: 1px;}
+
+        /* Mockup Keyframes */
+        @keyframes floatTablet {
+            0%, 100% { transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg) translateY(0); }
+            50% { transform: rotateX(12deg) rotateY(-12deg) rotateZ(2deg) translateY(-20px); box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 35px rgba(0, 242, 254, 0.2); }
+        }
+        @keyframes typingAnim {
+            0%, 5% { width: 0; border-color: transparent; }
+            5% { border-color: var(--cyan-light); }
+            20%, 40% { width: 100%; border-color: transparent; }
+            41%, 100% { width: 100%; border-color: transparent; }
+        }
+        @keyframes magicWandPop {
+            0%, 22% { opacity: 0; transform: scale(0.5); }
+            25%, 38% { opacity: 1; transform: scale(1); box-shadow: 0 0 25px var(--cyan-primary); }
+            40%, 100% { opacity: 0; transform: scale(0.5); }
+        }
+        @keyframes screenTransition {
+            0%, 40% { opacity: 1; pointer-events: auto; }
+            45%, 95% { opacity: 0; pointer-events: none; }
+            100% { opacity: 1; pointer-events: auto; }
+        }
+        @keyframes screenTransitionRev {
+            0%, 40% { opacity: 0; pointer-events: none; }
+            45%, 95% { opacity: 1; pointer-events: auto; }
+            100% { opacity: 0; pointer-events: none; }
+        }
+        @keyframes fillCircle {
+            0%, 48% { stroke-dashoffset: 440; }
+            55%, 90% { stroke-dashoffset: 66; } /* ~85% filled */
+            100% { stroke-dashoffset: 440; }
+        }
+
+        /* ==========================================================================
+           4. FEATURE 1: AI ASSESSMENT ENGINE (LEFT TEXT, RIGHT VISUAL)
+        ========================================================================== */
+        .split-section {
+            padding: 6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4rem;
+        }
+
+        .split-text { flex: 1; }
+        .split-text h2 { font-size: 2.8rem; line-height: 1.2; margin-bottom: 1.5rem; }
+        .split-text p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 2rem; }
+
+        .split-visual {
+            flex: 1.2; display: flex; justify-content: center; position: relative;
+        }
+
+        .ai-gen-card {
+            width: 100%; max-width: 500px; padding: 2.5rem;
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.8), rgba(0, 242, 254, 0.05));
+            min-height: 380px; display: flex; flex-direction: column;
+        }
+
+        /* Skeleton Loading Layer */
+        .skeleton-ui {
+            position: absolute; top: 2.5rem; left: 2.5rem; right: 2.5rem; bottom: 2.5rem;
+            display: flex; flex-direction: column; gap: 15px;
+            animation: toggleUI 8s infinite;
+        }
+        .skel-block {
+            width: 100%; height: 20px; background: rgba(255,255,255,0.05); border-radius: 8px;
+            position: relative; overflow: hidden;
+        }
+        .skel-block.short { width: 60%; }
+        .skel-block.tall { height: 60px; }
+        .skel-block::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* Generated Quiz Layer */
+        .quiz-ui {
+            position: absolute; top: 2.5rem; left: 2.5rem; right: 2.5rem; bottom: 2.5rem;
+            display: flex; flex-direction: column; gap: 20px;
+            opacity: 0; animation: toggleUIRev 8s infinite;
+        }
+        .q-header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 5px;}
+        .q-title { color: var(--cyan-light); font-weight: 600; }
+        .q-badge { background: rgba(0, 242, 254, 0.1); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; color: var(--cyan-light); border: 1px solid var(--glass-border);}
+        
+        .q-item { display: flex; flex-direction: column; gap: 10px; }
+        .q-text { font-size: 0.95rem; color: #fff; }
+        .q-options { display: flex; flex-direction: column; gap: 6px; padding-left: 10px;}
+        .q-opt { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); }
+        .q-radio { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); }
+        .q-radio.correct { border-color: var(--success-green); background: rgba(16,185,129,0.2); box-shadow: 0 0 8px var(--success-green);}
+
+        @keyframes shimmer { 100% { left: 100%; } }
+        @keyframes toggleUI { 0%, 40% { opacity: 1; } 45%, 95% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes toggleUIRev { 0%, 40% { opacity: 0; transform: scale(0.95); } 45%, 95% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+
+        /* ==========================================================================
+           5. HERO FEATURE 2: QUESTION-LEVEL ANALYTICS (RIGHT TEXT, LEFT VISUAL)
+        ========================================================================== */
+        .split-section-rev {
+            padding: 6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-direction: row-reverse;
+            gap: 4rem;
+        }
+
+        .analytics-widget {
+            width: 100%; max-width: 500px; padding: 2.5rem;
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.8), rgba(0, 242, 254, 0.05));
+            display: flex; flex-direction: column; gap: 1.5rem;
+        }
+
+        .aw-header { font-size: 1.2rem; font-weight: 600; color: #fff; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .aw-subtitle { font-size: 0.85rem; color: var(--text-muted); font-weight: 400;}
+
+        /* Horizontal Bar Chart */
+        .bar-chart { display: flex; flex-direction: column; gap: 15px; }
+        .bc-row { display: flex; align-items: center; gap: 15px; }
+        .bc-label { width: 25px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
+        .bc-track { flex: 1; height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; position: relative; overflow: hidden; }
+        .bc-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--cyan-gradient); border-radius: 6px; width: 0; }
+        .bc-val { width: 40px; text-align: right; font-size: 0.85rem; color: var(--cyan-light); font-weight: 600; opacity: 0;}
+
+        /* Reveal Animations for Chart */
+        .reveal.active .bf-1 { animation: fillBar 1s ease-out forwards 0.2s; width: 10%; }
+        .reveal.active .bv-1 { animation: fadeIn 0.5s forwards 1.2s; }
+        .reveal.active .bf-2 { animation: fillBar 1s ease-out forwards 0.4s; width: 15%; }
+        .reveal.active .bv-2 { animation: fadeIn 0.5s forwards 1.4s; }
+        .reveal.active .bf-3 { animation: fillBar 1s ease-out forwards 0.6s; width: 5%; }
+        .reveal.active .bv-3 { animation: fadeIn 0.5s forwards 1.6s; }
+        
+        /* Highlighted Warning Question */
+        .reveal.active .bc-row-alert .bc-label { color: var(--alert-red); text-shadow: 0 0 10px rgba(255,77,79,0.4);}
+        .reveal.active .bc-row-alert .bc-fill { background: linear-gradient(90deg, #ff6b6b, var(--alert-red)); box-shadow: 0 0 15px rgba(255,77,79,0.5); animation: fillBarAlert 1.5s ease-out forwards 0.8s; width: 60%; }
+        .reveal.active .bc-row-alert .bc-val { color: var(--alert-red); animation: fadeIn 0.5s forwards 2s; }
+
+        .reveal.active .bf-5 { animation: fillBar 1s ease-out forwards 1s; width: 20%; }
+        .reveal.active .bv-5 { animation: fadeIn 0.5s forwards 2.2s; }
+
+        /* Alert Badge Overlay */
+        .alert-badge {
+            background: rgba(255, 77, 79, 0.1); border: 1px solid var(--alert-red);
+            padding: 10px 15px; border-radius: 12px; display: flex; align-items: center; gap: 10px;
+            color: var(--alert-red); font-size: 0.9rem; font-weight: 500; margin-top: 10px;
+            opacity: 0; transform: translateY(10px);
+        }
+        .reveal.active .alert-badge { animation: slideUpFade 0.8s forwards 2.5s; }
+
+        @keyframes fillBar { 0% { width: 0; } }
+        @keyframes fillBarAlert { 0% { width: 0; box-shadow: none; } 100% { box-shadow: 0 0 15px rgba(255,77,79,0.5); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
+
+
+        /* ==========================================================================
+           6. CORE ASSESSMENT FEATURES GRID
+        ========================================================================== */
+        .features-grid { padding: 6rem 0; }
+        .grid-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
+
+        .feature-card {
+            padding: 3rem 2.5rem; display: flex; flex-direction: column;
+            position: relative; overflow: hidden; transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: default;
+        }
+
+        .feature-card::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+            background: var(--cyan-gradient); transform: scaleX(0); transform-origin: right; transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px); border-color: var(--glass-hover-border);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.15);
+        }
+        .feature-card:hover::before { transform: scaleX(1); transform-origin: left; }
+
+        .f-icon {
+            width: 70px; height: 70px; border-radius: 18px;
+            background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; color: var(--cyan-light); margin-bottom: 2rem; position: relative;
+        }
+
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; color: #fff; }
+        .feature-card p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; flex: 1; }
+
+        /* Card Hover Animations */
+        /* Card 1: Paper to A+ */
+        .fc-paper { position: absolute; transition: all 0.4s ease; }
+        .fc-badge { position: absolute; opacity: 0; transform: scale(0.5); color: var(--success-green); transition: all 0.4s ease; }
+        .feature-card:hover .fc-paper { opacity: 0; transform: scale(0.8) translateY(-10px); }
+        .feature-card:hover .fc-badge { opacity: 1; transform: scale(1.2); text-shadow: 0 0 15px rgba(16,185,129,0.5); }
+
+        /* Card 2: Security Shield */
+        .fc-shield { transition: all 0.4s ease; }
+        .feature-card:hover .fc-shield { transform: scale(1.1); color: #fff; text-shadow: 0 0 20px var(--cyan-light); }
+        .feature-card:hover .f-icon { border-color: var(--cyan-primary); background: rgba(0,242,254,0.1); }
+
+        /* Card 3: Data to Folder */
+        .fc-dots { display: flex; gap: 4px; position: absolute; left: 15px; top: 15px; opacity: 0;}
+        .fc-dot { width: 4px; height: 4px; background: var(--cyan-light); border-radius: 50%; }
+        .fc-folder { transition: all 0.4s ease; }
+        .feature-card:hover .fc-folder { transform: translateY(5px); color: #fff; }
+        .feature-card:hover .fc-dots { animation: flowData 1s infinite; }
+        @keyframes flowData { 0% { opacity: 0; transform: translate(0, -10px); } 50% { opacity: 1; } 100% { opacity: 0; transform: translate(15px, 10px); } }
+
+        /* ==========================================================================
+           7. ADVANTAGE SECTION (FULL WIDTH)
+        ========================================================================== */
+        .advantage { padding: 6rem 0; text-align: center; }
+        
+        .adv-panel {
+            padding: 5rem 3rem;
+            background: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, rgba(11, 15, 25, 0.4) 100%);
+            border-top: 1px solid rgba(0, 242, 254, 0.3); border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            border-radius: 30px; box-shadow: inset 0 20px 50px -20px rgba(0, 242, 254, 0.15);
+        }
+
+        .adv-panel h2 { font-size: 3rem; margin-bottom: 1.5rem; font-weight: 700; }
+        .adv-panel p { font-size: 1.2rem; color: var(--text-muted); max-width: 850px; margin: 0 auto; line-height: 1.8; }
+
+        /* ==========================================================================
+           8. BOTTOM NAVIGATION
+        ========================================================================== */
+        .bottom-nav { padding: 2rem 0 8rem; display: flex; justify-content: center; }
+        
+        .nav-pill-container {
+            display: inline-flex; gap: 1.5rem; padding: 1.5rem 2rem;
+            border-radius: 60px; background: rgba(11, 15, 25, 0.6);
+            backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap; justify-content: center;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem; border-radius: 40px; text-decoration: none;
+            font-weight: 500; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-prev {
+            background: rgba(255,255,255,0.03); color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-prev:hover {
+            background: rgba(255,255,255,0.08); color: var(--text-main);
+            transform: translateX(-5px); border-color: rgba(0, 242, 254, 0.4);
+        }
+
+        .btn-next {
+            background: rgba(0, 242, 254, 0.05); color: var(--cyan-light);
+            border: 1px solid var(--cyan-light); box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            animation: pulseNav 2.5s infinite alternate;
+        }
+        .btn-next:hover {
+            background: var(--cyan-gradient); color: #000; font-weight: 600;
+            border-color: transparent; box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+            transform: scale(1.05) translateX(5px); animation: none;
+        }
+
+        @keyframes pulseNav { 0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); } 100% { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); } }
+
+        /* ==========================================================================
+           RESPONSIVE DESIGN
+        ========================================================================== */
+        @media (max-width: 1024px) {
+            .split-section, .split-section-rev { flex-direction: column; text-align: center; gap: 4rem; }
+            .split-text { max-width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 2.8rem; }
+            .split-text h2 { font-size: 2.4rem; }
+            .adv-panel h2 { font-size: 2.2rem; }
+            
+            .tablet-mockup { transform: rotateY(0) rotateX(0) rotateZ(0); animation: floatMobile 6s ease-in-out infinite; max-width: 320px; height: 500px;}
+            @keyframes floatMobile { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+            
+            .nav-pill-container { flex-direction: column; width: 100%; border-radius: 20px; padding: 1.5rem; gap: 1rem; }
+            .btn { justify-content: center; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-top-left"></div>
+    <div class="ambient-glow glow-bottom-right"></div>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="#" class="brand-logo">
+                <div class="css-cap">
+                    <div class="cap-top"></div>
+                    <div class="cap-base"></div>
+                    <div class="cap-tassel"></div>
+                </div>
+                Paper Buddy
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="container hero">
+            <div class="hero-text reveal">
+                <h1>Instant AI Quiz Generator & <br><span class="text-gradient">Performance Analytics</span></h1>
+                <p>Generate highly accurate, curriculum-aligned quizzes in seconds using AI, and instantly analyze class performance to identify hidden learning gaps.</p>
+            </div>
+
+            <div class="hero-visual reveal" style="transition-delay: 0.2s;">
+                <div class="tablet-mockup">
+                    <div class="tablet-notch"></div>
+                    <div class="tablet-screen">
+                        
+                        <div class="screen-ai-input">
+                            <div class="mock-header">
+                                <div class="mock-avatar">SK</div>
+                                <div class="mock-greeting"></div>
+                            </div>
+
+                            <div class="mock-input-box">
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">AI Assessment Prompt</div>
+                                <div class="mock-typing">Create a 10-question quiz on the Solar System</div>
+                            </div>
+
+                            <div class="mock-magic-btn">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </div>
+                        </div>
+
+                        <div class="screen-dashboard">
+                            <div class="dash-title"></div>
+                            
+                            <div class="circular-progress">
+                                <svg class="circ-svg" viewBox="0 0 160 160">
+                                    <circle class="circ-bg" cx="80" cy="80" r="70"></circle>
+                                    <circle class="circ-fill" cx="80" cy="80" r="70"></circle>
+                                </svg>
+                                <div class="circ-text">
+                                    <div class="circ-val">85%</div>
+                                    <div class="circ-lbl">Class Average</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; width: 100%;">
+                                <div style="flex:1; height: 60px; background: rgba(255,255,255,0.05); border-radius: 12px;"></div>
+                                <div style="flex:1; height: 60px; background: rgba(255,255,255,0.05); border-radius: 12px;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container split-section">
+            <div class="split-text reveal">
+                <h2 class="text-gradient">Create Assessments in Seconds</h2>
+                <p>Stop spending your precious weekends drafting questions from scratch. Simply input your topic, grade level, and desired difficulty, and Paper Buddy’s AI instantly generates high-quality, varied quizzes. Edit, review, and publish directly to your students' apps with a single tap.</p>
+            </div>
+            
+            <div class="split-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel ai-gen-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h4 style="color: #fff;">AI Quiz Generator</h4>
+                        <i class="fa-solid fa-microchip" style="color: var(--cyan-light);"></i>
+                    </div>
+                    
+                    <div style="position: relative; flex: 1;">
+                        <div class="skeleton-ui">
+                            <div class="skel-block short"></div>
+                            <div class="skel-block tall"></div>
+                            <div class="skel-block"></div>
+                            <div class="skel-block" style="width: 80%;"></div>
+                        </div>
+
+                        <div class="quiz-ui">
+                            <div class="q-header">
+                                <span class="q-title">Science: Solar System</span>
+                                <span class="q-badge">10 Qs • Medium</span>
+                            </div>
+                            <div class="q-item">
+                                <div class="q-text">1. Which planet is known as the Red Planet?</div>
+                                <div class="q-options">
+                                    <div class="q-opt"><div class="q-radio"></div> Venus</div>
+                                    <div class="q-opt"><div class="q-radio correct"></div> Mars</div>
+                                    <div class="q-opt"><div class="q-radio"></div> Jupiter</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container split-section-rev">
+            <div class="split-text reveal">
+                <h2 class="text-gradient">Pinpoint Exactly Where Students Struggle</h2>
+                <p>Auto-grading is just the beginning. Our deep analytics break down performance mathematically, question-by-question. If the majority of the class failed Question 4, the teacher instantly knows exactly which concept needs to be retaught tomorrow morning, eliminating guesswork.</p>
+            </div>
+            
+            <div class="split-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel analytics-widget">
+                    
+                    <div>
+                        <div class="aw-header">Error Rate by Question <i class="fa-solid fa-chart-bar" style="color: var(--cyan-light);"></i></div>
+                        <div class="aw-subtitle">Topic: Thermodynamics Unit Test</div>
+                    </div>
+
+                    <div class="bar-chart">
+                        <div class="bc-row">
+                            <div class="bc-label">Q1</div>
+                            <div class="bc-track"><div class="bc-fill bf-1"></div></div>
+                            <div class="bc-val bv-1">10%</div>
+                        </div>
+                        <div class="bc-row">
+                            <div class="bc-label">Q2</div>
+                            <div class="bc-track"><div class="bc-fill bf-2"></div></div>
+                            <div class="bc-val bv-2">15%</div>
+                        </div>
+                        <div class="bc-row">
+                            <div class="bc-label">Q3</div>
+                            <div class="bc-track"><div class="bc-fill bf-3"></div></div>
+                            <div class="bc-val bv-3">5%</div>
+                        </div>
+                        
+                        <div class="bc-row bc-row-alert">
+                            <div class="bc-label">Q4</div>
+                            <div class="bc-track"><div class="bc-fill"></div></div>
+                            <div class="bc-val">60%</div>
+                        </div>
+
+                        <div class="bc-row">
+                            <div class="bc-label">Q5</div>
+                            <div class="bc-track"><div class="bc-fill bf-5"></div></div>
+                            <div class="bc-val bv-5">20%</div>
+                        </div>
+                    </div>
+
+                    <div class="alert-badge">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Critical Gap: 60% failed Q4 (Heat Capacity)
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-grid">
+            <div class="grid-wrapper">
+                
+                <div class="glass-panel feature-card reveal">
+                    <div class="f-icon">
+                        <i class="fa-regular fa-file-lines fc-paper"></i>
+                        <i class="fa-solid fa-award fc-badge"></i>
+                    </div>
+                    <h3>Instant Auto-Grading</h3>
+                    <p>Quizzes are graded the exact second the student hits submit. Eliminate hours of manual checking and provide instant, constructive feedback to your learners.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.1s;">
+                    <div class="f-icon">
+                        <i class="fa-solid fa-shield-halved fc-shield"></i>
+                    </div>
+                    <h3>Anti-Cheat Security</h3>
+                    <p>Smart shuffling of questions and multiple-choice options ensures that no two students get the exact same test sequence, strictly maintaining academic integrity.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.2s;">
+                    <div class="f-icon">
+                        <div class="fc-dots">
+                            <div class="fc-dot"></div><div class="fc-dot"></div><div class="fc-dot"></div>
+                        </div>
+                        <i class="fa-solid fa-folder-open fc-folder"></i>
+                    </div>
+                    <h3>Seamless Gradebook Sync</h3>
+                    <p>Quiz results automatically flow into the master gradebook and populate the student's personal analytics dashboard. Absolutely zero manual data entry required.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="container advantage">
+            <div class="glass-panel adv-panel reveal">
+                <h2 class="text-gradient">From Drafting to Data in Minutes.</h2>
+                <p>Paper Buddy transforms assessments from a tedious administrative chore into a powerful, real-time teaching tool. Generate quizzes effortlessly, grade them instantly, and use the deep analytics to adapt your teaching strategy to exactly what your students need.</p>
+            </div>
+        </section>
+
+        <section class="container bottom-nav reveal">
+            <div class="nav-pill-container">
+                <a href="community.html" class="btn btn-prev">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Page (Community Hub)
+                </a>
+                <a href="ai paper.html" class="btn btn-next">
+                    Next Page: Ai Question Paper <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Option: observer.unobserve(entry.target); to animate only once
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

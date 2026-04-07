@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Classroom Broadcast & Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================================================
+           GLOBAL VARIABLES & THEME SETTINGS
+        ========================================================================== */
+        :root {
+            --bg-base: #0B0F19;
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --cyan-light: #00f2fe;
+            --cyan-dark: #4facfe;
+            --cyan-gradient: linear-gradient(135deg, var(--cyan-light), var(--cyan-dark));
+            
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(0, 242, 254, 0.15);
+            --glass-border-strong: rgba(0, 242, 254, 0.4);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            
+            --alert-red: #ff4d4f;
+            --success-green: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --------------------------------------------------------------------------
+           BACKGROUND EFFECTS
+        -------------------------------------------------------------------------- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(rgba(0, 242, 254, 0.15) 1px, transparent 1px);
+            background-size: 35px 35px;
+            z-index: -2;
+            animation: panMatrix 60s linear infinite;
+        }
+
+        @keyframes panMatrix {
+            0% { background-position: 0 0; }
+            100% { background-position: 350px 350px; }
+        }
+
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.5;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-1 { top: -200px; left: -200px; width: 600px; height: 600px; background: rgba(0, 242, 254, 0.15); }
+        .glow-2 { bottom: -200px; right: -200px; width: 500px; height: 500px; background: rgba(79, 172, 254, 0.15); }
+
+        /* --------------------------------------------------------------------------
+           UTILITIES
+        -------------------------------------------------------------------------- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .text-gradient {
+            background: var(--cyan-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           HEADER & NAVIGATION
+        ========================================================================== */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        /* CSS-Drawn Graduation Cap */
+        .css-cap { position: relative; width: 36px; height: 24px; }
+        .cap-top {
+            position: absolute; top: 0; left: 0; width: 100%; height: 16px;
+            background: var(--cyan-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .cap-base {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 10px; background: var(--cyan-secondary);
+            border-radius: 0 0 4px 4px;
+        }
+        .cap-tassel {
+            position: absolute; right: 4px; top: 8px; width: 2px; height: 14px;
+            background: var(--cyan-primary); transform: rotate(-15deg);
+        }
+
+        /* ==========================================================================
+           SECTION 1: HERO (CENTERED)
+        ========================================================================== */
+        .hero {
+            padding: 6rem 0 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-text {
+            max-width: 900px;
+            margin-bottom: 4rem;
+            z-index: 10;
+        }
+
+        .hero-text h1 {
+            font-size: 3.8rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 750px;
+            margin-inline: auto;
+        }
+
+        /* 3D Mobile Mockup */
+        .hero-visual {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            perspective: 1200px;
+        }
+
+        .phone-mockup {
+            width: 320px;
+            height: 640px;
+            background: #06090F;
+            border: 4px solid #1A2235;
+            border-radius: 45px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 242, 254, 0.15);
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg);
+            animation: floatPhone 6s ease-in-out infinite;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 26px; background: #000;
+            border-radius: 0 0 14px 14px; z-index: 20;
+        }
+
+        .phone-screen {
+            background: #0B101C;
+            flex: 1; border-radius: 32px;
+            position: relative; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* App Screen Internal Animations */
+        .screen-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 45px 20px 20px; display: flex; flex-direction: column;
+        }
+
+        /* Screen 1: Compose Broadcast */
+        .screen-compose {
+            background: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, transparent 100%);
+            animation: screenToggle1 10s infinite;
+        }
+        
+        .mock-app-header { display: flex; justify-content: space-between; margin-bottom: 25px; }
+        .mock-app-title { width: 100px; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; }
+        
+        .mock-textarea {
+            flex: 1; border: 1px solid var(--glass-border); border-radius: 16px;
+            background: rgba(255,255,255,0.02); padding: 15px; position: relative;
+        }
+        .mock-typing-text {
+            font-size: 0.9rem; color: var(--cyan-light);
+            white-space: nowrap; overflow: hidden; border-right: 2px solid var(--cyan-light);
+            width: 0; animation: typingText 10s infinite;
+        }
+        .mock-btn-send {
+            margin-top: 20px; height: 45px; border-radius: 22px;
+            background: var(--cyan-gradient); display: flex; justify-content: center; align-items: center;
+            color: #000; font-weight: 700; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+            animation: pressSend 10s infinite;
+        }
+
+        /* Screen 2: Analytics Dashboard */
+        .screen-analytics {
+            background: #0B101C;
+            opacity: 0; pointer-events: none;
+            animation: screenToggle2 10s infinite;
+        }
+        .an-card {
+            background: rgba(0, 242, 254, 0.05); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 20px;
+        }
+        .an-val { font-size: 2.5rem; font-weight: 700; color: var(--cyan-light); text-shadow: 0 0 15px rgba(0, 242, 254, 0.5); }
+        .an-lbl { font-size: 0.8rem; color: var(--text-muted); }
+        .an-list { display: flex; flex-direction: column; gap: 10px; }
+        .an-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px;}
+        .an-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--text-muted); }
+        .an-line { flex: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; }
+        .an-check { color: var(--cyan-primary); font-size: 0.8rem; }
+
+        @keyframes floatPhone {
+            0%, 100% { transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg) translateY(0); }
+            50% { transform: rotateX(12deg) rotateY(-12deg) rotateZ(2deg) translateY(-20px); box-shadow: 0 50px 100px rgba(0,0,0,0.8), inset 0 0 25px rgba(0, 242, 254, 0.2); }
+        }
+        @keyframes typingText {
+            0%, 5% { width: 0; border-color: transparent; }
+            10% { border-color: var(--cyan-light); }
+            25%, 35% { width: 100%; border-color: transparent; }
+            36%, 100% { width: 100%; border-color: transparent; }
+        }
+        @keyframes pressSend {
+            0%, 35% { transform: scale(1); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+            38% { transform: scale(0.95); box-shadow: 0 0 5px rgba(0, 242, 254, 0.5); }
+            42%, 100% { transform: scale(1); box-shadow: 0 0 25px rgba(0, 242, 254, 0.6); }
+        }
+        @keyframes screenToggle1 {
+            0%, 45% { opacity: 1; }
+            50%, 95% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @keyframes screenToggle2 {
+            0%, 45% { opacity: 0; }
+            50%, 95% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* ==========================================================================
+           SECTION 2: HERO FEATURE 1 (SMART ANNOUNCEMENT ENGINE)
+        ========================================================================== */
+        .feature-split {
+            padding: 6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4rem;
+        }
+
+        .feature-text { flex: 1; }
+        .feature-text h2 { font-size: 2.8rem; line-height: 1.2; margin-bottom: 1.5rem; }
+        .feature-text p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 2rem; }
+
+        .feature-visual {
+            flex: 1.2; display: flex; justify-content: center; position: relative;
+        }
+
+        .interactive-card {
+            width: 100%; max-width: 500px; padding: 2.5rem;
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.8), rgba(0, 242, 254, 0.05));
+            min-height: 350px; display: flex; flex-direction: column; justify-content: center; gap: 20px;
+        }
+
+        /* Dropdown Animation */
+        .mock-dropdown {
+            background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+            padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;
+            color: var(--cyan-light); font-weight: 500; font-size: 0.95rem;
+            animation: pulseDropdown 4s infinite alternate;
+        }
+        
+        /* PDF Attachment Animation */
+        .mock-attachment {
+            background: rgba(255,255,255,0.03); border: 1px dashed var(--cyan-secondary);
+            padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 15px;
+        }
+        .ma-header { display: flex; align-items: center; gap: 15px; color: #fff; }
+        .ma-icon { font-size: 2rem; color: var(--cyan-light); }
+        .ma-name { font-size: 0.9rem; }
+        
+        .ma-progress-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;}
+        .ma-progress-fill { height: 100%; background: var(--cyan-gradient); width: 0; box-shadow: 0 0 10px var(--cyan-light); animation: fillProgress 6s infinite; }
+
+        @keyframes pulseDropdown { 0% { box-shadow: 0 0 0 rgba(0, 242, 254, 0); } 100% { box-shadow: 0 0 20px rgba(0, 242, 254, 0.15); } }
+        @keyframes fillProgress { 0%, 10% { width: 0; } 50%, 90% { width: 100%; } 100% { width: 0; } }
+
+        /* ==========================================================================
+           SECTION 3: HERO FEATURE 2 (COMMUNICATION ANALYTICS)
+        ========================================================================== */
+        .feature-split-rev {
+            padding: 6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-direction: row-reverse;
+            gap: 4rem;
+        }
+
+        /* Analytics Widget */
+        .analytics-widget {
+            width: 100%; max-width: 500px; padding: 2.5rem;
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.8), rgba(0, 242, 254, 0.05));
+            display: flex; flex-direction: column; align-items: center; gap: 25px;
+        }
+
+        /* Donut Chart */
+        .donut-container { position: relative; width: 160px; height: 160px; }
+        .donut-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .donut-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 12; }
+        .donut-fill {
+            fill: none; stroke: var(--cyan-light); stroke-width: 12;
+            stroke-dasharray: 440; stroke-dashoffset: 440; stroke-linecap: round;
+            filter: drop-shadow(0 0 8px var(--cyan-light));
+            animation: fillDonut 5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite alternate;
+        }
+        .donut-inner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .donut-pct { font-size: 2rem; font-weight: 700; color: #fff; line-height: 1; text-shadow: 0 0 10px rgba(0,242,254,0.4); }
+        .donut-lbl { font-size: 0.65rem; color: var(--cyan-light); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Unread List */
+        .unread-box { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; }
+        .ub-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .ub-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .ub-row:last-child { border-bottom: none; }
+        .ub-user { display: flex; align-items: center; gap: 10px; }
+        .ub-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--alert-red); box-shadow: 0 0 8px var(--alert-red); }
+        .ub-name { font-size: 0.9rem; color: #fff; }
+        
+        .btn-reminder {
+            background: rgba(0, 242, 254, 0.1); border: 1px solid var(--cyan-primary); color: var(--cyan-light);
+            padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+            animation: pulseReminder 2s infinite; cursor: pointer;
+        }
+
+        @keyframes fillDonut { 0% { stroke-dashoffset: 440; } 100% { stroke-dashoffset: 66; } /* ~85% */ }
+        @keyframes pulseReminder { 0%, 100% { box-shadow: 0 0 5px rgba(0,242,254,0.2); } 50% { box-shadow: 0 0 15px rgba(0,242,254,0.6); } }
+
+        /* ==========================================================================
+           SECTION 4: CORE FEATURES GRID
+        ========================================================================== */
+        .features-grid { padding: 6rem 0; }
+        .grid-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
+
+        .feature-card {
+            padding: 3rem 2.5rem; display: flex; flex-direction: column;
+            position: relative; overflow: hidden; transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: default;
+        }
+
+        .feature-card::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+            background: var(--cyan-gradient); transform: scaleX(0); transform-origin: right; transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px); border-color: var(--glass-border-strong);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.15);
+        }
+        .feature-card:hover::before { transform: scaleX(1); transform-origin: left; }
+
+        .f-icon {
+            width: 70px; height: 70px; border-radius: 18px;
+            background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; color: var(--cyan-light); margin-bottom: 2rem; position: relative;
+        }
+
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; color: #fff; }
+        .feature-card p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; flex: 1; }
+
+        /* Icon Hover Animations */
+        /* Card 1: Chat + Shield */
+        .fc-chat { transition: all 0.3s; }
+        .fc-shield { position: absolute; bottom: 12px; right: 12px; font-size: 1rem; color: var(--bg-dark); background: var(--cyan-light); border-radius: 50%; padding: 3px; opacity: 0; transform: scale(0.5); transition: all 0.3s; box-shadow: 0 0 10px var(--cyan-light); }
+        .feature-card:hover .fc-chat { transform: scale(1.1); text-shadow: 0 0 15px var(--cyan-light); }
+        .feature-card:hover .fc-shield { opacity: 1; transform: scale(1); }
+
+        /* Card 2: Calendar Clock */
+        .fc-cal { transition: all 0.4s; }
+        .feature-card:hover .fc-cal { transform: rotate(15deg) scale(1.1); color: #fff; text-shadow: 0 0 15px var(--cyan-light); }
+
+        /* Card 3: Trend Line */
+        .fc-trend { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: bottom left; }
+        .feature-card:hover .fc-trend { transform: scale(1.3) translateY(-5px); color: #fff; text-shadow: 0 0 20px var(--cyan-light); }
+
+        /* ==========================================================================
+           SECTION 5: ADVANTAGE SECTION
+        ========================================================================== */
+        .advantage { padding: 6rem 0; text-align: center; }
+        
+        .adv-panel {
+            padding: 5rem 3rem;
+            background: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, rgba(11, 15, 25, 0.4) 100%);
+            border-top: 1px solid rgba(0, 242, 254, 0.3); border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            border-radius: 30px; box-shadow: inset 0 20px 50px -20px rgba(0, 242, 254, 0.15);
+        }
+
+        .adv-panel h2 { font-size: 3rem; margin-bottom: 1.5rem; font-weight: 700; }
+        .adv-panel p { font-size: 1.2rem; color: var(--text-muted); max-width: 850px; margin: 0 auto; line-height: 1.8; }
+
+        /* ==========================================================================
+           SECTION 6: BOTTOM NAVIGATION
+        ========================================================================== */
+        .bottom-nav { padding: 2rem 0 8rem; display: flex; justify-content: center; }
+        
+        .nav-pill-container {
+            display: inline-flex; gap: 1.5rem; padding: 1.5rem 2rem;
+            border-radius: 60px; background: rgba(11, 15, 25, 0.6);
+            backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap; justify-content: center;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem; border-radius: 40px; text-decoration: none;
+            font-weight: 500; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-prev {
+            background: rgba(255,255,255,0.03); color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-prev:hover {
+            background: rgba(255,255,255,0.08); color: var(--text-main);
+            transform: translateX(-5px); border-color: rgba(0, 242, 254, 0.4);
+        }
+
+        .btn-next {
+            background: rgba(0, 242, 254, 0.05); color: var(--cyan-light);
+            border: 1px solid var(--cyan-light); box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            animation: pulseNav 2.5s infinite alternate;
+        }
+        .btn-next:hover {
+            background: var(--cyan-gradient); color: #000; font-weight: 600;
+            border-color: transparent; box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+            transform: scale(1.05) translateX(5px); animation: none;
+        }
+
+        @keyframes pulseNav { 0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); } 100% { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); } }
+
+        /* ==========================================================================
+           RESPONSIVE DESIGN
+        ========================================================================== */
+        @media (max-width: 1024px) {
+            .feature-split, .feature-split-rev { flex-direction: column; text-align: center; gap: 4rem; }
+            .feature-text { max-width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 2.8rem; }
+            .feature-text h2 { font-size: 2.4rem; }
+            .adv-panel h2 { font-size: 2.2rem; }
+            
+            .phone-mockup { transform: rotateY(0) rotateX(0) rotateZ(0); animation: floatMobile 6s ease-in-out infinite; max-width: 300px; height: 600px;}
+            @keyframes floatMobile { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+            
+            .nav-pill-container { flex-direction: column; width: 100%; border-radius: 20px; padding: 1.5rem; gap: 1rem; }
+            .btn { justify-content: center; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="#" class="brand-logo">
+                <div class="css-cap">
+                    <div class="cap-top"></div>
+                    <div class="cap-base"></div>
+                    <div class="cap-tassel"></div>
+                </div>
+                Paper Buddy
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="container hero">
+            <div class="hero-text reveal">
+                <h1>Smart Classroom Broadcasts & <br><span class="text-gradient">Communication Analytics</span></h1>
+                <p>Send instant updates to students and parents, and use real-time read analytics to guarantee your crucial message was received and understood.</p>
+            </div>
+
+            <div class="hero-visual reveal" style="transition-delay: 0.2s;">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        
+                        <div class="screen-layer screen-compose">
+                            <div class="mock-app-header">
+                                <div class="mock-app-title"></div>
+                                <i class="fa-solid fa-pen-to-square" style="color: var(--cyan-light);"></i>
+                            </div>
+                            
+                            <div class="mock-textarea">
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">To: All Students</div>
+                                <div class="mock-typing-text">Reminder: Science Projects due tomorrow!</div>
+                            </div>
+
+                            <div class="mock-btn-send">
+                                Send Broadcast <i class="fa-solid fa-paper-plane" style="margin-left: 8px;"></i>
+                            </div>
+                        </div>
+
+                        <div class="screen-layer screen-analytics">
+                            <div class="mock-app-header">
+                                <div class="mock-app-title" style="background: var(--cyan-gradient);"></div>
+                            </div>
+                            
+                            <div class="an-card">
+                                <div class="an-val">92%</div>
+                                <div class="an-lbl">Read by Parents</div>
+                            </div>
+
+                            <div class="an-list">
+                                <div class="an-item">
+                                    <div class="an-avatar"></div>
+                                    <div class="an-line"></div>
+                                    <i class="fa-solid fa-check-double an-check"></i>
+                                </div>
+                                <div class="an-item">
+                                    <div class="an-avatar"></div>
+                                    <div class="an-line" style="width: 60%;"></div>
+                                    <i class="fa-solid fa-check-double an-check"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container feature-split">
+            <div class="feature-text reveal">
+                <h2 class="text-gradient">Professional Classroom Megaphone</h2>
+                <p>Teachers can send targeted, rich-media announcements directly to specific classes, individual students, or exclusively to parents. Attach documents, photos, or voice notes in a single tap, triggering an instant push notification on the recipients' devices.</p>
+            </div>
+            
+            <div class="feature-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel interactive-card">
+                    
+                    <div class="mock-dropdown">
+                        <span>Target: Class 10-A Parents Only</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+
+                    <div class="mock-attachment">
+                        <div class="ma-header">
+                            <i class="fa-solid fa-file-pdf ma-icon"></i>
+                            <div class="ma-name">Project_Guidelines.pdf</div>
+                        </div>
+                        <div class="ma-progress-bg">
+                            <div class="ma-progress-fill"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="container feature-split-rev">
+            <div class="feature-text reveal">
+                <h2 class="text-gradient">Read Receipts & Engagement Data</h2>
+                <p>Never wonder if parents actually saw the memo. Our communication analytics dashboard provides real-time read receipts and engagement metrics. Identify exactly who hasn't opened crucial updates and send automated, one-tap reminders to bridge the communication gap instantly.</p>
+            </div>
+            
+            <div class="feature-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel analytics-widget">
+                    
+                    <div class="donut-container">
+                        <svg class="donut-svg" viewBox="0 0 160 160">
+                            <circle class="donut-bg" cx="80" cy="80" r="70"></circle>
+                            <circle class="donut-fill" cx="80" cy="80" r="70"></circle>
+                        </svg>
+                        <div class="donut-inner">
+                            <div class="donut-pct">85%</div>
+                            <div class="donut-lbl">Acknowledged</div>
+                        </div>
+                    </div>
+
+                    <div class="unread-box">
+                        <div class="ub-title">
+                            <span>Unread by:</span>
+                            <span>3 Parents</span>
+                        </div>
+                        <div class="ub-row">
+                            <div class="ub-user">
+                                <div class="ub-dot"></div>
+                                <div class="ub-name">Rahul Sharma (P)</div>
+                            </div>
+                            <div class="btn-reminder">Send Reminder</div>
+                        </div>
+                        <div class="ub-row">
+                            <div class="ub-user">
+                                <div class="ub-dot"></div>
+                                <div class="ub-name">Anita Desai (P)</div>
+                            </div>
+                            <div class="btn-reminder">Send Reminder</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-grid">
+            <div class="grid-wrapper">
+                
+                <div class="glass-panel feature-card reveal">
+                    <div class="f-icon">
+                        <i class="fa-regular fa-comments fc-chat"></i>
+                        <i class="fa-solid fa-shield-halved fc-shield"></i>
+                    </div>
+                    <h3>Controlled Replies</h3>
+                    <p>Maintain professional boundaries. Teachers can set announcements as strict "No-Reply broadcasts" or selectively enable a moderated, private Q&A thread.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.1s;">
+                    <div class="f-icon">
+                        <i class="fa-solid fa-calendar-day fc-cal"></i>
+                    </div>
+                    <h3>Scheduled Posts</h3>
+                    <p>Draft announcements during your free periods and precisely schedule them to automatically publish at optimal times (e.g., 6:00 PM for working parents).</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.2s;">
+                    <div class="f-icon">
+                        <i class="fa-solid fa-chart-line fc-trend"></i>
+                    </div>
+                    <h3>Parent-Teacher Insight</h3>
+                    <p>Track long-term engagement performance to easily see which parents are highly responsive and which families might need direct, personalized outreach.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="container advantage">
+            <div class="glass-panel adv-panel reveal">
+                <h2 class="text-gradient">End the WhatsApp Group Chaos.</h2>
+                <p>Teachers deserve their privacy and professional boundaries. Replace chaotic, unmoderated group chats with a structured, one-way broadcast channel. Paper Buddy gives educators absolute authority over their communication while providing the precise analytics to ensure student success.</p>
+            </div>
+        </section>
+
+        <section class="container bottom-nav reveal">
+            <div class="nav-pill-container">
+                <a href="leaves.html" class="btn btn-prev">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Page Leaves
+                </a>
+                <a href="resources.html" class="btn btn-next">
+                    Study Resources <i class="fa-solid fa-rocket"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: observer.unobserve(entry.target); 
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

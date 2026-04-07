@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | Smart Resource Hub & Material Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & THEME SETUP
+        ========================================================================== */
+        :root {
+            /* Colors */
+            --bg-dark: #0B0F19;
+            --text-main: #FFFFFF;
+            --text-muted: #8b9bb4;
+            --cyan-primary: #00f2fe;
+            --cyan-secondary: #4facfe;
+            --cyan-gradient: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
+            --cyan-glow: rgba(0, 242, 254, 0.4);
+            --alert-amber: #f59e0b;
+            --success-green: #10b981;
+            
+            /* Glassmorphism */
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(0, 242, 254, 0.15);
+            --glass-hover-border: rgba(0, 242, 254, 0.4);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --blur: blur(16px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --------------------------------------------------------------------------
+           BACKGROUND EFFECTS
+        -------------------------------------------------------------------------- */
+        /* Subtle Cyan Dot-Grid Matrix */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(rgba(0, 242, 254, 0.15) 1px, transparent 1px);
+            background-size: 35px 35px;
+            opacity: 0.8;
+            z-index: -2;
+            pointer-events: none;
+            animation: moveGrid 60s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 350px 350px; }
+        }
+
+        /* Ambient Glowing Orbs */
+        .ambient-glow {
+            position: fixed;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-top-left { top: -200px; left: -200px; }
+        .glow-bottom-right { bottom: -200px; right: -200px; background: radial-gradient(circle, rgba(79, 172, 254, 0.05) 0%, transparent 60%); }
+
+        /* --------------------------------------------------------------------------
+           UTILITIES
+        -------------------------------------------------------------------------- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .text-gradient {
+            background: var(--cyan-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           2. HEADER & NAVIGATION
+        ========================================================================== */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        /* CSS-Drawn Graduation Cap */
+        .css-cap { position: relative; width: 36px; height: 24px; }
+        .cap-top {
+            position: absolute; top: 0; left: 0; width: 100%; height: 16px;
+            background: var(--cyan-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .cap-base {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 10px; background: var(--cyan-secondary);
+            border-radius: 0 0 4px 4px;
+        }
+        .cap-tassel {
+            position: absolute; right: 4px; top: 8px; width: 2px; height: 14px;
+            background: var(--cyan-primary); transform: rotate(-15deg);
+        }
+
+        /* ==========================================================================
+           3. HERO SECTION (CENTERED + 3D MOCKUP)
+        ========================================================================== */
+        .hero {
+            padding: 5rem 0 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-text {
+            max-width: 900px;
+            margin-bottom: 4rem;
+            z-index: 10;
+        }
+
+        .hero-text h1 {
+            font-size: 3.8rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 750px;
+            margin-inline: auto;
+        }
+
+        /* 3D Mobile/Tablet Mockup */
+        .hero-visual {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            perspective: 1200px;
+        }
+
+        .tablet-mockup {
+            width: 450px;
+            height: 600px;
+            background: #05080E;
+            border: 4px solid #1A2235;
+            border-radius: 35px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 0 25px rgba(0, 242, 254, 0.15);
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg);
+            animation: floatTablet 6s ease-in-out infinite;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tablet-notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 20px; background: #000;
+            border-radius: 0 0 12px 12px; z-index: 10;
+        }
+
+        .tablet-screen {
+            background: #0B101C;
+            flex: 1; border-radius: 24px;
+            position: relative; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Screen 1: Upload Phase */
+        .screen-upload {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 40px 20px; display: flex; flex-direction: column;
+            opacity: 1; animation: screenTransition 12s infinite;
+        }
+
+        .mock-header {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 30px;
+        }
+        .mock-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--cyan-gradient); display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: bold; color: #000; }
+        .mock-greeting { width: 140px; height: 12px; background: rgba(255,255,255,0.8); border-radius: 6px; }
+
+        .mock-folder-area {
+            flex: 1; border: 1px dashed var(--glass-border); border-radius: 16px;
+            background: rgba(255,255,255,0.02); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; position: relative;
+        }
+        
+        .mock-folder-icon { font-size: 3rem; color: var(--text-muted); margin-bottom: 10px; transition: color 0.3s;}
+        
+        .mock-drag-file {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 242, 254, 0.1); border: 1px solid var(--cyan-primary);
+            padding: 10px 15px; border-radius: 8px; display: flex; align-items: center; gap: 10px;
+            color: var(--cyan-light); font-size: 0.8rem; font-weight: 500;
+            box-shadow: 0 0 15px rgba(0,242,254,0.2);
+            opacity: 0;
+            animation: dragDropFile 12s infinite;
+        }
+
+        /* Screen 2: Analytics Data Phase */
+        .screen-data {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 40px 20px; display: flex; flex-direction: column;
+            background: linear-gradient(180deg, rgba(0,242,254,0.05) 0%, transparent 100%);
+            opacity: 0; animation: screenTransitionRev 12s infinite;
+        }
+
+        .data-header { width: 160px; height: 14px; background: rgba(255,255,255,0.2); border-radius: 7px; margin-bottom: 30px; }
+
+        .data-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 20px; margin-bottom: 15px;
+            display: flex; flex-direction: column; gap: 5px;
+        }
+        .dc-val { font-size: 2rem; font-weight: 700; color: var(--cyan-light); text-shadow: 0 0 10px rgba(0,242,254,0.4); }
+        .dc-lbl { font-size: 0.85rem; color: var(--text-muted); }
+        
+        .dc-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 10px; overflow: hidden;}
+        .dc-bar-fill { height: 100%; background: var(--cyan-gradient); width: 0; }
+        .screen-data .dc-bar-fill { animation: fillDataBar 12s infinite; }
+
+        /* Mockup Keyframes */
+        @keyframes floatTablet {
+            0%, 100% { transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg) translateY(0); }
+            50% { transform: rotateX(12deg) rotateY(-12deg) rotateZ(2deg) translateY(-20px); box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 35px rgba(0, 242, 254, 0.2); }
+        }
+        @keyframes dragDropFile {
+            0%, 10% { opacity: 0; transform: translate(-50%, -50px); }
+            15%, 25% { opacity: 1; transform: translate(-50%, 20px); }
+            30% { opacity: 1; transform: translate(-50%, 80px) scale(0.8); }
+            35%, 100% { opacity: 0; transform: translate(-50%, 80px) scale(0.5); }
+        }
+        @keyframes screenTransition {
+            0%, 40% { opacity: 1; pointer-events: auto; }
+            45%, 95% { opacity: 0; pointer-events: none; }
+            100% { opacity: 1; pointer-events: auto; }
+        }
+        @keyframes screenTransitionRev {
+            0%, 40% { opacity: 0; pointer-events: none; }
+            45%, 95% { opacity: 1; pointer-events: auto; }
+            100% { opacity: 0; pointer-events: none; }
+        }
+        @keyframes fillDataBar {
+            0%, 45% { width: 0; }
+            55%, 95% { width: 85%; }
+            100% { width: 0; }
+        }
+
+        /* ==========================================================================
+           4. FEATURE 1: SMART DISTRIBUTION ENGINE (LEFT TEXT, RIGHT VISUAL)
+        ========================================================================== */
+        .split-section {
+            padding: 6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4rem;
+        }
+
+        .split-text { flex: 1; }
+        .split-text h2 { font-size: 2.8rem; line-height: 1.2; margin-bottom: 1.5rem; }
+        .split-text p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 2rem; }
+
+        .split-visual {
+            flex: 1.2; display: flex; justify-content: center; position: relative;
+        }
+
+        .dist-card {
+            width: 100%; max-width: 500px; padding: 2.5rem;
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.8), rgba(0, 242, 254, 0.05));
+            min-height: 380px; display: flex; flex-direction: column;
+        }
+
+        /* Folder Structure UI */
+        .folder-tree { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; flex: 1;}
+        .ft-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid transparent; transition: all 0.3s;}
+        .ft-item.selected { border-color: var(--cyan-primary); background: rgba(0,242,254,0.05); }
+        .ft-icon { color: var(--cyan-light); }
+        .ft-name { font-size: 0.9rem; color: #fff; flex: 1;}
+        .ft-check { color: var(--success-green); opacity: 0; transition: opacity 0.3s; }
+        .ft-item.selected .ft-check { opacity: 1; }
+        .ft-sub { padding-left: 30px; display: flex; flex-direction: column; gap: 8px; }
+
+        .push-btn {
+            width: 100%; padding: 12px; border-radius: 20px; background: rgba(0,242,254,0.1); border: 1px solid var(--cyan-primary);
+            color: var(--cyan-primary); font-weight: 600; text-align: center;
+            animation: pulseBtn 4s infinite alternate; cursor: default; position: relative; overflow: hidden;
+        }
+        .push-btn-fill {
+            position: absolute; top: 0; left: 0; height: 100%; background: var(--cyan-gradient); z-index: -1; width: 0;
+            animation: btnFill 4s infinite;
+        }
+
+        @keyframes pulseBtn { 0% { box-shadow: 0 0 5px rgba(0,242,254,0.2); } 100% { box-shadow: 0 0 20px rgba(0,242,254,0.4); } }
+        @keyframes btnFill { 0%, 50% { width: 0; opacity: 1;} 80%, 90% { width: 100%; opacity: 1;} 95%, 100% { width: 100%; opacity: 0;} }
+
+        /* ==========================================================================
+           5. FEATURE 2: ENGAGEMENT ANALYTICS (RIGHT TEXT, LEFT VISUAL)
+        ========================================================================== */
+        .split-section-rev {
+            padding: 6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-direction: row-reverse;
+            gap: 4rem;
+        }
+
+        .analytics-widget {
+            width: 100%; max-width: 500px; padding: 2.5rem;
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.8), rgba(0, 242, 254, 0.05));
+            display: flex; flex-direction: column; gap: 2rem;
+        }
+
+        .aw-header { font-size: 1.2rem; font-weight: 600; color: #fff; margin-bottom: 10px; }
+
+        /* Double Bar Chart */
+        .db-chart { display: flex; flex-direction: column; gap: 15px; }
+        .db-row { display: flex; flex-direction: column; gap: 5px; }
+        .db-label { font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between;}
+        .db-tracks { display: flex; flex-direction: column; gap: 4px; }
+        .db-track { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; position: relative; overflow: hidden; }
+        .db-fill-1 { position: absolute; top: 0; left: 0; height: 100%; background: var(--cyan-light); border-radius: 4px; width: 0; box-shadow: 0 0 8px var(--cyan-light);}
+        .db-fill-2 { position: absolute; top: 0; left: 0; height: 100%; background: var(--cyan-dark); border-radius: 4px; width: 0; }
+
+        .reveal.active .d1-1 { animation: fillBar 1.5s ease-out forwards 0.2s; width: 90%; }
+        .reveal.active .d1-2 { animation: fillBar 1.5s ease-out forwards 0.4s; width: 60%; }
+        
+        .reveal.active .d2-1 { animation: fillBar 1.5s ease-out forwards 0.6s; width: 75%; }
+        .reveal.active .d2-2 { animation: fillBar 1.5s ease-out forwards 0.8s; width: 40%; }
+
+        /* Needs Attention List */
+        .attn-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; }
+        .at-title { font-size: 0.8rem; color: var(--alert-amber); font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        .at-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+        .at-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--alert-red); box-shadow: 0 0 5px var(--alert-red); }
+        .at-name { font-size: 0.85rem; color: #fff; }
+        .at-status { font-size: 0.75rem; color: var(--text-muted); margin-left: auto; }
+
+        @keyframes fillBar { 0% { width: 0; } }
+
+        /* ==========================================================================
+           6. CORE FEATURES GRID
+        ========================================================================== */
+        .features-grid { padding: 6rem 0; }
+        .grid-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
+
+        .feature-card {
+            padding: 3rem 2.5rem; display: flex; flex-direction: column;
+            position: relative; overflow: hidden; transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: default;
+        }
+
+        .feature-card::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+            background: var(--cyan-gradient); transform: scaleX(0); transform-origin: right; transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px); border-color: var(--glass-hover-border);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.15);
+        }
+        .feature-card:hover::before { transform: scaleX(1); transform-origin: left; }
+
+        .f-icon {
+            width: 70px; height: 70px; border-radius: 18px;
+            background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; color: var(--cyan-light); margin-bottom: 2rem; position: relative;
+        }
+
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; color: #fff; }
+        .feature-card p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; flex: 1; }
+
+        /* Card Hover Animations */
+        /* Card 1: Multi-Format */
+        .fc-multi { position: absolute; transition: all 0.4s ease; opacity: 0; transform: scale(0.5); }
+        .fm-1 { opacity: 1; transform: scale(1); }
+        .feature-card:hover .fm-1 { opacity: 0; transform: scale(1.5); filter: blur(5px); }
+        .feature-card:hover .fm-2 { opacity: 1; transform: scale(1); text-shadow: 0 0 15px var(--cyan-light); transition-delay: 0.1s;}
+
+        /* Card 2: Auto-Expiring */
+        .fc-doc { transition: all 0.4s ease; }
+        .fc-lock { position: absolute; font-size: 1rem; color: var(--bg-dark); background: var(--alert-amber); border-radius: 50%; padding: 4px; bottom: 12px; right: 12px; opacity: 0; transform: scale(0.5); transition: all 0.4s ease; box-shadow: 0 0 10px var(--alert-amber); }
+        .feature-card:hover .fc-doc { opacity: 0.7; }
+        .feature-card:hover .fc-lock { opacity: 1; transform: scale(1); }
+
+        /* Card 3: Cloud Sync */
+        .fc-cloud { transition: all 0.4s ease; }
+        .fc-stream { position: absolute; font-size: 1rem; top: 18px; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; color: #fff;}
+        .feature-card:hover .fc-cloud { color: rgba(0,242,254,0.5); }
+        .feature-card:hover .fc-stream { opacity: 1; transform: translateY(0); text-shadow: 0 0 10px var(--cyan-light); animation: upStream 1s infinite alternate; }
+        @keyframes upStream { 0% { transform: translateY(0); } 100% { transform: translateY(-5px); } }
+
+        /* ==========================================================================
+           7. ADVANTAGE SECTION (FULL WIDTH)
+        ========================================================================== */
+        .advantage { padding: 6rem 0; text-align: center; }
+        
+        .adv-panel {
+            padding: 5rem 3rem;
+            background: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, rgba(11, 15, 25, 0.4) 100%);
+            border-top: 1px solid rgba(0, 242, 254, 0.3); border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            border-radius: 30px; box-shadow: inset 0 20px 50px -20px rgba(0, 242, 254, 0.15);
+        }
+
+        .adv-panel h2 { font-size: 3rem; margin-bottom: 1.5rem; font-weight: 700; }
+        .adv-panel p { font-size: 1.2rem; color: var(--text-muted); max-width: 850px; margin: 0 auto; line-height: 1.8; }
+
+        /* ==========================================================================
+           8. BOTTOM NAVIGATION
+        ========================================================================== */
+        .bottom-nav { padding: 2rem 0 8rem; display: flex; justify-content: center; }
+        
+        .nav-pill-container {
+            display: inline-flex; gap: 1.5rem; padding: 1.5rem 2rem;
+            border-radius: 60px; background: rgba(11, 15, 25, 0.6);
+            backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap; justify-content: center;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem; border-radius: 40px; text-decoration: none;
+            font-weight: 500; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-prev {
+            background: rgba(255,255,255,0.03); color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-prev:hover {
+            background: rgba(255,255,255,0.08); color: var(--text-main);
+            transform: translateX(-5px); border-color: rgba(0, 242, 254, 0.4);
+        }
+
+        .btn-next {
+            background: rgba(0, 242, 254, 0.05); color: var(--cyan-light);
+            border: 1px solid var(--cyan-light); box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            animation: pulseNav 2.5s infinite alternate;
+        }
+        .btn-next:hover {
+            background: var(--cyan-gradient); color: #000; font-weight: 600;
+            border-color: transparent; box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+            transform: scale(1.05) translateX(5px); animation: none;
+        }
+
+        @keyframes pulseNav { 0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); } 100% { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); } }
+
+        /* ==========================================================================
+           RESPONSIVE DESIGN
+        ========================================================================== */
+        @media (max-width: 1024px) {
+            .split-section, .split-section-rev { flex-direction: column; text-align: center; gap: 4rem; }
+            .split-text { max-width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 2.8rem; }
+            .split-text h2 { font-size: 2.4rem; }
+            .adv-panel h2 { font-size: 2.2rem; }
+            
+            .tablet-mockup { transform: rotateY(0) rotateX(0) rotateZ(0); animation: floatMobile 6s ease-in-out infinite; max-width: 320px; height: 500px;}
+            @keyframes floatMobile { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+            
+            .nav-pill-container { flex-direction: column; width: 100%; border-radius: 20px; padding: 1.5rem; gap: 1rem; }
+            .btn { justify-content: center; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-top-left"></div>
+    <div class="ambient-glow glow-bottom-right"></div>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="#" class="brand-logo">
+                <div class="css-cap">
+                    <div class="cap-top"></div>
+                    <div class="cap-base"></div>
+                    <div class="cap-tassel"></div>
+                </div>
+                Paper Buddy
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="container hero">
+            <div class="hero-text reveal">
+                <h1>Smart Resource Hub & <br><span class="text-gradient">Material Analytics</span></h1>
+                <p>Digitize your curriculum. Instantly share study materials, notes, and videos with your students, and use real-time analytics to see exactly who is engaging with the content.</p>
+            </div>
+
+            <div class="hero-visual reveal" style="transition-delay: 0.2s;">
+                <div class="tablet-mockup">
+                    <div class="tablet-notch"></div>
+                    <div class="tablet-screen">
+                        
+                        <div class="screen-upload">
+                            <div class="mock-header">
+                                <div class="mock-avatar">SK</div>
+                                <div class="mock-greeting"></div>
+                            </div>
+
+                            <div class="mock-folder-area">
+                                <i class="fa-regular fa-folder-open mock-folder-icon"></i>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">Drop files here</div>
+                                
+                                <div class="mock-drag-file">
+                                    <i class="fa-solid fa-file-pdf"></i> Physics_Chapter_4.pdf
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="screen-data">
+                            <div class="data-header"></div>
+                            
+                            <div class="data-card">
+                                <div class="dc-lbl">Download Rate</div>
+                                <div class="dc-val">85%</div>
+                                <div class="dc-bar-bg"><div class="dc-bar-fill"></div></div>
+                            </div>
+
+                            <div class="data-card" style="margin-top: 10px;">
+                                <div class="dc-lbl">Viewed by</div>
+                                <div class="dc-val" style="color: #fff; text-shadow: none; font-size: 1.5rem;">32 <span style="font-size: 1rem; color: var(--text-muted);">/ 40 Students</span></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container split-section">
+            <div class="split-text reveal">
+                <h2 class="text-gradient">Share Anything, Instantly.</h2>
+                <p>Eliminate the friction of distributing study materials. Upload high-resolution PDFs, Word documents, presentations, or YouTube links directly from your device. Organize them neatly by chapter and push them instantly to specific classes or individual students' Digital Backpacks.</p>
+            </div>
+            
+            <div class="split-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel dist-card">
+                    
+                    <div class="folder-tree">
+                        <div class="ft-item">
+                            <i class="fa-solid fa-folder ft-icon"></i>
+                            <div class="ft-name">Science - Term 1</div>
+                        </div>
+                        <div class="ft-sub">
+                            <div class="ft-item selected">
+                                <i class="fa-solid fa-file-pdf ft-icon" style="color: #ff4d4f;"></i>
+                                <div class="ft-name">Gravity_Worksheet.pdf</div>
+                                <i class="fa-solid fa-circle-check ft-check"></i>
+                            </div>
+                            <div class="ft-item selected">
+                                <i class="fa-brands fa-youtube ft-icon" style="color: #ff0000;"></i>
+                                <div class="ft-name">Gravity_Lecture_Link</div>
+                                <i class="fa-solid fa-circle-check ft-check"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="push-btn">
+                        Push to Class 10-A
+                        <div class="push-btn-fill"></div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="container split-section-rev">
+            <div class="split-text reveal">
+                <h2 class="text-gradient">Track Student Engagement in Real-Time</h2>
+                <p>Stop wondering if students are actually reviewing the notes you painstakingly prepared. Paper Buddy’s material analytics provide detailed insights into file open rates and view counts. Identify which resources are most effective and spot disengaged students before exam season begins.</p>
+            </div>
+            
+            <div class="split-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel analytics-widget">
+                    
+                    <div class="aw-header">Downloads vs. Views</div>
+
+                    <div class="db-chart">
+                        <div class="db-row">
+                            <div class="db-label"><span>Gravity_Worksheet.pdf</span></div>
+                            <div class="db-tracks">
+                                <div class="db-track"><div class="db-fill-1 d1-1"></div></div>
+                                <div class="db-track"><div class="db-fill-2 d1-2"></div></div>
+                            </div>
+                        </div>
+                        <div class="db-row" style="margin-top: 10px;">
+                            <div class="db-label"><span>Motion_Notes.pdf</span></div>
+                            <div class="db-tracks">
+                                <div class="db-track"><div class="db-fill-1 d2-1"></div></div>
+                                <div class="db-track"><div class="db-fill-2 d2-2"></div></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 15px; font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">
+                            <span style="display:flex; align-items:center; gap:5px;"><div style="width:8px; height:8px; background:var(--cyan-light); border-radius:2px;"></div> Downloads</span>
+                            <span style="display:flex; align-items:center; gap:5px;"><div style="width:8px; height:8px; background:var(--cyan-dark); border-radius:2px;"></div> Views</span>
+                        </div>
+                    </div>
+
+                    <div class="attn-box">
+                        <div class="at-title"><i class="fa-solid fa-triangle-exclamation"></i> Needs Attention (0 Views)</div>
+                        <div class="at-row">
+                            <div class="at-dot"></div>
+                            <div class="at-name">Rahul Sharma</div>
+                            <div class="at-status">Class 10-A</div>
+                        </div>
+                        <div class="at-row" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px;">
+                            <div class="at-dot"></div>
+                            <div class="at-name">Priya Patel</div>
+                            <div class="at-status">Class 10-A</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-grid">
+            <div class="grid-wrapper">
+                
+                <div class="glass-panel feature-card reveal">
+                    <div class="f-icon">
+                        <i class="fa-solid fa-file-pdf fc-multi fm-1"></i>
+                        <i class="fa-solid fa-photo-film fc-multi fm-2"></i>
+                    </div>
+                    <h3>Multi-Format Support</h3>
+                    <p>Whether it's high-res images of whiteboard notes, audio lectures, or heavy PDFs, the system automatically compresses and delivers them flawlessly to students.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.1s;">
+                    <div class="f-icon">
+                        <i class="fa-solid fa-file-lines fc-doc"></i>
+                        <i class="fa-solid fa-lock fc-lock"></i>
+                    </div>
+                    <h3>Auto-Expiring Content</h3>
+                    <p>Protect your intellectual property. Set specific study materials to auto-lock or disappear after a major exam to maintain focus on the current curriculum.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.2s;">
+                    <div class="f-icon">
+                        <i class="fa-solid fa-cloud fc-cloud"></i>
+                        <i class="fa-solid fa-arrow-up fc-stream"></i>
+                    </div>
+                    <h3>Cloud Storage Sync</h3>
+                    <p>Never lose a lesson plan again. All shared materials are safely backed up in the school's centralized cloud vault for incredibly easy reuse next academic year.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="container advantage">
+            <div class="glass-panel adv-panel reveal">
+                <h2 class="text-gradient">End the Printing Costs. Elevate Learning.</h2>
+                <p>Teachers no longer have to fight over the school photocopier or worry about students losing critical printed notes. By digitizing the resource distribution and backing it with engagement data, teachers ensure every student has 24/7 access to the precise tools they need to succeed.</p>
+            </div>
+        </section>
+
+        <section class="container bottom-nav reveal">
+            <div class="nav-pill-container">
+                <a href="announcement.html" class="btn btn-prev">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Page Announcement
+                </a>
+                <a href="syllabus.html" class="btn btn-next">
+                    Next Page: Syllabus <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Option: observer.unobserve(entry.target); to animate only once
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

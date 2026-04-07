@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Buddy | AI Assignment Engine & Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================================================
+           GLOBAL VARIABLES & THEME SETTINGS
+        ========================================================================== */
+        :root {
+            /* Colors */
+            --bg-dark: #0B0F19;
+            --bg-darker: #06090f;
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --cyan-primary: #00F2FE;
+            --cyan-secondary: #4FACFE;
+            --cyan-gradient: linear-gradient(135deg, var(--cyan-primary), var(--cyan-secondary));
+            --cyan-glow: rgba(0, 242, 254, 0.4);
+            --alert-green: #10B981;
+            
+            /* Glassmorphism */
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(0, 242, 254, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --blur: blur(16px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --------------------------------------------------------------------------
+           BACKGROUND EFFECTS
+        -------------------------------------------------------------------------- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(var(--cyan-primary) 1px, transparent 1px);
+            background-size: 35px 35px;
+            opacity: 0.08;
+            z-index: -2;
+            pointer-events: none;
+            animation: driftGrid 60s linear infinite;
+        }
+
+        @keyframes driftGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 350px 350px; }
+        }
+
+        /* Ambient Glowing Orbs */
+        .ambient-glow {
+            position: fixed;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.04) 0%, transparent 60%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-1 { top: -200px; left: -200px; }
+        .glow-2 { bottom: -200px; right: -200px; }
+
+        /* --------------------------------------------------------------------------
+           UTILITIES
+        -------------------------------------------------------------------------- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .text-gradient {
+            background: var(--cyan-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           HEADER & NAVIGATION
+        ========================================================================== */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        /* CSS-Drawn Graduation Cap */
+        .css-cap { position: relative; width: 36px; height: 24px; }
+        .cap-top {
+            position: absolute; top: 0; left: 0; width: 100%; height: 16px;
+            background: var(--cyan-gradient);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .cap-base {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 10px; background: var(--cyan-secondary);
+            border-radius: 0 0 4px 4px;
+        }
+        .cap-tassel {
+            position: absolute; right: 4px; top: 8px; width: 2px; height: 14px;
+            background: var(--cyan-primary); transform: rotate(-15deg);
+        }
+
+        /* ==========================================================================
+           SECTION 1: HERO (CENTERED WITH 3D MOCKUP)
+        ========================================================================== */
+        .hero {
+            padding: 5rem 0 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-text {
+            max-width: 900px;
+            margin-bottom: 4rem;
+            z-index: 10;
+        }
+
+        .hero-text h1 {
+            font-size: 3.8rem;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 750px;
+            margin-inline: auto;
+        }
+
+        /* 3D Mobile Mockup */
+        .hero-visual {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            perspective: 1200px;
+        }
+
+        .phone-mockup {
+            width: 320px;
+            height: 640px;
+            background: var(--bg-darker);
+            border: 4px solid #1A2235;
+            border-radius: 45px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 0 20px rgba(0, 242, 254, 0.15);
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg);
+            animation: floatPhone 6s ease-in-out infinite;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 26px; background: #000;
+            border-radius: 0 0 14px 14px; z-index: 10;
+        }
+
+        .phone-screen {
+            background: #0B101C;
+            flex: 1; border-radius: 32px;
+            position: relative; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column;
+            padding: 40px 20px 20px;
+            background-image: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, transparent 40%);
+        }
+
+        /* Mockup UI: Teacher App Assignment Hub */
+        .mock-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .mock-user { display: flex; align-items: center; gap: 10px; }
+        .mock-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--cyan-gradient); display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: bold; color: #000; }
+        .mock-greeting { width: 100px; height: 8px; background: rgba(255,255,255,0.8); border-radius: 4px; }
+        
+        .mock-prompt-box {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 12px; padding: 15px; margin-bottom: 25px;
+            box-shadow: inset 0 0 10px rgba(0,242,254,0.05);
+            position: relative;
+        }
+        
+        .mock-prompt-text {
+            font-size: 0.8rem; color: var(--cyan-light);
+            white-space: nowrap; overflow: hidden;
+            border-right: 2px solid var(--cyan-light);
+            animation: typing 8s steps(30, end) infinite;
+            display: inline-block;
+        }
+
+        .mock-sparkle {
+            position: absolute; right: 15px; bottom: 15px;
+            color: var(--cyan-light); font-size: 1.2rem;
+            opacity: 0; animation: sparklePop 8s infinite;
+        }
+
+        .mock-questions {
+            display: flex; flex-direction: column; gap: 10px; flex: 1;
+        }
+        .mock-q-card {
+            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px;
+            opacity: 0; transform: translateY(10px);
+            animation: popQuestion 8s infinite;
+        }
+        .mq-1 { animation-delay: 3.5s; }
+        .mq-2 { animation-delay: 3.8s; }
+        .mq-3 { animation-delay: 4.1s; }
+        .mock-q-line { width: 80%; height: 6px; background: #fff; border-radius: 3px; margin-bottom: 8px; }
+        .mock-q-sub { width: 40%; height: 4px; background: var(--text-muted); border-radius: 2px; }
+
+        @keyframes floatPhone {
+            0%, 100% { transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg) translateY(0); }
+            50% { transform: rotateX(12deg) rotateY(-12deg) rotateZ(2deg) translateY(-20px); box-shadow: 20px 50px 80px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 242, 254, 0.2); }
+        }
+        @keyframes typing {
+            0%, 10% { width: 0; border-color: var(--cyan-light); }
+            30%, 70% { width: 100%; border-color: transparent; }
+            90%, 100% { width: 0; border-color: transparent; }
+        }
+        @keyframes sparklePop {
+            0%, 30% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+            35% { opacity: 1; transform: scale(1.2) rotate(15deg); text-shadow: 0 0 15px var(--cyan-light); }
+            40%, 70% { opacity: 1; transform: scale(1) rotate(0deg); }
+            75%, 100% { opacity: 0; transform: scale(0.5); }
+        }
+        @keyframes popQuestion {
+            0%, 35% { opacity: 0; transform: translateY(10px); }
+            45%, 70% { opacity: 1; transform: translateY(0); }
+            80%, 100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* ==========================================================================
+           SECTION 2: AI-POWERED GENERATION (SPLIT L-R)
+        ========================================================================== */
+        .feature-split {
+            padding: 6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4rem;
+        }
+
+        .feature-text { flex: 1; }
+        .feature-text h2 { font-size: 2.8rem; line-height: 1.2; margin-bottom: 1.5rem; }
+        .feature-text p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 2rem; }
+
+        .feature-visual {
+            flex: 1.2;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .ai-gen-card {
+            width: 100%; max-width: 500px; padding: 2.5rem;
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.8), rgba(0, 242, 254, 0.05));
+            min-height: 350px; display: flex; flex-direction: column;
+        }
+
+        .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .ai-title { font-size: 1.2rem; font-weight: 600; color: #fff; }
+        .ai-wand { font-size: 1.5rem; color: var(--cyan-light); animation: wandPulse 4s infinite; }
+
+        .content-box { position: relative; flex: 1; }
+        
+        /* Skeleton Layer */
+        .skeleton-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; gap: 15px;
+            animation: fadeOutSkel 8s infinite;
+        }
+        .skel-line { width: 100%; height: 16px; background: rgba(255,255,255,0.05); border-radius: 8px; position: relative; overflow: hidden; }
+        .skel-line.short { width: 60%; }
+        .skel-line::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* Formatted Content Layer */
+        .formatted-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; gap: 20px;
+            opacity: 0; animation: fadeInContent 8s infinite;
+        }
+        .fmt-q { display: flex; gap: 10px; }
+        .fmt-num { font-weight: 700; color: var(--cyan-light); }
+        .fmt-text-box { flex: 1; }
+        .fmt-text { font-size: 0.95rem; color: #fff; margin-bottom: 8px; }
+        .fmt-options { display: flex; gap: 10px; }
+        .fmt-opt { padding: 4px 10px; background: rgba(0,242,254,0.1); border: 1px solid rgba(0,242,254,0.3); border-radius: 6px; font-size: 0.75rem; color: var(--cyan-light); }
+
+        @keyframes wandPulse { 0%, 100% { transform: scale(1) rotate(0deg); text-shadow: 0 0 5px var(--cyan-light); } 50% { transform: scale(1.2) rotate(15deg); text-shadow: 0 0 20px var(--cyan-light); } }
+        @keyframes shimmer { 100% { left: 100%; } }
+        @keyframes fadeOutSkel { 0%, 40% { opacity: 1; } 45%, 95% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes fadeInContent { 0%, 40% { opacity: 0; transform: translateY(10px); } 45%, 95% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; } }
+
+        /* ==========================================================================
+           SECTION 3: ANALYTICS (SPLIT R-L)
+        ========================================================================== */
+        .feature-split-rev {
+            padding: 6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-direction: row-reverse;
+            gap: 4rem;
+        }
+
+        .analytics-widget {
+            width: 100%; max-width: 500px; padding: 3rem;
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.8), rgba(0, 242, 254, 0.05));
+            display: flex; flex-direction: column; gap: 2rem; align-items: center;
+        }
+
+        /* Circular Progress Ring */
+        .ring-wrapper { position: relative; width: 160px; height: 160px; }
+        .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .ring-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 10; }
+        .ring-fill {
+            fill: none; stroke: var(--cyan-light); stroke-width: 10;
+            stroke-dasharray: 440; stroke-dashoffset: 440; stroke-linecap: round;
+            filter: drop-shadow(0 0 8px var(--cyan-light));
+            animation: fillRing 4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite alternate;
+        }
+        .ring-inner {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .ring-pct { font-size: 2rem; font-weight: 700; color: #fff; line-height: 1; text-shadow: 0 0 10px rgba(0,242,254,0.3); }
+        .ring-lbl { font-size: 0.7rem; color: var(--cyan-light); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Mini Bar Chart */
+        .mini-chart {
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 15px;
+        }
+        .mc-title { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+        .mc-bars { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; gap: 10px; }
+        .mc-bar { flex: 1; background: rgba(255,255,255,0.1); border-radius: 4px 4px 0 0; position: relative; display: flex; justify-content: center; }
+        .mc-fill { position: absolute; bottom: 0; left: 0; width: 100%; border-radius: 4px 4px 0 0; background: var(--cyan-gradient); transform-origin: bottom; animation: growBar 4s infinite alternate; }
+        
+        .mc-b1 { height: 40%; } .mc-b2 { height: 60%; } .mc-b3 { height: 90%; background: var(--alert-green); box-shadow: 0 0 10px rgba(16,185,129,0.5); } .mc-b4 { height: 50%; } .mc-b5 { height: 75%; }
+
+        @keyframes fillRing { 0% { stroke-dashoffset: 440; } 100% { stroke-dashoffset: 66; } /* ~85% */ }
+        @keyframes growBar { 0% { transform: scaleY(0); } 100% { transform: scaleY(1); } }
+
+        /* ==========================================================================
+           SECTION 4: CREATION TOOLS GRID
+        ========================================================================== */
+        .features-grid { padding: 6rem 0; }
+        .grid-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
+
+        .feature-card {
+            padding: 3rem 2.5rem; display: flex; flex-direction: column;
+            position: relative; overflow: hidden; transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: default;
+        }
+
+        .feature-card::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+            background: var(--cyan-gradient); transform: scaleX(0); transform-origin: right; transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px); border-color: rgba(0, 242, 254, 0.4);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.15);
+        }
+        .feature-card:hover::before { transform: scaleX(1); transform-origin: left; }
+
+        .f-icon {
+            width: 70px; height: 70px; border-radius: 18px;
+            background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; color: var(--cyan-light); margin-bottom: 2rem; position: relative;
+        }
+
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; color: #fff; }
+        .feature-card p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; flex: 1; }
+
+        /* Card 1 Hover: Camera to Doc */
+        .f-icon .fa-camera { position: absolute; transition: all 0.3s ease; }
+        .f-icon .fa-file-pdf { position: absolute; opacity: 0; transform: scale(0.5); transition: all 0.3s ease; color: #fff;}
+        .feature-card:hover .fa-camera { opacity: 0; transform: scale(1.5); filter: blur(5px); }
+        .feature-card:hover .fa-file-pdf { opacity: 1; transform: scale(1); text-shadow: 0 0 15px var(--cyan-light); }
+
+        /* Card 2 Hover: Typing Cursor */
+        .text-box-anim { width: 30px; height: 20px; border: 2px solid var(--cyan-light); border-radius: 4px; display: flex; align-items: center; padding-left: 4px; }
+        .type-cursor { width: 2px; height: 12px; background: #fff; opacity: 0; transition: opacity 0.2s; }
+        .feature-card:hover .type-cursor { animation: blinkCursor 0.8s infinite; }
+        @keyframes blinkCursor { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+        /* Card 3 Hover: Clock to Calendar */
+        .f-icon .fa-clock { transition: transform 0.5s ease; }
+        .feature-card:hover .fa-clock { transform: rotate(180deg); color: #fff; text-shadow: 0 0 15px var(--cyan-light); }
+
+        /* ==========================================================================
+           SECTION 5: ADVANTAGE SECTION
+        ========================================================================== */
+        .advantage { padding: 6rem 0; text-align: center; }
+        .adv-panel {
+            padding: 5rem 3rem;
+            background: linear-gradient(180deg, rgba(0, 242, 254, 0.05) 0%, rgba(11, 15, 25, 0.4) 100%);
+            border-top: 1px solid rgba(0, 242, 254, 0.3); border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            border-radius: 30px; box-shadow: inset 0 20px 50px -20px rgba(0, 242, 254, 0.15);
+        }
+        .adv-panel h2 { font-size: 3rem; margin-bottom: 1.5rem; font-weight: 700; }
+        .adv-panel p { font-size: 1.2rem; color: var(--text-muted); max-width: 850px; margin: 0 auto; line-height: 1.8; }
+
+        /* ==========================================================================
+           SECTION 6: BOTTOM NAVIGATION
+        ========================================================================== */
+        .bottom-nav { padding: 2rem 0 8rem; display: flex; justify-content: center; }
+        .nav-pill-container {
+            display: inline-flex; gap: 1.5rem; padding: 1.5rem 2rem;
+            border-radius: 60px; background: rgba(11, 15, 25, 0.6);
+            backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap; justify-content: center;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem; border-radius: 40px; text-decoration: none;
+            font-weight: 500; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-prev {
+            background: rgba(255,255,255,0.03); color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-prev:hover {
+            background: rgba(255,255,255,0.08); color: var(--text-main);
+            transform: translateX(-5px); border-color: rgba(0, 242, 254, 0.4);
+        }
+
+        .btn-next {
+            background: rgba(0, 242, 254, 0.05); color: var(--cyan-light);
+            border: 1px solid var(--cyan-light); box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            animation: pulseNav 2.5s infinite alternate;
+        }
+        .btn-next:hover {
+            background: var(--cyan-gradient); color: #000; font-weight: 600;
+            border-color: transparent; box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+            transform: scale(1.05) translateX(5px); animation: none;
+        }
+
+        @keyframes pulseNav { 0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); } 100% { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); } }
+
+        /* ==========================================================================
+           RESPONSIVE DESIGN
+        ========================================================================== */
+        @media (max-width: 1024px) {
+            .feature-split, .feature-split-rev { flex-direction: column; text-align: center; gap: 4rem; }
+            .feature-text { max-width: 100%; }
+            .ai-gen-card, .analytics-widget { max-width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 2.8rem; }
+            .feature-text h2 { font-size: 2.4rem; }
+            .adv-panel h2 { font-size: 2.2rem; }
+            .phone-mockup { transform: rotateY(0) rotateX(0) rotateZ(0); animation: floatMobile 6s ease-in-out infinite; max-width: 300px; height: 600px;}
+            @keyframes floatMobile { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+            .nav-pill-container { flex-direction: column; width: 100%; border-radius: 20px; padding: 1.5rem; gap: 1rem; }
+            .btn { justify-content: center; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="#" class="brand-logo">
+                <div class="css-cap">
+                    <div class="cap-top"></div>
+                    <div class="cap-base"></div>
+                    <div class="cap-tassel"></div>
+                </div>
+                Paper Buddy
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="container hero">
+            <div class="hero-text reveal">
+                <h1>AI Assignment Engine & <br><span class="text-gradient">Submission Analytics</span></h1>
+                <p>Revolutionize homework. Generate customized assignments instantly using AI, capture worksheets via camera, and track class submission analytics in real-time.</p>
+            </div>
+
+            <div class="hero-visual reveal" style="transition-delay: 0.2s;">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        
+                        <div class="mock-header">
+                            <div class="mock-user">
+                                <div class="mock-avatar">SK</div>
+                                <div class="mock-greeting"></div>
+                            </div>
+                        </div>
+
+                        <div class="mock-prompt-box">
+                            <div class="mock-prompt-text">Generate 5 questions on Data Structures</div>
+                            <i class="fa-solid fa-wand-magic-sparkles mock-sparkle"></i>
+                        </div>
+
+                        <div class="mock-questions">
+                            <div class="mock-q-card mq-1">
+                                <div class="mock-q-line"></div>
+                                <div class="mock-q-sub"></div>
+                            </div>
+                            <div class="mock-q-card mq-2">
+                                <div class="mock-q-line" style="width: 90%;"></div>
+                                <div class="mock-q-sub" style="width: 50%;"></div>
+                            </div>
+                            <div class="mock-q-card mq-3">
+                                <div class="mock-q-line" style="width: 70%;"></div>
+                                <div class="mock-q-sub" style="width: 30%;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container feature-split">
+            <div class="feature-text reveal">
+                <h2 class="text-gradient">Create Worksheets in Seconds with AI</h2>
+                <p>Say goodbye to hours of drafting questions. Simply input a topic or syllabus chapter, and Paper Buddy’s embedded AI generates a highly relevant, grade-appropriate assignment in seconds. Review, edit, and publish instantly to your students' devices.</p>
+            </div>
+            
+            <div class="feature-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel ai-gen-card">
+                    <div class="ai-header">
+                        <div class="ai-title">AI Generator Active</div>
+                        <i class="fa-solid fa-wand-magic-sparkles ai-wand"></i>
+                    </div>
+                    
+                    <div class="content-box">
+                        <div class="skeleton-layer">
+                            <div class="skel-line"></div>
+                            <div class="skel-line short"></div>
+                            <div class="skel-line" style="margin-top: 10px;"></div>
+                            <div class="skel-line short"></div>
+                        </div>
+
+                        <div class="formatted-layer">
+                            <div class="fmt-q">
+                                <div class="fmt-num">Q1.</div>
+                                <div class="fmt-text-box">
+                                    <div class="fmt-text">Explain the concept of an Array vs Linked List.</div>
+                                </div>
+                            </div>
+                            <div class="fmt-q">
+                                <div class="fmt-num">Q2.</div>
+                                <div class="fmt-text-box">
+                                    <div class="fmt-text">Which of the following is LIFO?</div>
+                                    <div class="fmt-options">
+                                        <div class="fmt-opt">Queue</div>
+                                        <div class="fmt-opt">Stack</div>
+                                        <div class="fmt-opt">Tree</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container feature-split-rev">
+            <div class="feature-text reveal">
+                <h2 class="text-gradient">Live Submission & Performance Tracking</h2>
+                <p>Don't just collect homework—analyze it. The assignment analytics dashboard gives teachers real-time visibility into submission rates and average scores, making it mathematically easy to spot which specific topics the class struggled with the most.</p>
+            </div>
+            
+            <div class="feature-visual reveal" style="transition-delay: 0.2s;">
+                <div class="glass-panel analytics-widget">
+                    
+                    <div class="ring-wrapper">
+                        <svg class="ring-svg" viewBox="0 0 160 160">
+                            <circle class="ring-bg" cx="80" cy="80" r="70"></circle>
+                            <circle class="ring-fill" cx="80" cy="80" r="70"></circle>
+                        </svg>
+                        <div class="ring-inner">
+                            <div class="ring-pct">85%</div>
+                            <div class="ring-lbl">Submitted</div>
+                        </div>
+                    </div>
+
+                    <div class="mini-chart">
+                        <div class="mc-title">Average Score Distribution</div>
+                        <div class="mc-bars">
+                            <div class="mc-bar"><div class="mc-fill mc-b1"></div></div>
+                            <div class="mc-bar"><div class="mc-fill mc-b2"></div></div>
+                            <div class="mc-bar"><div class="mc-fill mc-b3"></div></div>
+                            <div class="mc-bar"><div class="mc-fill mc-b4"></div></div>
+                            <div class="mc-bar"><div class="mc-fill mc-b5"></div></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="container features-grid">
+            <div class="grid-wrapper">
+                
+                <div class="glass-panel feature-card reveal">
+                    <div class="f-icon">
+                        <i class="fa-solid fa-camera"></i>
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <h3>Camera-to-Cloud Upload</h3>
+                    <p>Have a physical worksheet? Snap a picture using the in-app scanner, and it’s instantly converted into a high-quality, readable PDF for the students.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.1s;">
+                    <div class="f-icon">
+                        <div class="text-box-anim"><div class="type-cursor"></div></div>
+                    </div>
+                    <h3>Manual Text Builder</h3>
+                    <p>Prefer the traditional way? Use the powerful rich-text editor to manually type out assignments, format complex math equations, and add custom instructions.</p>
+                </div>
+
+                <div class="glass-panel feature-card reveal" style="transition-delay: 0.2s;">
+                    <div class="f-icon">
+                        <i class="fa-regular fa-clock"></i>
+                    </div>
+                    <h3>Automated Deadlines</h3>
+                    <p>Set strict submission deadlines that automatically trigger push notifications to students' devices, ensuring that homework is never conveniently "forgotten."</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="container advantage">
+            <div class="glass-panel adv-panel reveal">
+                <h2 class="text-gradient">Smarter Homework, Zero Paper Trail.</h2>
+                <p>We are eliminating the friction of homework creation and collection. By combining AI generation, flexible manual uploads, and deep submission analytics, teachers save hours of prep time while gaining unprecedented insights into student comprehension.</p>
+            </div>
+        </section>
+
+        <section class="container bottom-nav reveal">
+            <div class="nav-pill-container">
+                <a href="student_attendance.html" class="btn btn-prev">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Page (Student Attendance)
+                </a>
+                <a href="staff_attendance.html" class="btn btn-next">
+                    Next Page: Staff Attendance <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
