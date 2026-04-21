@@ -4,74 +4,333 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paper Buddy - Secure Student Login</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        accent: {
+                            cyan: '#22d3ee',
+                            purple: '#a855f7',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #cbd5e1;
+            overflow-x: hidden;
+        }
+
+        /* Mesh Gradient Background */
+        .mesh-gradient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: 
+                radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(34, 211, 238, 0.15) 0px, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Glassmorphic Utilities */
+        .glassmorphic {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Phone Frame CSS */
+        .phone-frame {
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 9/19;
+            border-radius: 40px;
+            padding: 12px;
+            position: relative;
+            margin: 0 auto;
+            border: 4px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .phone-screen {
+            background: #020617;
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .phone-speaker {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        /* App Inputs & Buttons */
+        .app-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .app-input:focus {
+            border-color: #22d3ee;
+        }
+
+        .app-password-wrapper {
+            position: relative;
+        }
+        .toggle-app-password {
+            position: absolute;
+            right: 16px;
+            top: 14px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .toggle-app-password:hover {
+            color: #22d3ee;
+        }
+
+        .app-login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .app-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(168, 85, 247, 0.5);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmering-animation::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 4s infinite linear;
+            pointer-events: none;
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            padding: 24px;
+            border-radius: 20px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(34, 211, 238, 0.4);
+        }
+        .icon-3d {
+            font-size: 2rem;
+            background: -webkit-linear-gradient(135deg, #22d3ee, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+
+        /* Padlock Animation */
+        .padlock-animation-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .padlock {
+            position: relative;
+            width: 40px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+        .padlock-body {
+            position: absolute;
+            bottom: 0;
+            width: 40px;
+            height: 30px;
+            background: #475569;
+            border-radius: 8px;
+            border: 2px solid #94a3b8;
+        }
+        .padlock-shackle {
+            position: absolute;
+            top: 0;
+            left: 5px;
+            width: 30px;
+            height: 25px;
+            border: 4px solid #94a3b8;
+            border-bottom: none;
+            border-radius: 15px 15px 0 0;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: left bottom;
+        }
+        /* Hover to unlock logic via JS or parent hover */
+        .features-grid:hover ~ .padlock-animation-container .padlock-shackle {
+            transform: translateY(-5px) rotate(15deg);
+            border-color: #22d3ee;
+        }
+
+        /* Bottom Button */
+        .next-page-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(34, 211, 238, 0.1);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            backdrop-filter: blur(8px);
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: #22d3ee;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            z-index: 50;
+        }
+        .next-page-btn:hover {
+            background: rgba(34, 211, 238, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
 
     <div class="mesh-gradient-bg"></div>
 
-    <div class="login-page-container">
+    <div class="login-page-container min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 md:p-12 gap-12 lg:gap-24 max-w-7xl mx-auto relative z-10 pb-24 lg:pb-12">
         
-        <div class="app-mockup-section">
+        <div class="app-mockup-section w-full lg:w-1/2 flex justify-center lg:justify-end perspective-1000">
             <div class="phone-frame glassmorphic floating-animation">
+                <div class="phone-speaker"></div>
                 <div class="phone-screen shimmering-animation">
-                    <div class="app-login-screen">
-                        <img src="assets/paper_buddy_logo.png" alt="Paper Buddy Logo" class="app-logo">
-                        <h2>Welcome Back</h2>
-                        <form class="app-form">
-                            <input type="text" placeholder="Student ID" class="app-input">
+                    <div class="app-login-screen text-center">
+                        <img src="assets/paper_buddy_logo.png" alt="Paper Buddy Logo" class="w-20 h-20 object-contain mx-auto mb-6 rounded-2xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-white mb-8">Welcome Back</h2>
+                        <form class="app-form text-left">
+                            <input type="text" placeholder="Student ID" class="app-input text-sm">
                             <div class="app-password-wrapper">
-                                <input type="password" placeholder="Password" class="app-input" id="app-password">
+                                <input type="password" placeholder="Password" class="app-input text-sm" id="app-password">
                                 <i class="fas fa-eye-slash toggle-app-password" onclick="togglePasswordVisibility('app-password')"></i>
                             </div>
-                            <button type="submit" class="app-login-btn">Sign In</button>
+                            <button type="submit" class="app-login-btn mt-2">Sign In</button>
                         </form>
                     </div>
                 </div>
-                <div class="phone-speaker"></div>
-                <div class="phone-button"></div>
             </div>
         </div>
 
-        <div class="features-section">
-            <div class="features-header staggered-entry">
-                <h1>Paper Buddy</h1>
-                <p>Securely managing your student life.</p>
+        <div class="features-section w-full lg:w-1/2 flex flex-col justify-center">
+            
+            <div class="features-header staggered-entry mb-10 text-center lg:text-left">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-4">Paper Buddy</h1>
+                <p class="text-slate-400 text-lg">Securely managing your student life.</p>
             </div>
 
-            <div class="features-grid staggered-entry">
+            <div class="features-grid staggered-entry grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl mx-auto lg:mx-0">
+                
                 <div class="feature-card glassmorphic tilting-card" data-tilt>
                     <i class="fas fa-id-card-alt icon-3d"></i>
-                    <h3>Secure ID Auth</h3>
-                    <p>Log in using your verified student School ID for maximum security.</p>
+                    <h3 class="text-xl font-bold text-white mb-2">Secure ID Auth</h3>
+                    <p class="text-slate-400 text-sm">Log in using your verified student School ID for maximum security.</p>
                 </div>
+                
                 <div class="feature-card glassmorphic tilting-card" data-tilt>
                     <i class="fas fa-magic icon-3d"></i>
-                    <h3>Modern UX</h3>
-                    <p>Experience a breathtaking glassmorphic interface designed for students.</p>
+                    <h3 class="text-xl font-bold text-white mb-2">Modern UX</h3>
+                    <p class="text-slate-400 text-sm">Experience a breathtaking glassmorphic interface designed for students.</p>
                 </div>
-                <div class="feature-card glassmorphic tilting-card" data-tilt>
+                
+                <div class="feature-card glassmorphic tilting-card sm:col-span-2" data-tilt>
                     <i class="fas fa-eye icon-3d"></i>
-                    <h3>Visual Feedback</h3>
-                    <p>Micro-interactions on every element provide instant visual response.</p>
+                    <h3 class="text-xl font-bold text-white mb-2">Visual Feedback</h3>
+                    <p class="text-slate-400 text-sm">Micro-interactions on every element provide instant visual response and an intuitive experience.</p>
                 </div>
+
             </div>
             
-            <div class="padlock-animation-container staggered-entry">
+            <div class="padlock-animation-container staggered-entry mt-8">
                 <div id="padlock" class="padlock">
-                    <div class="padlock-body"></div>
                     <div class="padlock-shackle"></div>
+                    <div class="padlock-body"></div>
                 </div>
-                <p class="padlock-status">Hover feature cards to unlock access</p>
+                <p class="padlock-status text-sm text-slate-500 font-medium tracking-wide">Hover feature cards to unlock access</p>
             </div>
+
         </div>
     </div>
 
-    <a href="dashboard.html" class="next-page-btn pulsing-glass reflection-effect staggered-entry">
-        Next Page: Explore Dashboard
+    <a href="dashboard.html" class="next-page-btn pulsing-glass reflection-effect staggered-entry flex items-center gap-2">
+        Explore Dashboard <i class="fas fa-arrow-right text-xs"></i>
     </a>
 
     <script src="script.js"></script>
+
+    <script>
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            const icon = input.nextElementSibling;
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            }
+        }
+    </script>
 </body>
 </html>
