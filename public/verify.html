@@ -33,48 +33,48 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans selection:bg-accent-purple selection:text-white">
+<body class="min-h-screen flex flex-col font-sans selection:bg-accent-purple selection:text-white overflow-x-hidden">
 
     <nav class="w-full z-50 bg-navy-900/80 backdrop-blur-lg border-b border-white/10 shadow-lg p-4">
-        <div class="max-w-5xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='/'">
-             <img 
-        src="assets/paper_buddy_logo.png" 
-        alt="Paper Buddy Logo"
-        style="width:36px;height:36px;object-fit:contain;border-radius:8px;"
-      >
-                <div class="text-2xl font-bold bg-gradient-to-r from-white to-accent-purple bg-clip-text text-transparent">
+        <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onclick="window.location.href='/'">
+                <img 
+                    src="assets/paper_buddy_logo.png" 
+                    alt="Paper Buddy Logo"
+                    class="w-8 h-8 sm:w-9 sm:h-9 object-contain rounded-lg shrink-0"
+                >
+                <div class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white to-accent-purple bg-clip-text text-transparent">
                     Paper<span class="text-accent-purple">Buddy</span>
                 </div>
             </div>
-            <div class="text-sm font-semibold text-slate-400 tracking-wider uppercase">
-                Credential Verification
+            <div class="text-xs sm:text-sm font-semibold text-slate-400 tracking-wider uppercase text-right">
+                Credential<br class="sm:hidden" /> Verification
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow flex flex-col items-center py-12 px-4 sm:px-6 relative">
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-accent-purple/10 rounded-full blur-[100px] pointer-events-none"></div>
-        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-cyan/10 rounded-full blur-[100px] pointer-events-none"></div>
+    <main class="flex-grow flex flex-col items-center py-8 sm:py-12 px-4 sm:px-6 relative w-full">
+        <div class="absolute top-0 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-accent-purple/10 rounded-full blur-[80px] sm:blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-0 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-accent-cyan/10 rounded-full blur-[80px] sm:blur-[100px] pointer-events-none"></div>
 
         <div class="w-full max-w-3xl z-10">
-            <div class="text-center mb-10">
-                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">Verify a Certificate</h1>
-                <p class="text-slate-400">Enter the certificate number below to verify its authenticity and view the original document.</p>
+            <div class="text-center mb-8 sm:mb-10">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">Verify a Certificate</h1>
+                <p class="text-sm sm:text-base text-slate-400 max-w-lg mx-auto">Enter the certificate number below to verify its authenticity and view the original document.</p>
             </div>
 
-            <div class="glass-panel rounded-2xl p-6 mb-8 shadow-2xl">
-                <form id="verifyForm" class="flex flex-col sm:flex-row gap-4">
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 mb-8 shadow-2xl">
+                <form id="verifyForm" class="flex flex-col sm:flex-row gap-3 sm:gap-4">
                     <input 
                         type="text" 
                         id="certInput"
                         placeholder="e.g. PB-2026-001" 
-                        class="flex-grow bg-navy-900 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition-all placeholder:text-slate-500 text-lg uppercase"
+                        class="flex-grow w-full bg-navy-900 border border-white/10 rounded-xl px-4 py-3 sm:px-5 sm:py-4 text-white focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition-all placeholder:text-slate-500 text-base sm:text-lg uppercase"
                         required
                     />
                     <button 
                         type="submit" 
-                        class="bg-gradient-to-r from-accent-purple to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] transform hover:-translate-y-0.5 whitespace-nowrap"
+                        class="w-full sm:w-auto bg-gradient-to-r from-accent-purple to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] transform hover:-translate-y-0.5 whitespace-nowrap"
                     >
                         Verify Now
                     </button>
@@ -82,7 +82,7 @@
             </div>
 
             <div id="resultContainer" class="hidden glass-panel rounded-2xl overflow-hidden shadow-2xl transition-all duration-500">
-                <div id="resultHeader" class="p-6 border-b border-white/10 flex items-center justify-between">
+                <div id="resultHeader" class="p-4 sm:p-6 border-b border-white/10">
                     </div>
 
                 <div id="resultBody" class="p-0 bg-navy-950/50 flex flex-col items-center">
@@ -91,13 +91,12 @@
         </div>
     </main>
 
-    <footer class="border-t border-white/10 py-6 text-center text-slate-500 text-sm z-10 bg-navy-950">
+    <footer class="border-t border-white/10 py-6 text-center text-slate-500 text-xs sm:text-sm z-10 bg-navy-950 px-4">
         © 2026 PaperBuddy Inc. All rights reserved.
     </footer>
 
     <script>
         // --- CERTIFICATE DATABASE ---
-        // Add your valid certificates here. Ensure the PDF files are uploaded to 'public/certs/'
         const certificateDatabase = {
             "PB-2026-001": {
                 name: "Shashi Kant",
@@ -113,7 +112,7 @@
             },
             "PB-2026-003": {
                 name: "Vikash Kumar",
-                course: "DSoftware Developer",
+                course: "Software Developer",
                 issueDate: "April 20, 2026",
                 pdfUrl: "/certs/PB-2026-003.pdf"
             }
@@ -127,8 +126,8 @@
         const resultBody = document.getElementById('resultBody');
 
         // SVG Icons
-        const iconValid = `<svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-        const iconInvalid = `<svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        const iconValid = `<svg class="w-6 h-6 sm:w-8 sm:h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        const iconInvalid = `<svg class="w-6 h-6 sm:w-8 sm:h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
 
         // Handle URL parameters on load
         window.addEventListener('DOMContentLoaded', () => {
@@ -146,7 +145,6 @@
             e.preventDefault();
             const certId = input.value.trim().toUpperCase();
             
-            // Update URL to make it shareable without reloading the page
             const newUrl = `${window.location.pathname}?certId=${encodeURIComponent(certId)}`;
             window.history.pushState({ path: newUrl }, '', newUrl);
 
@@ -161,44 +159,46 @@
             if (certData) {
                 // VALID CERTIFICATE
                 resultHeader.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="p-2 bg-green-500/10 rounded-full">${iconValid}</div>
-                        <div>
-                            <h3 class="text-xl font-bold text-white">Certificate Verified</h3>
-                            <p class="text-green-400 text-sm font-medium">Authentic PaperBuddy Credential</p>
+                    <div class="flex flex-col sm:flex-row w-full items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="p-2 sm:p-2.5 bg-green-500/10 rounded-full shrink-0">${iconValid}</div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold text-white leading-tight">Certificate Verified</h3>
+                                <p class="text-green-400 text-xs sm:text-sm font-medium">Authentic PaperBuddy Credential</p>
+                            </div>
                         </div>
+                        <button onclick="copyShareLink()" class="w-full sm:w-auto flex justify-center items-center gap-2 text-sm text-accent-cyan hover:text-white transition-colors bg-accent-cyan/10 px-4 py-2.5 rounded-lg border border-accent-cyan/30 shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                            Copy Share Link
+                        </button>
                     </div>
-                    <button onclick="copyShareLink()" class="hidden sm:flex items-center gap-2 text-sm text-accent-cyan hover:text-white transition-colors bg-accent-cyan/10 px-4 py-2 rounded-lg border border-accent-cyan/30">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                        Copy Share Link
-                    </button>
                 `;
 
                 resultBody.innerHTML = `
-                    <div class="w-full grid grid-cols-1 md:grid-cols-3 border-b border-white/5">
-                        <div class="p-4 md:p-6 border-b md:border-b-0 md:border-r border-white/5">
-                            <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Recipient</p>
-                            <p class="text-white font-bold text-lg">${certData.name}</p>
+                    <div class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 border-b border-white/5">
+                        <div class="p-4 sm:p-5 md:p-6 border-b md:border-b-0 md:border-r border-white/5">
+                            <p class="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider mb-1">Recipient</p>
+                            <p class="text-white font-bold text-base sm:text-lg break-words">${certData.name}</p>
                         </div>
-                        <div class="p-4 md:p-6 border-b md:border-b-0 md:border-r border-white/5">
-                            <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Course/Role</p>
-                            <p class="text-slate-300 font-medium">${certData.course}</p>
+                        <div class="p-4 sm:p-5 md:p-6 border-b md:border-b-0 md:border-r border-white/5">
+                            <p class="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider mb-1">Course/Role</p>
+                            <p class="text-slate-300 font-medium text-sm sm:text-base break-words">${certData.course}</p>
                         </div>
-                        <div class="p-4 md:p-6">
-                            <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Issue Date</p>
-                            <p class="text-slate-300 font-medium">${certData.issueDate}</p>
+                        <div class="p-4 sm:p-5 md:p-6 sm:col-span-2 md:col-span-1">
+                            <p class="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider mb-1">Issue Date</p>
+                            <p class="text-slate-300 font-medium text-sm sm:text-base">${certData.issueDate}</p>
                         </div>
                     </div>
-                    <div class="w-full bg-navy-950 p-4 sm:p-8">
-                        <div class="w-full aspect-[1/1.414] max-w-2xl mx-auto rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-white flex items-center justify-center relative group">
-                            <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 z-0">
-                                <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                <span>Loading Document...</span>
+                    <div class="w-full bg-navy-950 p-4 sm:p-6 md:p-8">
+                        <div class="w-full aspect-[1/1.414] min-h-[300px] max-w-2xl mx-auto rounded-lg sm:rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-white flex items-center justify-center relative group">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 z-0 p-4 text-center">
+                                <svg class="w-10 h-10 sm:w-12 sm:h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <span class="text-sm sm:text-base">Loading Document...</span>
                             </div>
                             <iframe src="${certData.pdfUrl}#toolbar=0" class="w-full h-full relative z-10" frameborder="0"></iframe>
                         </div>
                         <div class="mt-6 text-center">
-                             <a href="${certData.pdfUrl}" target="_blank" download class="inline-flex items-center gap-2 text-sm text-white hover:text-accent-cyan transition-colors">
+                             <a href="${certData.pdfUrl}" target="_blank" download class="inline-flex items-center justify-center gap-2 text-sm text-white bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl hover:text-accent-cyan transition-all border border-white/5 hover:border-accent-cyan/30">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                 Download Original PDF
                             </a>
@@ -208,26 +208,26 @@
             } else {
                 // INVALID CERTIFICATE
                 resultHeader.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="p-2 bg-red-500/10 rounded-full">${iconInvalid}</div>
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <div class="p-2 sm:p-2.5 bg-red-500/10 rounded-full shrink-0">${iconInvalid}</div>
                         <div>
-                            <h3 class="text-xl font-bold text-white">Invalid Certificate</h3>
-                            <p class="text-red-400 text-sm font-medium">Record Not Found</p>
+                            <h3 class="text-lg sm:text-xl font-bold text-white leading-tight">Invalid Certificate</h3>
+                            <p class="text-red-400 text-xs sm:text-sm font-medium">Record Not Found</p>
                         </div>
                     </div>
                 `;
 
                 resultBody.innerHTML = `
-                    <div class="p-12 text-center w-full">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-500/10 mb-4">
-                            <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <div class="p-8 sm:p-12 text-center w-full">
+                        <div class="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-500/10 mb-4">
+                            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                         </div>
-                        <h4 class="text-2xl font-bold text-white mb-2">No Match Found</h4>
-                        <p class="text-slate-400 max-w-md mx-auto">
-                            The certificate number <strong>"${certId}"</strong> does not exist in our database. Please check the spelling and try again.
+                        <h4 class="text-xl sm:text-2xl font-bold text-white mb-2">No Match Found</h4>
+                        <p class="text-sm sm:text-base text-slate-400 max-w-md mx-auto px-4">
+                            The certificate number <strong class="text-white break-words">"${certId}"</strong> does not exist in our database. Please check the spelling and try again.
                         </p>
-                        <p class="mt-6 text-sm text-slate-500">
-                            If you believe this is an error, contact <a href="mailto:support@paperbuddy.in" class="text-accent-cyan hover:underline">support@paperbuddy.in</a>
+                        <p class="mt-6 text-xs sm:text-sm text-slate-500">
+                            If you believe this is an error, contact <br class="sm:hidden" /> <a href="mailto:support@paperbuddy.in" class="text-accent-cyan hover:underline">support@paperbuddy.in</a>
                         </p>
                     </div>
                 `;
