@@ -173488,7 +173488,7 @@ return A.m($async$Hn,r)},
 Az(a,b){return this.bys(a,b)},
 bys(a,b){var s=0,r=A.n(t.z),q,p,o,n
 var $async$Az=A.j(function(c,d){if(c===1)return A.k(d,r)
-for(;;)switch(s){case 0:o=A.fl("http://api.paperbuddy.in/"+a,0,null)
+for(;;)switch(s){case 0:o=A.fl("https://api.paperbuddy.in/"+a,0,null)
 n=t.N
 n=A.V(["Content-Type","application/json"],n,n)
 s=3
@@ -173649,7 +173649,7 @@ JW(a,b,c){return this.bSo(a,b,c)},
 bSo(a7,a8,a9){var s=0,r=A.n(t.b5),q,p=2,o=[],n=this,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6
 var $async$JW=A.j(function(b0,b1){if(b0===1){o.push(b1)
 s=p}for(;;)switch(s){case 0:p=4
-m=A.cNU("POST",A.fl("http://api.paperbuddy.in/extract-batch-student-data",0,null))
+m=A.cNU("POST",A.fl("https://api.paperbuddy.in/extract-batch-student-data",0,null))
 m.x.h(0,"fieldLabels",B.dB.a2p(a7,null))
 m.x.h(0,"missingDataPolicy",a9)
 l=0,g=t.G5,f=t.zb,e=t.N,d=f.j("lG<1>"),c=f.j("f2<1>")
@@ -173704,7 +173704,7 @@ JX(a,b){return this.bSq(a,b)},
 bSq(a7,a8){var s=0,r=A.n(t.b5),q,p=2,o=[],n=this,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6
 var $async$JX=A.j(function(a9,b0){if(a9===1){o.push(b0)
 s=p}for(;;)switch(s){case 0:p=4
-m=A.cNU("POST",A.fl("http://api.paperbuddy.in/extract-classes",0,null))
+m=A.cNU("POST",A.fl("https://api.paperbuddy.in/extract-classes",0,null))
 l=0,g=t.zb,f=g.j("lG<1>"),e=t.G5,d=t.N,c=g.j("f2<1>")
 case 7:if(!(l<a7.length)){s=9
 break}k=a7[l]
@@ -173762,7 +173762,7 @@ JY(a,b){return this.bSs(a,b)},
 bSs(a7,a8){var s=0,r=A.n(t.b5),q,p=2,o=[],n=this,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6
 var $async$JY=A.j(function(a9,b0){if(a9===1){o.push(b0)
 s=p}for(;;)switch(s){case 0:p=4
-m=A.cNU("POST",A.fl("http://api.paperbuddy.in/extract-teachers",0,null))
+m=A.cNU("POST",A.fl("https://api.paperbuddy.in/extract-teachers",0,null))
 l=0,g=t.zb,f=g.j("lG<1>"),e=t.G5,d=t.N,c=g.j("f2<1>")
 case 7:if(!(l<a7.length)){s=9
 break}k=a7[l]
