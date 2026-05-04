@@ -9,6 +9,17 @@ export default defineConfig({
         plugins: [['babel-plugin-react-compiler']],
       },
     }),
+    {
+      name: 'hackathon-rewrite',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url === '/hackathon') {
+            req.url = '/hackathon/index.html'
+          }
+          next()
+        })
+      }
+    }
   ],
   base: "/", 
 })
