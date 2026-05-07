@@ -1,6 +1,6 @@
 {
-    "name": "paper_buddy_teachers",
-    "short_name": "paper_buddy_teachers",
+    "name": "Paper buddy",
+    "short_name": "Paper buddy",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#ffffff",
