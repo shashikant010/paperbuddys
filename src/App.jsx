@@ -86,7 +86,7 @@ const teamMembers = [
     linkedin: null
   },
   {
-    name: "Vikash Kumar",
+    name: "Vikash Bamnia",
     role: "Co-Founder & Head of Marketing",
     bio: "Bridging the gap between technology and real-world school administrative needs.",
     color: "from-orange-500 to-red-500",
