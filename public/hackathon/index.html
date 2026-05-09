@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PaperBuddy EduHack | Hack the Web</title>
-      <link rel="icon" type="image/png" href="../app_logo.png" />
+    <link rel="icon" type="image/png" href="../app_logo.png" />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,15 +13,16 @@
             theme: {
                 extend: {
                     colors: {
-                        void: '#030303',
-                        surface: '#0a0a0a',
-                        'surface-light': '#141414',
+                        void: '#050505',
+                        surface: '#0d0d0d',
+                        'surface-light': '#1a1a1a',
                         neon: {
                             cyan: '#00F0FF',
                             purple: '#8A2BE2',
                             green: '#00FF41',
                             amber: '#FFB800',
-                            blue: '#3B82F6'
+                            blue: '#3B82F6',
+                            pink: '#FF00E5'
                         }
                     },
                     fontFamily: {
@@ -29,17 +30,18 @@
                         mono: ['Space Mono', 'monospace']
                     },
                     animation: {
-                        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pulse-glow': 'pulseGlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'float': 'float 6s ease-in-out infinite',
+                        'spin-slow': 'spin 8s linear infinite',
                     },
                     keyframes: {
                         pulseGlow: {
-                            '0%, 100%': { opacity: 1, filter: 'drop-shadow(0 0 10px rgba(0, 240, 255, 0.5))' },
-                            '50%': { opacity: .7, filter: 'drop-shadow(0 0 2px rgba(0, 240, 255, 0.2))' },
+                            '0%, 100%': { opacity: 1, filter: 'drop-shadow(0 0 15px rgba(0, 240, 255, 0.6))' },
+                            '50%': { opacity: .5, filter: 'drop-shadow(0 0 5px rgba(0, 240, 255, 0.2))' },
                         },
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
+                            '50%': { transform: 'translateY(-15px)' },
                         }
                     }
                 }
@@ -48,7 +50,7 @@
     </script>
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -56,52 +58,60 @@
 
     <style>
         body {
-            background-color: #030303;
+            background-color: #050505;
             color: #ffffff;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ThreeJS Canvas */
-        #webgl-container {
+        /* High-Performance Canvas Background */
+        #bg-canvas {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: -1;
             pointer-events: none;
-            background: radial-gradient(circle at top right, #111 0%, #030303 80%);
+            background: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #050505 70%);
         }
 
-        /* Modern Bento/Glass Cards */
+        /* Glassmorphism Bento Cards */
         .bento-card {
-            background: rgba(20, 20, 20, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 24px;
-            overflow: hidden;
             position: relative;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
 
         .bento-card:hover {
             border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-            background: rgba(25, 25, 25, 0.6);
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
         }
 
+        /* Subtle Inner Glow on Hover */
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 24px;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.06), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .bento-card:hover::before { opacity: 1; }
+
         /* Typography Gradients */
-        .text-gradient {
-            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
         .text-gradient-cyan {
-            background: linear-gradient(135deg, #00F0FF 0%, #0080FF 100%);
+            background: linear-gradient(135deg, #00F0FF 0%, #3B82F6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         /* Animated Border Button */
         .btn-animated-border {
             position: relative;
@@ -127,8 +137,7 @@
             z-index: -1;
             transition: background 0.3s;
         }
-        .btn-animated-border:hover::after { background: #e5e5e5; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .btn-animated-border:hover::after { background: #f0f0f0; }
 
         /* Timeline Connector */
         .timeline-line::before {
@@ -138,26 +147,33 @@
             height: 100%; width: 2px;
             background: linear-gradient(to bottom, #00F0FF, #8A2BE2, transparent);
             z-index: 0;
+            opacity: 0.5;
         }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #030303; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        /* Hardware Acceleration for GSAP */
+        .gs-reveal {
+            will-change: transform, opacity;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #00F0FF; }
     </style>
 </head>
 <body class="selection:bg-neon-cyan selection:text-black">
 
-    <!-- 3D Background Engine -->
-    <canvas id="webgl-container"></canvas>
+    <!-- High Performance Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
 
     <!-- Navigation -->
     <nav class="fixed w-full z-50 top-0 pt-4 px-4 transition-all duration-300" id="navbar">
-        <div class="max-w-7xl mx-auto bento-card px-4 sm:px-6 py-4 flex justify-between items-center rounded-2xl shadow-lg">
+        <div class="max-w-7xl mx-auto bento-card px-5 sm:px-6 py-4 flex justify-between items-center rounded-2xl">
             <div class="flex items-center gap-3">
-                <i data-lucide="hexagon" class="text-neon-cyan w-6 h-6 sm:w-8 sm:h-8 animate-pulse-glow"></i>
-                <div class="text-lg sm:text-xl font-bold tracking-tight text-white">
-                    PaperBuddy <span class="text-neon-cyan font-mono text-xs sm:text-sm">EDUHACK</span>
+                <i data-lucide="hexagon" class="text-neon-cyan w-7 h-7 animate-pulse-glow"></i>
+                <div class="text-xl font-bold tracking-tight text-white flex items-baseline gap-1.5">
+                    PaperBuddy <span class="text-neon-cyan font-mono text-xs font-bold px-2 py-0.5 rounded bg-neon-cyan/10 border border-neon-cyan/20 hidden sm:inline-block">EDUHACK</span>
                 </div>
             </div>
             
@@ -169,101 +185,98 @@
             </div>
 
             <a href="https://unstop.com/p/paperbuddy-ai-web-development-hackathon-2026-deenbandhu-chhotu-ram-university-of-science-and-technology-dcrust-murthal-1684435" 
-               class="btn-animated-border text-black font-bold text-sm sm:text-base px-4 sm:px-6 py-2 shadow-[0_0_20px_rgba(0,240,255,0.2)]">
+               class="btn-animated-border text-black font-bold text-sm px-5 py-2.5 shadow-[0_0_20px_rgba(0,240,255,0.2)]">
                 Register
             </a>
         </div>
     </nav>
 
-    <main class="relative z-10 px-4 pt-28 sm:pt-32 pb-20">
+    <main class="relative z-10 px-4 pt-32 sm:pt-40 pb-20 overflow-hidden">
         
         <!-- Hero Section -->
-        <section class="flex flex-col justify-center items-center text-center max-w-6xl mx-auto mb-24 sm:mb-32 gs-reveal">
+        <section class="flex flex-col justify-center items-center text-center max-w-5xl mx-auto mb-24 sm:mb-32 gs-reveal">
             
-            <div class="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 font-mono text-xs w-full max-w-3xl">
-                <div class="bento-card py-2 px-4 flex items-center justify-center gap-2 text-neon-cyan w-auto">
+            <div class="flex flex-wrap justify-center gap-3 mb-8 font-mono text-xs w-full">
+                <div class="bg-white/5 border border-white/10 backdrop-blur-sm rounded-full py-2 px-4 flex items-center justify-center gap-2 text-neon-cyan">
                     <i data-lucide="code" class="w-4 h-4"></i> Software Dev
                 </div>
-                <div class="bento-card py-2 px-4 flex items-center justify-center gap-2 text-neon-purple w-auto">
+                <div class="bg-white/5 border border-white/10 backdrop-blur-sm rounded-full py-2 px-4 flex items-center justify-center gap-2 text-neon-purple">
                     <i data-lucide="users" class="w-4 h-4"></i> 1 - 4 Members
                 </div>
-                <div class="bento-card py-2 px-4 flex items-center justify-center gap-2 text-neon-green w-full sm:w-auto mt-2 sm:mt-0">
-                    <i data-lucide="calendar" class="w-4 h-4"></i> Reg Closes: May 24, 12:00 AM IST
+                <div class="bg-white/5 border border-white/10 backdrop-blur-sm rounded-full py-2 px-4 flex items-center justify-center gap-2 text-neon-green">
+                    <i data-lucide="calendar" class="w-4 h-4"></i> Ends May 24
                 </div>
             </div>
 
-            <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tighter mb-6 px-2">
+            <h1 class="text-5xl sm:text-7xl md:text-8xl font-extrabold leading-[1.1] tracking-tighter mb-6 text-balance">
                 Hack the Web.<br>
                 <span class="text-gradient-cyan">Build the Future.</span>
             </h1>
             
-            <p class="text-base sm:text-lg md:text-xl text-zinc-400 mb-10 max-w-3xl mx-auto font-medium px-4">
+            <p class="text-lg sm:text-xl text-zinc-400 mb-12 max-w-2xl mx-auto font-medium text-balance">
                 Join an exhilarating coding journey to build impactful web solutions that solve real-world problems in education, productivity, and student life.
             </p>
 
             <!-- Registration Countdown Timer -->
-            <div class="mb-10 w-full px-2">
-                <p class="font-mono text-xs sm:text-sm text-zinc-500 mb-4 tracking-widest uppercase">Registration Closes In:</p>
-                <div class="flex gap-2 sm:gap-4 md:gap-8 justify-center font-mono">
-                    <div class="flex flex-col items-center bento-card p-3 sm:p-4 min-w-[70px] sm:min-w-[90px] md:min-w-[100px]">
-                        <span id="days" class="text-2xl sm:text-3xl md:text-5xl font-bold text-white">00</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-500 mt-1 uppercase">Days</span>
+            <div class="mb-12 w-full max-w-2xl mx-auto">
+                <p class="font-mono text-sm text-zinc-500 mb-4 tracking-widest uppercase">Registration Closes In</p>
+                <div class="grid grid-cols-4 gap-2 sm:gap-4 font-mono">
+                    <div class="flex flex-col items-center bento-card p-4 sm:p-5">
+                        <span id="days" class="text-3xl sm:text-5xl font-bold text-white">00</span>
+                        <span class="text-[10px] sm:text-xs text-zinc-500 mt-2 uppercase tracking-wider">Days</span>
                     </div>
-                    <div class="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-700 mt-2 sm:mt-2">:</div>
-                    <div class="flex flex-col items-center bento-card p-3 sm:p-4 min-w-[70px] sm:min-w-[90px] md:min-w-[100px]">
-                        <span id="hours" class="text-2xl sm:text-3xl md:text-5xl font-bold text-white">00</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-500 mt-1 uppercase">Hrs</span>
+                    <div class="flex flex-col items-center bento-card p-4 sm:p-5">
+                        <span id="hours" class="text-3xl sm:text-5xl font-bold text-white">00</span>
+                        <span class="text-[10px] sm:text-xs text-zinc-500 mt-2 uppercase tracking-wider">Hours</span>
                     </div>
-                    <div class="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-700 mt-2 sm:mt-2">:</div>
-                    <div class="flex flex-col items-center bento-card p-3 sm:p-4 min-w-[70px] sm:min-w-[90px] md:min-w-[100px]">
-                        <span id="mins" class="text-2xl sm:text-3xl md:text-5xl font-bold text-white">00</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-500 mt-1 uppercase">Mins</span>
+                    <div class="flex flex-col items-center bento-card p-4 sm:p-5">
+                        <span id="mins" class="text-3xl sm:text-5xl font-bold text-white">00</span>
+                        <span class="text-[10px] sm:text-xs text-zinc-500 mt-2 uppercase tracking-wider">Mins</span>
                     </div>
-                    <div class="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-700 mt-2 sm:mt-2">:</div>
-                    <div class="flex flex-col items-center bento-card p-3 sm:p-4 min-w-[70px] sm:min-w-[90px] md:min-w-[100px] border-neon-cyan/30">
-                        <span id="secs" class="text-2xl sm:text-3xl md:text-5xl font-bold text-neon-cyan">00</span>
-                        <span class="text-[10px] sm:text-xs text-neon-cyan mt-1 uppercase">Secs</span>
+                    <div class="flex flex-col items-center bento-card p-4 sm:p-5 border-neon-cyan/40 bg-neon-cyan/5">
+                        <span id="secs" class="text-3xl sm:text-5xl font-bold text-neon-cyan">00</span>
+                        <span class="text-[10px] sm:text-xs text-neon-cyan mt-2 uppercase tracking-wider">Secs</span>
                     </div>
                 </div>
             </div>
 
             <a href="https://unstop.com/p/paperbuddy-ai-web-development-hackathon-2026-deenbandhu-chhotu-ram-university-of-science-and-technology-dcrust-murthal-1684435" 
-               class="bg-white text-black font-bold text-lg sm:text-xl px-10 sm:px-12 py-3 sm:py-4 rounded-full hover:scale-105 transition-transform flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-                Initialize <i data-lucide="arrow-right" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+               class="group bg-white text-black font-bold text-lg px-10 py-4 rounded-full hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]">
+                Initialize Hack <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
             </a>
         </section>
 
         <!-- Main Dashboard: About & Contact -->
         <section id="about" class="max-w-7xl mx-auto mb-24 sm:mb-32">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- The Special Twist -->
-                <div class="bento-card md:col-span-2 p-6 sm:p-8 md:p-10 flex flex-col justify-center gs-reveal">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neon-purple/10 text-neon-purple font-mono text-xs mb-6 border border-neon-purple/20 w-max">
-                        <i data-lucide="rocket" class="w-3 h-3"></i> THE SPECIAL TWIST
+                <div class="bento-card lg:col-span-2 p-8 sm:p-10 flex flex-col justify-center gs-reveal hover-glow">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-purple/10 text-neon-purple font-mono text-xs font-bold mb-6 border border-neon-purple/20 w-max">
+                        <i data-lucide="rocket" class="w-3.5 h-3.5"></i> THE SPECIAL TWIST
                     </div>
-                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 leading-tight">A Launchpad for Your Career</h2>
-                    <p class="text-zinc-400 text-base sm:text-lg leading-relaxed">
-                        This is not just a hackathon. Top projects may get a chance to be integrated directly into the PaperBuddy ecosystem, and standout contributors may secure <strong class="text-white">exclusive internship opportunities</strong> with our core engineering team!
+                    <h2 class="text-3xl sm:text-4xl font-bold mb-4 leading-tight text-white">A Launchpad for Your Career</h2>
+                    <p class="text-zinc-400 text-lg leading-relaxed max-w-2xl">
+                        This is not just a hackathon. Top projects may get a chance to be integrated directly into the PaperBuddy ecosystem, and standout contributors may secure <span class="text-neon-cyan font-semibold">exclusive internship opportunities</span> with our core engineering team!
                     </p>
                 </div>
 
                 <!-- Contact & Help -->
-                <div class="bento-card p-6 sm:p-8 flex flex-col justify-between gs-reveal">
+                <div class="bento-card p-8 flex flex-col justify-between gs-reveal hover-glow">
                     <div>
-                        <h3 class="text-xl font-bold mb-2">Need Assistance?</h3>
-                        <p class="text-sm text-zinc-400 mb-6">Contact the organizers directly for queries regarding teams, rules, or submissions.</p>
+                        <h3 class="text-2xl font-bold mb-3 text-white">Need Backup?</h3>
+                        <p class="text-sm text-zinc-400 mb-8">Contact the organizers directly for queries regarding teams, rules, or submissions.</p>
                         
-                        <div class="space-y-4 font-mono text-sm break-all sm:break-normal">
-                            <div class="flex items-center gap-3 text-zinc-300">
-                                <div class="w-8 h-8 shrink-0 rounded-full bg-surface-light flex items-center justify-center border border-white/10"><i data-lucide="user" class="w-4 h-4 text-neon-cyan"></i></div>
+                        <div class="space-y-5 font-mono text-sm">
+                            <div class="flex items-center gap-4 text-zinc-300 group">
+                                <div class="w-10 h-10 shrink-0 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-neon-cyan/10 group-hover:border-neon-cyan/30 transition-colors"><i data-lucide="user" class="w-4 h-4 text-neon-cyan"></i></div>
                                 Vikash Kumar
                             </div>
-                            <a href="mailto:hr@paperbuddy.in" class="flex items-center gap-3 text-zinc-300 hover:text-neon-cyan transition-colors">
-                                <div class="w-8 h-8 shrink-0 rounded-full bg-surface-light flex items-center justify-center border border-white/10"><i data-lucide="mail" class="w-4 h-4 text-neon-cyan"></i></div>
+                            <a href="mailto:hr@paperbuddy.in" class="flex items-center gap-4 text-zinc-300 hover:text-neon-cyan transition-colors group">
+                                <div class="w-10 h-10 shrink-0 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-neon-cyan/10 group-hover:border-neon-cyan/30 transition-colors"><i data-lucide="mail" class="w-4 h-4 text-neon-cyan"></i></div>
                                 hr@paperbuddy.in
-                            </a>
-                            <a href="tel:+917404453741" class="flex items-center gap-3 text-zinc-300 hover:text-neon-cyan transition-colors">
-                                <div class="w-8 h-8 shrink-0 rounded-full bg-surface-light flex items-center justify-center border border-white/10"><i data-lucide="phone" class="w-4 h-4 text-neon-cyan"></i></div>
+                            </div>
+                            <a href="tel:+917404453741" class="flex items-center gap-4 text-zinc-300 hover:text-neon-cyan transition-colors group">
+                                <div class="w-10 h-10 shrink-0 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-neon-cyan/10 group-hover:border-neon-cyan/30 transition-colors"><i data-lucide="phone" class="w-4 h-4 text-neon-cyan"></i></div>
                                 +91 7404453741
                             </a>
                         </div>
@@ -274,54 +287,54 @@
 
         <!-- Tracks Section -->
         <section id="tracks" class="max-w-7xl mx-auto mb-24 sm:mb-32">
-            <div class="text-center mb-12 sm:mb-16 gs-reveal px-4">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Choose Your Track</h2>
-                <p class="text-zinc-400 font-mono text-sm max-w-2xl mx-auto">Build with any stack. Focus on clean UI/UX, real-world usability, and scalability. Select your architectural focus area below.</p>
+            <div class="text-center mb-16 gs-reveal px-4">
+                <h2 class="text-4xl font-bold mb-4">Choose Your Track</h2>
+                <p class="text-zinc-400 font-mono text-sm max-w-2xl mx-auto">Build with any stack. Focus on clean UI/UX, real-world usability, and scalable logic.</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Track 1: Education -->
-                <div class="bento-card p-6 sm:p-8 border-t-4 border-t-neon-cyan gs-reveal group">
-                    <div class="w-14 h-14 rounded-2xl bg-neon-cyan/10 flex items-center justify-center text-neon-cyan mb-6 group-hover:scale-110 transition-transform">
+                <div class="bento-card p-8 border-t-4 border-t-neon-cyan gs-reveal hover-glow group h-full flex flex-col">
+                    <div class="w-16 h-16 rounded-2xl bg-neon-cyan/10 flex items-center justify-center text-neon-cyan mb-6 group-hover:-translate-y-2 transition-transform duration-300">
                         <i data-lucide="graduation-cap" class="w-8 h-8"></i>
                     </div>
-                    <p class="font-mono text-neon-cyan text-xs mb-2 uppercase tracking-widest">Track 01</p>
+                    <p class="font-mono text-neon-cyan text-xs font-bold mb-2 uppercase tracking-widest">Track 01</p>
                     <h3 class="text-2xl font-bold text-white mb-3">Education</h3>
-                    <p class="text-zinc-400 text-sm mb-6 h-auto sm:h-16">Revolutionize learning and school ops. The core challenge to build the future classroom.</p>
-                    <ul class="space-y-3 font-mono text-xs sm:text-sm text-zinc-300 border-t border-white/10 pt-4">
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-neon-cyan w-4 h-4"></i> Student Dashboards</li>
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-neon-cyan w-4 h-4"></i> Task & HW Managers</li>
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-neon-cyan w-4 h-4"></i> Learning Portals</li>
+                    <p class="text-zinc-400 text-sm mb-6 flex-grow">Revolutionize learning and school ops. Build the tools for the future classroom.</p>
+                    <ul class="space-y-3 font-mono text-sm text-zinc-300 border-t border-white/10 pt-6">
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="text-neon-cyan w-4 h-4"></i> Student Dashboards</li>
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="text-neon-cyan w-4 h-4"></i> Task & HW Managers</li>
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="text-neon-cyan w-4 h-4"></i> Learning Portals</li>
                     </ul>
                 </div>
 
                 <!-- Track 2: Productivity -->
-                <div class="bento-card p-6 sm:p-8 border-t-4 border-t-neon-purple gs-reveal group delay-100">
-                    <div class="w-14 h-14 rounded-2xl bg-neon-purple/10 flex items-center justify-center text-neon-purple mb-6 group-hover:scale-110 transition-transform">
+                <div class="bento-card p-8 border-t-4 border-t-neon-purple gs-reveal hover-glow group h-full flex flex-col">
+                    <div class="w-16 h-16 rounded-2xl bg-neon-purple/10 flex items-center justify-center text-neon-purple mb-6 group-hover:-translate-y-2 transition-transform duration-300">
                         <i data-lucide="zap" class="w-8 h-8"></i>
                     </div>
-                    <p class="font-mono text-neon-purple text-xs mb-2 uppercase tracking-widest">Track 02</p>
+                    <p class="font-mono text-neon-purple text-xs font-bold mb-2 uppercase tracking-widest">Track 02</p>
                     <h3 class="text-2xl font-bold text-white mb-3">Productivity</h3>
-                    <p class="text-zinc-400 text-sm mb-6 h-auto sm:h-16">Tools that optimize human time. Optimize workflows and enhance focus.</p>
-                    <ul class="space-y-3 font-mono text-xs sm:text-sm text-zinc-300 border-t border-white/10 pt-4">
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-neon-purple w-4 h-4"></i> Time Management Tools</li>
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-neon-purple w-4 h-4"></i> Habit Trackers</li>
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-neon-purple w-4 h-4"></i> Minimal SaaS Web Apps</li>
+                    <p class="text-zinc-400 text-sm mb-6 flex-grow">Tools that optimize human time. Streamline workflows and enhance focus.</p>
+                    <ul class="space-y-3 font-mono text-sm text-zinc-300 border-t border-white/10 pt-6">
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="text-neon-purple w-4 h-4"></i> Time Management</li>
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="text-neon-purple w-4 h-4"></i> Habit Trackers</li>
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="text-neon-purple w-4 h-4"></i> SaaS Micro-tools</li>
                     </ul>
                 </div>
 
                 <!-- Track 3: Open Innovation -->
-                <div class="bento-card p-6 sm:p-8 border-t-4 border-t-neon-blue gs-reveal group delay-200 sm:col-span-2 md:col-span-1">
-                    <div class="w-14 h-14 rounded-2xl bg-neon-blue/10 flex items-center justify-center text-neon-blue mb-6 group-hover:scale-110 transition-transform">
+                <div class="bento-card p-8 border-t-4 border-t-neon-blue gs-reveal hover-glow group h-full flex flex-col md:col-span-1 sm:col-span-2 sm:mx-auto md:mx-0 sm:w-1/2 md:w-full">
+                    <div class="w-16 h-16 rounded-2xl bg-neon-blue/10 flex items-center justify-center text-neon-blue mb-6 group-hover:-translate-y-2 transition-transform duration-300">
                         <i data-lucide="globe" class="w-8 h-8"></i>
                     </div>
-                    <p class="font-mono text-neon-blue text-xs mb-2 uppercase tracking-widest">Track 03</p>
+                    <p class="font-mono text-neon-blue text-xs font-bold mb-2 uppercase tracking-widest">Track 03</p>
                     <h3 class="text-2xl font-bold text-white mb-3">Open Innovation</h3>
-                    <p class="text-zinc-400 text-sm mb-6 h-auto sm:h-16">No boundaries. Build what you envision. From AI wrappers to Fintech logic.</p>
-                    <ul class="space-y-3 font-mono text-xs sm:text-sm text-zinc-300 border-t border-white/10 pt-4">
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-neon-blue w-4 h-4"></i> AI Integrations</li>
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-neon-blue w-4 h-4"></i> Fintech Solutions</li>
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="text-neon-blue w-4 h-4"></i> Social Platforms</li>
+                    <p class="text-zinc-400 text-sm mb-6 flex-grow">No boundaries. Build what you envision. From AI wrappers to Fintech logic.</p>
+                    <ul class="space-y-3 font-mono text-sm text-zinc-300 border-t border-white/10 pt-6">
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="text-neon-blue w-4 h-4"></i> AI Integrations</li>
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="text-neon-blue w-4 h-4"></i> Fintech Solutions</li>
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="text-neon-blue w-4 h-4"></i> Social Platforms</li>
                     </ul>
                 </div>
             </div>
@@ -329,59 +342,59 @@
 
         <!-- Stages & Timelines -->
         <section id="timeline" class="max-w-4xl mx-auto mb-24 sm:mb-32">
-            <div class="text-center mb-12 sm:mb-16 gs-reveal px-4">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Stages & Timelines</h2>
+            <div class="text-center mb-16 gs-reveal px-4">
+                <h2 class="text-4xl font-bold mb-4">Stages & Timelines</h2>
                 <p class="text-zinc-400 font-mono text-sm">Prepare your execution strategy.</p>
             </div>
 
-            <div class="relative timeline-line ml-4 sm:ml-6 md:ml-0 md:pl-10 space-y-12">
+            <div class="relative timeline-line ml-5 md:ml-0 md:pl-12 space-y-12">
                 
                 <!-- Registration -->
-                <div class="relative pl-10 sm:pl-12 md:pl-4 gs-reveal">
-                    <div class="absolute left-[7px] md:-left-[28px] bg-void border-2 border-zinc-600 w-5 h-5 rounded-full mt-1.5 z-10 flex items-center justify-center"></div>
-                    <div class="bento-card p-5 sm:p-6 md:p-8">
-                        <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-2">
-                            <h4 class="text-lg sm:text-xl font-bold text-zinc-300">Registration Deadline</h4>
-                            <span class="font-mono text-[10px] sm:text-xs bg-zinc-800 text-zinc-300 px-2 sm:px-3 py-1 rounded-md border border-zinc-700 w-fit">Ends: 24 May '26, 12:00 AM IST</span>
+                <div class="relative pl-8 md:pl-0 gs-reveal">
+                    <div class="absolute -left-[10px] md:-left-[58px] bg-void border-[3px] border-zinc-600 w-6 h-6 rounded-full mt-1.5 z-10"></div>
+                    <div class="bento-card p-6 md:p-8 hover-glow">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                            <h4 class="text-xl font-bold text-zinc-100">Registration Deadline</h4>
+                            <span class="font-mono text-xs bg-white/5 text-zinc-300 px-3 py-1.5 rounded border border-white/10 w-fit">Ends: 24 May '26, 12:00 AM IST</span>
                         </div>
-                        <p class="text-zinc-500 text-xs sm:text-sm">Ensure your team of 1-4 members is fully registered on the Unstop platform before the deadline.</p>
+                        <p class="text-zinc-400 text-sm">Ensure your team of 1-4 members is fully registered on the Unstop platform before the deadline.</p>
                     </div>
                 </div>
 
                 <!-- Round 1 -->
-                <div class="relative pl-10 sm:pl-12 md:pl-4 gs-reveal">
-                    <div class="absolute left-[7px] md:-left-[28px] bg-void border-2 border-neon-cyan w-5 h-5 rounded-full mt-1.5 z-10 shadow-[0_0_10px_#00F0FF]"></div>
-                    <div class="bento-card p-5 sm:p-6 md:p-8 border-l-4 border-l-neon-cyan">
-                        <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-2">
-                            <h4 class="text-xl sm:text-2xl font-bold text-white">Round 1: Idea Pitch (PPT)</h4>
-                            <span class="font-mono text-[10px] sm:text-xs bg-neon-cyan/10 text-neon-cyan px-2 sm:px-3 py-1 rounded-md border border-neon-cyan/30 w-fit">24 May - 26 May '26, 11:59 PM IST</span>
+                <div class="relative pl-8 md:pl-0 gs-reveal">
+                    <div class="absolute -left-[10px] md:-left-[58px] bg-void border-[3px] border-neon-cyan w-6 h-6 rounded-full mt-1.5 z-10 shadow-[0_0_15px_#00F0FF]"></div>
+                    <div class="bento-card p-6 md:p-8 border-l-[3px] border-l-neon-cyan hover-glow">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                            <h4 class="text-2xl font-bold text-white">Round 1: Idea Pitch (PPT)</h4>
+                            <span class="font-mono text-xs bg-neon-cyan/10 text-neon-cyan px-3 py-1.5 rounded border border-neon-cyan/20 w-fit font-bold">24 May - 26 May '26</span>
                         </div>
-                        <p class="text-zinc-400 text-xs sm:text-sm mb-4">
-                            Submit a brief presentation outlining your innovative idea. Tell us which track you have chosen, the specific problem you are solving, and the tech stack you plan to use. Show us your vision!
+                        <p class="text-zinc-400 text-sm mb-5">
+                            Submit a brief presentation outlining your innovative idea. Tell us which track you have chosen, the specific problem you are solving, and the tech stack you plan to use.
                         </p>
-                        <ul class="flex flex-wrap gap-2 text-[10px] sm:text-xs font-mono text-zinc-300">
-                            <li class="bg-surface-light px-2 py-1 rounded border border-white/5 flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> PPT Submission</li>
-                            <li class="bg-surface-light px-2 py-1 rounded border border-white/5 flex items-center gap-1"><i data-lucide="target" class="w-3 h-3"></i> Problem Statement</li>
-                        </ul>
+                        <div class="flex flex-wrap gap-2 text-xs font-mono text-zinc-300">
+                            <span class="bg-white/5 px-3 py-1.5 rounded border border-white/10 flex items-center gap-1.5"><i data-lucide="file-text" class="w-3.5 h-3.5"></i> PPT Deck</span>
+                            <span class="bg-white/5 px-3 py-1.5 rounded border border-white/10 flex items-center gap-1.5"><i data-lucide="target" class="w-3.5 h-3.5"></i> Problem Statement</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Round 2 -->
-                <div class="relative pl-10 sm:pl-12 md:pl-4 gs-reveal">
-                    <div class="absolute left-[7px] md:-left-[28px] bg-void border-2 border-neon-purple w-5 h-5 rounded-full mt-1.5 z-10 shadow-[0_0_10px_#8A2BE2]"></div>
-                    <div class="bento-card p-5 sm:p-6 md:p-8 border-l-4 border-l-neon-purple">
-                        <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-2">
-                            <h4 class="text-xl sm:text-2xl font-bold text-white">Round 2: Final Submission</h4>
-                            <span class="font-mono text-[10px] sm:text-xs bg-neon-purple/10 text-neon-purple px-2 sm:px-3 py-1 rounded-md border border-neon-purple/30 w-fit">28 May - 30 May '26, 11:59 PM IST</span>
+                <div class="relative pl-8 md:pl-0 gs-reveal">
+                    <div class="absolute -left-[10px] md:-left-[58px] bg-void border-[3px] border-neon-purple w-6 h-6 rounded-full mt-1.5 z-10 shadow-[0_0_15px_#8A2BE2]"></div>
+                    <div class="bento-card p-6 md:p-8 border-l-[3px] border-l-neon-purple hover-glow">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                            <h4 class="text-2xl font-bold text-white">Round 2: Final Submission</h4>
+                            <span class="font-mono text-xs bg-neon-purple/10 text-neon-purple px-3 py-1.5 rounded border border-neon-purple/20 w-fit font-bold">28 May - 30 May '26</span>
                         </div>
-                        <p class="text-zinc-400 text-xs sm:text-sm mb-4">
-                            Time to build! Submit your fully functional web application. You will need to provide your source code repository along with a live working link or a short demo video showcasing your clean UI/UX and features.
+                        <p class="text-zinc-400 text-sm mb-5">
+                            Time to build! Submit your fully functional web application. Provide your source code repository along with a live working link or a short demo video showcasing your UI/UX.
                         </p>
-                        <ul class="flex flex-wrap gap-2 text-[10px] sm:text-xs font-mono text-zinc-300">
-                            <li class="bg-surface-light px-2 py-1 rounded border border-white/5 flex items-center gap-1"><i data-lucide="github" class="w-3 h-3"></i> Source Code</li>
-                            <li class="bg-surface-light px-2 py-1 rounded border border-white/5 flex items-center gap-1"><i data-lucide="globe" class="w-3 h-3"></i> Live Link</li>
-                            <li class="bg-surface-light px-2 py-1 rounded border border-white/5 flex items-center gap-1"><i data-lucide="video" class="w-3 h-3"></i> Demo Video</li>
-                        </ul>
+                        <div class="flex flex-wrap gap-2 text-xs font-mono text-zinc-300">
+                            <span class="bg-white/5 px-3 py-1.5 rounded border border-white/10 flex items-center gap-1.5"><i data-lucide="github" class="w-3.5 h-3.5"></i> Source Code</span>
+                            <span class="bg-white/5 px-3 py-1.5 rounded border border-white/10 flex items-center gap-1.5"><i data-lucide="globe" class="w-3.5 h-3.5"></i> Live Link</span>
+                            <span class="bg-white/5 px-3 py-1.5 rounded border border-white/10 flex items-center gap-1.5"><i data-lucide="video" class="w-3.5 h-3.5"></i> Demo Video</span>
+                        </div>
                     </div>
                 </div>
 
@@ -390,84 +403,103 @@
 
         <!-- Rewards & Prizes -->
         <section id="prizes" class="max-w-7xl mx-auto mb-32">
-            <div class="text-center mb-12 sm:mb-16 gs-reveal px-4">
-                <div class="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-neon-amber/10 text-neon-amber font-mono text-xs sm:text-sm border border-neon-amber/30 mb-4 font-bold shadow-[0_0_15px_rgba(255,184,0,0.2)]">
-                    TOTAL CASH POOL: ₹18,000
+            <div class="text-center mb-16 gs-reveal px-4">
+                <div class="inline-block px-5 py-2 rounded-full bg-neon-amber/10 text-neon-amber font-mono text-sm border border-neon-amber/30 mb-6 font-bold shadow-[0_0_20px_rgba(255,184,0,0.15)]">
+                    TOTAL CASH POOL: ₹11,000
                 </div>
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Rewards & Prizes</h2>
-                <p class="text-zinc-400 font-mono text-xs sm:text-sm">* All prizes and certificates will be released within 3 days post-event.</p>
+                <h2 class="text-4xl font-bold mb-4">Rewards & Prizes</h2>
+                <p class="text-zinc-400 font-mono text-sm">* Prizes and certificates will be released within 3 days post-event.</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <!-- Podium Layout -->
+            <div class="flex flex-col md:flex-row justify-center items-end gap-6 mb-10">
+                
                 <!-- 2nd Prize -->
-                <div class="bento-card p-6 sm:p-8 flex flex-col items-center text-center gs-reveal md:mt-12 order-2 md:order-1 border-t-2 border-t-zinc-400">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-zinc-800 border border-zinc-600 flex items-center justify-center mb-4 sm:mb-6 shadow-[0_0_20px_rgba(161,161,170,0.3)]">
-                        <i data-lucide="medal" class="w-6 h-6 sm:w-8 sm:h-8 text-zinc-300"></i>
+                <div class="bento-card p-8 w-full md:w-1/3 flex flex-col items-center text-center gs-reveal md:order-1 border-t-[3px] border-t-zinc-400 md:mb-6">
+                    <div class="w-20 h-20 rounded-full bg-zinc-800/50 border border-zinc-500 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(161,161,170,0.2)]">
+                        <i data-lucide="medal" class="w-10 h-10 text-zinc-300"></i>
                     </div>
-                    <p class="font-mono text-zinc-400 text-xs sm:text-sm mb-2 uppercase tracking-widest">Second Place</p>
-                    <p class="text-3xl sm:text-4xl font-black text-white mb-4">₹3,000</p>
-                    <p class="text-xs sm:text-sm font-semibold text-zinc-300 bg-surface-light px-3 sm:px-4 py-2 rounded-lg border border-white/5 w-full">Certificate Included</p>
+                    <p class="font-mono text-zinc-400 text-sm font-bold mb-2 uppercase tracking-widest">Second Place</p>
+                    <p class="text-4xl font-black text-white mb-6">₹3,000</p>
+                    <p class="text-xs font-mono text-zinc-300 bg-white/5 px-4 py-2 rounded border border-white/10 w-full">Certificate Included</p>
                 </div>
 
-                <!-- 1st Prize -->
-                <div class="bento-card p-6 sm:p-8 flex flex-col items-center text-center gs-reveal relative overflow-hidden order-1 md:order-2 border border-neon-amber/50 shadow-[0_0_40px_rgba(255,184,0,0.15)] transform md:-translate-y-4">
-                    <div class="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-amber to-transparent"></div>
-                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-neon-amber/20 blur-3xl rounded-full"></div>
+                <!-- 1st Prize (Taller & Center) -->
+                <div class="bento-card p-10 w-full md:w-1/3 flex flex-col items-center text-center gs-reveal relative overflow-hidden md:order-2 border border-neon-amber/40 shadow-[0_0_40px_rgba(255,184,0,0.1)] md:scale-105 z-10 bg-gradient-to-b from-neon-amber/5 to-transparent">
+                    <div class="absolute top-0 w-full h-1.5 bg-gradient-to-r from-transparent via-neon-amber to-transparent"></div>
                     
-                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-amber-900/40 border border-neon-amber flex items-center justify-center mb-4 sm:mb-6 shadow-[0_0_30px_rgba(255,184,0,0.4)] relative z-10 animate-float">
-                        <i data-lucide="trophy" class="w-8 h-8 sm:w-10 sm:h-10 text-neon-amber"></i>
+                    <div class="w-24 h-24 rounded-full bg-amber-900/30 border-2 border-neon-amber flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(255,184,0,0.3)] animate-float">
+                        <i data-lucide="trophy" class="w-12 h-12 text-neon-amber"></i>
                     </div>
                     
-                    <p class="font-mono text-neon-amber text-xs sm:text-sm mb-2 uppercase tracking-widest font-bold">First Place</p>
-                    <p class="text-4xl sm:text-5xl font-black text-white mb-4 sm:mb-6">₹5,000</p>
+                    <p class="font-mono text-neon-amber text-sm mb-2 uppercase tracking-widest font-black">First Place</p>
+                    <p class="text-5xl font-black text-white mb-8">₹5,000</p>
                     
-                    <div class="w-full space-y-2 relative z-10">
-                        <p class="text-xs sm:text-sm font-bold text-black bg-neon-amber px-3 sm:px-4 py-2 rounded-lg shadow-[0_0_15px_rgba(255,184,0,0.4)]">
-                            <i data-lucide="briefcase" class="inline w-3 h-3 sm:w-4 sm:h-4 mr-1"></i> Internship Offer!
+                    <div class="w-full space-y-3">
+                        <p class="text-sm font-bold text-black bg-neon-amber px-4 py-2.5 rounded shadow-[0_0_15px_rgba(255,184,0,0.4)] flex justify-center items-center gap-2">
+                            <i data-lucide="briefcase" class="w-4 h-4"></i> Internship Offer!
                         </p>
-                        <p class="text-xs sm:text-sm font-semibold text-zinc-300 bg-surface-light px-3 sm:px-4 py-2 rounded-lg border border-white/5 w-full">Certificate Included</p>
+                        <p class="text-xs font-mono text-zinc-300 bg-white/5 px-4 py-2 rounded border border-white/10 w-full">Certificate Included</p>
                     </div>
                 </div>
 
                 <!-- 3rd Prize -->
-                <div class="bento-card p-6 sm:p-8 flex flex-col items-center text-center gs-reveal md:mt-12 order-3 border-t-2 border-t-orange-600 sm:col-span-2 md:col-span-1">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-orange-900/30 border border-orange-700 flex items-center justify-center mb-4 sm:mb-6 shadow-[0_0_20px_rgba(234,88,12,0.3)]">
-                        <i data-lucide="award" class="w-6 h-6 sm:w-8 sm:h-8 text-orange-500"></i>
+                <div class="bento-card p-8 w-full md:w-1/3 flex flex-col items-center text-center gs-reveal md:order-3 border-t-[3px] border-t-orange-600 md:mb-6">
+                    <div class="w-20 h-20 rounded-full bg-orange-900/20 border border-orange-700 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(234,88,12,0.2)]">
+                        <i data-lucide="award" class="w-10 h-10 text-orange-500"></i>
                     </div>
-                    <p class="font-mono text-orange-500 text-xs sm:text-sm mb-2 uppercase tracking-widest">Third Place</p>
-                    <p class="text-3xl sm:text-4xl font-black text-white mb-4">₹2,000</p>
-                    <p class="text-xs sm:text-sm font-semibold text-zinc-300 bg-surface-light px-3 sm:px-4 py-2 rounded-lg border border-white/5 w-full">Certificate Included</p>
+                    <p class="font-mono text-orange-500 text-sm font-bold mb-2 uppercase tracking-widest">Third Place</p>
+                    <p class="text-4xl font-black text-white mb-6">₹2,000</p>
+                    <p class="text-xs font-mono text-zinc-300 bg-white/5 px-4 py-2 rounded border border-white/10 w-full">Certificate Included</p>
                 </div>
             </div>
 
-            <!-- Participation Reward -->
-            <div class="max-w-2xl mx-auto mt-6 gs-reveal px-2 sm:px-0">
-                <div class="bento-card p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-4 border-dashed border-white/20">
-                    <div class="flex items-center gap-3 sm:gap-4 flex-col sm:flex-row">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full bg-surface-light flex items-center justify-center border border-white/10">
-                            <i data-lucide="gift" class="text-neon-cyan w-5 h-5 sm:w-6 sm:h-6"></i>
+            <!-- Additional Awards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto gs-reveal">
+                 <!-- Innovation Award -->
+                <div class="bento-card p-5 flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-4 border-dashed border-white/20">
+                    <div class="flex items-center gap-4 flex-col sm:flex-row">
+                        <div class="w-12 h-12 shrink-0 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                            <i data-lucide="lightbulb" class="text-neon-cyan w-6 h-6"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-base sm:text-lg">For All Participants</h4>
-                            <p class="text-zinc-400 text-xs sm:text-sm">Everyone who submits a project wins.</p>
+                            <h4 class="font-bold text-lg text-white">Best Innovation</h4>
+                            <p class="text-zinc-400 text-sm">Most creative solution.</p>
                         </div>
                     </div>
-                    <div class="flex flex-wrap justify-center sm:justify-end gap-2">
-                        
-                        <span class="text-[10px] sm:text-xs font-mono bg-neon-cyan/10 px-2 sm:px-3 py-1.5 rounded text-neon-cyan border border-neon-cyan/20">Participation Certificate
+                    <span class="text-xs font-mono bg-neon-cyan/10 px-3 py-2 rounded text-neon-cyan border border-neon-cyan/20 whitespace-nowrap font-bold">
+                        Internship + ₹1,000
+                    </span>
+                </div>
+
+                <!-- Participation -->
+                <div class="bento-card p-5 flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-4 border-dashed border-white/20">
+                    <div class="flex items-center gap-4 flex-col sm:flex-row">
+                        <div class="w-12 h-12 shrink-0 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                            <i data-lucide="gift" class="text-neon-purple w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-white">All Participants</h4>
+                            <p class="text-zinc-400 text-sm">Every valid submission.</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono bg-neon-purple/10 px-3 py-2 rounded text-neon-purple border border-neon-purple/20 whitespace-nowrap font-bold">
+                        E-Certificate
+                    </span>
                 </div>
             </div>
         </section>
 
         <!-- Footer CTA -->
-        <footer class="w-full text-center pt-12 border-t border-white/5 gs-reveal px-4">
-            <h2 class="text-2xl sm:text-3xl font-black mb-6">Start Building Now</h2>
+        <footer class="w-full text-center pt-16 border-t border-white/10 gs-reveal px-4">
+            <h2 class="text-4xl font-black mb-8 text-white">Ready to Build?</h2>
             <a href="https://unstop.com/p/paperbuddy-ai-web-development-hackathon-2026-deenbandhu-chhotu-ram-university-of-science-and-technology-dcrust-murthal-1684435" 
-               class="inline-block bg-white text-black font-bold text-base sm:text-lg px-8 sm:px-10 py-3 rounded-full hover:scale-105 transition-all mb-12 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-                Register on Unstop
+               class="inline-flex items-center justify-center gap-2 bg-white text-black font-bold text-lg px-12 py-4 rounded-full hover:scale-105 transition-transform duration-300 mb-16 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                Register on Unstop <i data-lucide="external-link" class="w-5 h-5"></i>
             </a>
             
-            <div class="flex justify-center text-xs sm:text-sm text-zinc-600 font-mono pb-6">
+            <div class="flex flex-col items-center justify-center text-sm text-zinc-600 font-mono pb-8 gap-2">
+                <i data-lucide="hexagon" class="w-6 h-6 text-zinc-700"></i>
                 <span>© 2026 PaperBuddy Inc. All rights reserved.</span>
             </div>
         </footer>
@@ -475,170 +507,144 @@
 
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 
     <script>
         // 1. Icons Init
         lucide.createIcons();
 
-        // 2. GSAP Scroll Animations
+        // 2. Mouse Glow Effect for Bento Cards
+        document.querySelectorAll('.bento-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // 3. GSAP Scroll Animations (Optimized)
         gsap.registerPlugin(ScrollTrigger);
         
-        const revealElements = document.querySelectorAll('.gs-reveal');
-        revealElements.forEach((elem) => {
-            gsap.fromTo(elem, 
-                { y: 40, opacity: 0 }, 
-                {
-                    y: 0, 
-                    opacity: 1, 
-                    duration: 0.8, 
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: elem,
-                        start: "top 90%",
-                        toggleActions: "play none none reverse"
-                    }
-                }
-            );
+        // Batch reveal for smoother performance
+        ScrollTrigger.batch(".gs-reveal", {
+            onEnter: batch => gsap.fromTo(batch, 
+                { y: 30, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: "power3.out", overwrite: true }
+            ),
+            start: "top 85%",
+            once: true // Only play once to save resources
         });
 
-        // Navbar blur effect
+        // Navbar Blur Effect
+        const nav = document.getElementById('navbar').firstElementChild;
         window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar').firstElementChild;
             if (window.scrollY > 20) {
-                nav.classList.add('bg-surface/90', 'border', 'border-white/10');
+                nav.classList.add('bg-surface/80', 'backdrop-blur-md', 'border', 'border-white/10');
+                nav.classList.remove('bg-transparent');
             } else {
-                nav.classList.remove('bg-surface/90', 'border', 'border-white/10');
+                nav.classList.remove('bg-surface/80', 'backdrop-blur-md', 'border', 'border-white/10');
+                nav.classList.add('bg-transparent');
             }
-        });
+        }, { passive: true });
 
-        // 3. Live Countdown Timer -> Target: May 24, 2026 00:00:00 IST
+        // 4. Live Countdown Timer -> Target: May 24, 2026
         const countDownDate = new Date("May 24, 2026 00:00:00").getTime();
 
         const updateTimer = setInterval(function() {
             const now = new Date().getTime();
             const distance = countDownDate - now;
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            document.getElementById("days").innerText = days.toString().padStart(2, '0');
-            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
-            document.getElementById("mins").innerText = minutes.toString().padStart(2, '0');
-            document.getElementById("secs").innerText = seconds.toString().padStart(2, '0');
-
             if (distance < 0) {
                 clearInterval(updateTimer);
-                document.getElementById("days").innerText = "00";
-                document.getElementById("hours").innerText = "00";
-                document.getElementById("mins").innerText = "00";
-                document.getElementById("secs").innerText = "00";
+                return;
             }
+
+            document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+            document.getElementById("hours").innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+            document.getElementById("mins").innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            document.getElementById("secs").innerText = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
         }, 1000);
 
-        // 4. Subtle 3D Background System
-        const initThreeJS = () => {
-            const canvas = document.getElementById('webgl-container');
-            const scene = new THREE.Scene();
+        // 5. Highly Optimized Canvas Background (Replaces laggy Three.js)
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // optimize
+        let width, height;
+        let particles = [];
+        
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
             
-            // Camera setup
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 40;
-
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            // Floating Geometric Particles (Lower count for better mobile performance)
-            const particlesGeometry = new THREE.BufferGeometry();
-            const isMobile = window.innerWidth < 768;
-            const particlesCount = isMobile ? 150 : 500;
-            const posArray = new Float32Array(particlesCount * 3);
-            const sizesArray = new Float32Array(particlesCount);
-
-            for(let i = 0; i < particlesCount * 3; i+=3) {
-                posArray[i] = (Math.random() - 0.5) * 100; // x
-                posArray[i+1] = (Math.random() - 0.5) * 100; // y
-                posArray[i+2] = (Math.random() - 0.5) * 50; // z
-                sizesArray[i/3] = Math.random() * (isMobile ? 1.5 : 2);
-            }
-
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizesArray, 1));
+            const isMobile = width < 768;
+            const particleCount = isMobile ? 40 : 100;
+            particles = [];
             
-            // Custom shader for glowing dots
-            const particlesMaterial = new THREE.PointsMaterial({
-                size: isMobile ? 0.2 : 0.15,
-                color: 0x00F0FF,
-                transparent: true,
-                opacity: 0.3,
-                blending: THREE.AdditiveBlending
-            });
-
-            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-            scene.add(particlesMesh);
-
-            // Connect lines between close particles (Skip on mobile for better FPS)
-            let lineMesh;
-            if(!isMobile) {
-                const lineMaterial = new THREE.LineBasicMaterial({ color: 0x8A2BE2, transparent: true, opacity: 0.05 });
-                lineMesh = new THREE.LineSegments(particlesGeometry, lineMaterial);
-                scene.add(lineMesh);
-            }
-
-            // Mouse Interaction for Parallax (Desktop only)
-            let mouseX = 0;
-            let mouseY = 0;
-            const windowHalfX = window.innerWidth / 2;
-            const windowHalfY = window.innerHeight / 2;
-
-            if(!isMobile) {
-                document.addEventListener('mousemove', (event) => {
-                    mouseX = (event.clientX - windowHalfX);
-                    mouseY = (event.clientY - windowHalfY);
+            for(let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2 + 0.5,
+                    alpha: Math.random() * 0.5 + 0.1
                 });
             }
+        }
 
-            // Animation Loop
-            function animate() {
-                requestAnimationFrame(animate);
+        function drawParticles() {
+            // Draw gradient background
+            const gradient = ctx.createRadialGradient(width/2, 0, 0, width/2, 0, Math.max(width, height));
+            gradient.addColorStop(0, '#11111a');
+            gradient.addColorStop(1, '#050505');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Update & draw
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
                 
-                particlesMesh.rotation.y += 0.0005;
-                particlesMesh.rotation.x += 0.0002;
+                // Wrap around edges
+                if(p.x < 0) p.x = width;
+                if(p.x > width) p.x = 0;
+                if(p.y < 0) p.y = height;
+                if(p.y > height) p.y = 0;
                 
-                if(lineMesh) {
-                    lineMesh.rotation.y += 0.0005;
-                    lineMesh.rotation.x += 0.0002;
-                }
-
-                // Parallax movement
-                if(!isMobile) {
-                    camera.position.x += (mouseX * 0.01 - camera.position.x) * 0.05;
-                    camera.position.y += (-mouseY * 0.01 - camera.position.y) * 0.05;
-                } else {
-                    // Simple slow pan for mobile
-                    camera.position.x = Math.sin(Date.now() * 0.0005) * 2;
-                    camera.position.y = Math.cos(Date.now() * 0.0005) * 2;
-                }
-                
-                camera.lookAt(scene.position);
-                renderer.render(scene, camera);
-            }
-
-            animate();
-
-            // Handle Resize
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 240, 255, ${p.alpha})`;
+                ctx.fill();
             });
-        };
+            
+            // Draw connections (only close ones to save performance)
+            ctx.lineWidth = 0.5;
+            for(let i = 0; i < particles.length; i++) {
+                for(let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = dx*dx + dy*dy;
+                    
+                    if(dist < 15000) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(138, 43, 226, ${0.15 - dist/100000})`;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            requestAnimationFrame(drawParticles);
+        }
 
-        // Init 3D slightly delayed
-        setTimeout(initThreeJS, 100);
+        window.addEventListener('resize', () => {
+            initCanvas();
+        }, { passive: true });
+
+        initCanvas();
+        drawParticles();
+
     </script>
 </body>
-</html> 
+</html>
