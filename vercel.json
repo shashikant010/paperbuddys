@@ -9,6 +9,14 @@
       "destination": "/app/$1"
     },
     {
+      "source": "/students",
+      "destination": "/students/index.html"
+    },
+    {
+      "source": "/students/(.*)",
+      "destination": "/students/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
