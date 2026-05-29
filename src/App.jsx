@@ -6,10 +6,11 @@ import {
   BrainCircuit, Layers, BookOpen, Linkedin, Zap, Users, School,
   Star, Quote, Calendar, CreditCard, TrendingUp, ShieldCheck,
   MessageCircle, BarChart3, Smartphone, AlertTriangle, Trash2,
-  Mail, MapPin, Moon, Sun, ExternalLink, QrCode, Bus, Presentation, Laptop
+  Mail, MapPin, Moon, Sun, ExternalLink, QrCode, Bus, Presentation, Laptop,
+  Phone, RefreshCcw, FileSignature
 } from 'lucide-react';
 
-// --- IMAGE IMPORTS (Maintained from your original code) ---
+// --- IMAGE IMPORTS ---
 import appLogo from './assets/app_logo.png';
 import shashiImg from './assets/shashikant.png';
 import sachinImg from './assets/sachin.png';
@@ -20,6 +21,8 @@ import teamGroupImg from './assets/team.webp';
 const APK_DOWNLOAD_LINK = "https://play.google.com/store/apps/details?id=com.paperbuddy.students";
 const TEACHER_APK_LINK = "https://play.google.com/store/apps/details?id=com.paperbuddy.paper_buddy_teachers&hl=en_IN";
 const CONTACT_EMAIL = "support@paperbuddy.in";
+const CONTACT_PHONE = "+91 97182 03533";
+const CONTACT_ADDRESS = "Gurugram, Haryana, India";
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
@@ -33,11 +36,6 @@ const containerVariants = {
 const textFadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 60, damping: 20 } }
-};
-
-const popIn = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 100 } }
 };
 
 // --- DATA ---
@@ -283,7 +281,7 @@ const Footer = ({ isDarkMode }) => (
   <footer className={`border-t py-16 transition-colors duration-300 ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-        <div>
+        <div className="lg:col-span-1">
           <div className="flex items-center gap-2 mb-4">
              <img src={appLogo} alt="Logo" className="w-8 h-8 rounded" />
              <h2 className={`text-2xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>PaperBuddy</h2>
@@ -292,24 +290,36 @@ const Footer = ({ isDarkMode }) => (
             The complete, modern ecosystem designed to unify students, teachers, parents, and admins.
           </p>
         </div>
+        
         <div>
           <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Quick Links</h3>
           <ul className="space-y-3 text-sm font-medium">
             <li><Link to="/team" className="hover:text-blue-500 transition-colors">Our Team</Link></li>
-            <li><Link to="/privacy" className="hover:text-blue-500 transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/pricing" className="hover:text-blue-500 transition-colors">Pricing & Products</Link></li>
             <li><Link to="/account-deletion" className="hover:text-blue-500 transition-colors">Data Deletion</Link></li>
           </ul>
         </div>
-        <div className="lg:col-span-2">
+
+        <div>
+          <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Legal Policies</h3>
+          <ul className="space-y-3 text-sm font-medium">
+            <li><Link to="/privacy" className="hover:text-blue-500 transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="hover:text-blue-500 transition-colors">Terms & Conditions</Link></li>
+            <li><Link to="/refunds" className="hover:text-blue-500 transition-colors">Refund & Cancellation</Link></li>
+          </ul>
+        </div>
+        
+        <div>
           <h3 className={`font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Contact Us</h3>
           <div className="text-sm space-y-3 font-medium">
              <p className="flex items-center gap-3"><Mail size={18} className="text-blue-500"/> {CONTACT_EMAIL}</p>
-             <p className="flex items-center gap-3"><MapPin size={18} className="text-blue-500"/> Gurugram, Haryana, India</p>
+             <p className="flex items-center gap-3"><Phone size={18} className="text-blue-500"/> {CONTACT_PHONE}</p>
+             <p className="flex items-center gap-3"><MapPin size={18} className="text-blue-500"/> {CONTACT_ADDRESS}</p>
           </div>
         </div>
       </div>
       <div className={`border-t pt-8 text-center text-sm font-semibold ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
-        <p>© {new Date().getFullYear()} PaperBuddy Inc. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} PaperBuddy ERP. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -631,38 +641,311 @@ const TeamPage = ({ isDarkMode }) => {
   );
 };
 
+// --- LEGAL POLICIES PAGES ---
+
 const PrivacyPolicyPage = ({ isDarkMode }) => {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  return (
+    <div className={`min-h-screen ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+      <section className={`pt-32 pb-16 text-center border-b ${isDarkMode ? 'border-slate-800 bg-slate-900/80' : 'border-slate-200 bg-slate-50'}`}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto px-6">
+          <div className="flex justify-center mb-4">
+            <ShieldCheck className="text-blue-500" size={40} />
+          </div>
+          <h1 className={`text-4xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+            Privacy Policy
+          </h1>
+          <p className="font-semibold opacity-70">
+            Effective Date: 1 March 2026
+          </p>
+        </motion.div>
+      </section>
+
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-6 space-y-10 leading-relaxed font-medium">
+          <div>
+            <p>
+              PaperBuddy ERP ("we", "our", or "us") operates the PaperBuddy School ERP
+              applications for Students, Teachers, Administrators, and Parents.
+              We are committed to protecting your privacy and ensuring transparency
+              in how we collect, use, and safeguard your data.
+            </p>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>1. Information We Collect</h2>
+            <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Personal Information</h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Name</li>
+              <li>Email address</li>
+              <li>Phone number</li>
+              <li>Profile photo (optional)</li>
+              <li>School and class details</li>
+            </ul>
+            <h3 className={`font-semibold mt-4 mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Academic Data</h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Attendance records</li>
+              <li>Marks and results</li>
+              <li>Assignments and submissions</li>
+              <li>Performance analytics</li>
+            </ul>
+            <h3 className={`font-semibold mt-4 mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Device & Usage Data</h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Device type and OS version</li>
+              <li>App usage logs</li>
+              <li>Crash reports for performance improvement</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>2. App Permissions & Usage</h2>
+            <p className="mb-4">
+              To provide core ERP functionalities, the PaperBuddy app requests the following device permissions. We strictly use these permissions for the stated purposes:
+            </p>
+            <div className="space-y-4">
+              <div>
+                <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Location & Background Location Services</h3>
+                <p className="text-sm opacity-70 font-mono mb-1">
+                  (ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION, FOREGROUND_SERVICE, FOREGROUND_SERVICE_LOCATION)
+                </p>
+                <p>We require access to your device's precise and coarse location, including tracking location in the background via foreground services. This is utilized exclusively for:</p>
+                <ul className="list-disc list-inside space-y-1 mt-2">
+                  <li><strong>Location-Based Attendance:</strong> To verify that staff or students are within the designated school geofence when marking attendance.</li>
+                  <li><strong>Driver Location Tracking:</strong> To provide parents and administrators with real-time school bus tracking. <em>Note: Driver location is continuously tracked in the background even when the app is closed or not in use to ensure student safety during transit.</em></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Storage Access</h3>
+                <p className="text-sm opacity-70 font-mono mb-1">(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)</p>
+                <p>Used to read and write files to your device. This allows users to upload profile photos, submit homework assignments, and download study materials, report cards, and fee receipts.</p>
+              </div>
+              <div>
+                <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Internet & Network Access</h3>
+                <p className="text-sm opacity-70 font-mono mb-1">(INTERNET)</p>
+                <p>Essential for the application to communicate with our secure cloud servers, allowing real-time synchronization of attendance, results, messages, and overall app functionality.</p>
+              </div>
+              <div>
+                <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Push Notifications</h3>
+                <p className="text-sm opacity-70 font-mono mb-1">(POST_NOTIFICATIONS)</p>
+                <p>Required to send real-time alerts and updates regarding student attendance, fee reminders, new assignments, and critical school announcements.</p>
+              </div>
+              <div>
+                <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Device Wake Lock</h3>
+                <p className="text-sm opacity-70 font-mono mb-1">(WAKE_LOCK)</p>
+                <p>Used temporarily to prevent the device processor from sleeping during critical background tasks, ensuring uninterrupted live location updates for school buses and stable downloads for large educational files.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>3. How We Use Your Information</h2>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Provide and maintain ERP services</li>
+              <li>Manage attendance, results, and academic records</li>
+              <li>Enable communication between schools and users</li>
+              <li>Improve app performance and user experience</li>
+              <li>Provide customer support</li>
+              <li>Ensure security and prevent misuse</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>4. Data Sharing & Disclosure</h2>
+            <p>We do <strong>not sell personal data</strong>. Data may be shared only with:</p>
+            <ul className="list-disc list-inside space-y-1 mt-2">
+              <li>Authorized school administrators and teachers</li>
+              <li>Service providers for hosting and analytics (under confidentiality)</li>
+              <li>Legal authorities if required by law</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>5. Data Security</h2>
+            <p>We implement industry-standard security measures including:</p>
+            <ul className="list-disc list-inside space-y-1 mt-2">
+              <li>Encrypted data transmission (HTTPS)</li>
+              <li>Secure cloud storage</li>
+              <li>Role-based access control</li>
+              <li>Regular security monitoring</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>6. Data Retention</h2>
+            <p>We retain user data only as long as necessary to provide services or comply with legal obligations. Schools control student record retention policies.</p>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>7. Children's Privacy</h2>
+            <p>PaperBuddy ERP is designed for educational institutions and may be used by students under 18. Data is collected only through schools and managed by authorized administrators.</p>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>8. Your Rights</h2>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Access your data</li>
+              <li>Request corrections</li>
+              <li>Request deletion through your school or via our Data Deletion page</li>
+              <li>Withdraw consent where applicable</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>9. Third-Party Services</h2>
+            <p>We may use trusted third-party services such as cloud hosting and analytics providers. These services follow strict data protection standards.</p>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>10. Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. Updates will be posted on this page with a revised effective date.</p>
+          </div>
+
+          <div>
+            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>11. Contact Us</h2>
+            <p>If you have questions about this Privacy Policy:</p>
+            <ul className="list-none mt-2 space-y-1">
+              <li>Email: {CONTACT_EMAIL}</li>
+              <li>Phone: {CONTACT_PHONE}</li>
+              <li>Location: {CONTACT_ADDRESS}</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+const TermsConditionsPage = ({ isDarkMode }) => {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   return (
     <div className={`min-h-screen pt-32 pb-24 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
       <div className="max-w-4xl mx-auto px-6">
         <div className="flex justify-center mb-6">
-          <div className="p-4 rounded-2xl bg-blue-500/10 text-blue-500">
-            <ShieldCheck size={48} />
+          <div className="p-4 rounded-2xl bg-purple-500/10 text-purple-500">
+            <FileSignature size={48} />
           </div>
         </div>
         <h1 className={`text-4xl md:text-5xl font-black text-center mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-          Privacy Policy
+          Terms & Conditions
         </h1>
-        <p className="text-center font-bold mb-12">Effective Date: 1 March 2026</p>
+        <p className="text-center font-bold mb-12">Last Updated: March 2026</p>
         
         <div className={`space-y-10 p-10 rounded-[2rem] border ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-xl'}`}>
-          <p className="font-medium text-lg">
-            PaperBuddy ERP operates the PaperBuddy School ERP applications for Students, Teachers, Administrators, and Parents.
-            We are committed to protecting your privacy and ensuring transparency in how we collect, use, and safeguard your data.
-          </p>
-          {/* Abridged for space, add rest of content similarly using the dark/light classes */}
           <div>
-            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>1. Information We Collect</h2>
+            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>1. Acceptance of Terms</h2>
+            <p className="font-medium">By accessing or using the PaperBuddy ERP platform (including applications and websites), you agree to comply with and be bound by these Terms & Conditions.</p>
+          </div>
+          <div>
+            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>2. Use of the Services</h2>
+            <p className="font-medium">PaperBuddy provides ERP solutions designed to facilitate school management. You agree to use these services only for lawful educational and administrative purposes.</p>
+          </div>
+          <div>
+            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>3. User Accounts</h2>
+            <p className="font-medium">Users are responsible for maintaining the confidentiality of their login credentials. Any activity occurring under your account is your responsibility.</p>
+          </div>
+          <div>
+            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>4. Intellectual Property</h2>
+            <p className="font-medium">All content, features, and functionality on the platform—including software, designs, and text—are owned by PaperBuddy ERP and are protected by copyright and intellectual property laws.</p>
+          </div>
+          <div>
+            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>5. Limitation of Liability</h2>
+            <p className="font-medium">PaperBuddy ERP shall not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use our platform.</p>
+          </div>
+          <div>
+            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>6. Governing Law</h2>
+            <p className="font-medium">These terms shall be governed by and construed in accordance with the laws of Haryana, India. Any disputes will be subject to the exclusive jurisdiction of the courts in Gurugram.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const RefundsCancellationsPage = ({ isDarkMode }) => {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  return (
+    <div className={`min-h-screen pt-32 pb-24 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="flex justify-center mb-6">
+          <div className="p-4 rounded-2xl bg-orange-500/10 text-orange-500">
+            <RefreshCcw size={48} />
+          </div>
+        </div>
+        <h1 className={`text-4xl md:text-5xl font-black text-center mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          Refunds & Cancellations
+        </h1>
+        <p className="text-center font-bold mb-12">Policy effective for all subscription plans.</p>
+        
+        <div className={`space-y-10 p-10 rounded-[2rem] border ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-xl'}`}>
+          <div>
+            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Cancellation Policy</h2>
+            <p className="font-medium mb-4">Administrators or designated school representatives can cancel their institutional subscription to PaperBuddy ERP at any time by contacting support.</p>
             <ul className="list-disc list-inside space-y-2 font-medium">
-              <li>Name, Email address, Phone number</li>
-              <li>Attendance records, Marks and results</li>
-              <li>Live location tracking for School Bus drivers during transit.</li>
+              <li>Cancellations will take effect at the end of the current billing cycle.</li>
+              <li>Account data will be retained for 30 days post-cancellation to allow for data export before final deletion.</li>
             </ul>
           </div>
           <div>
-            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>2. Contact Us</h2>
-            <p className="font-medium">Email: support@paperbuddy.in<br/>Location: Gurugram, Haryana, India</p>
+            <h2 className={`text-2xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Refund Policy</h2>
+            <p className="font-medium mb-4">We strive to ensure complete satisfaction. If you are unsatisfied with our ERP solution, the following refund rules apply:</p>
+            <ul className="list-disc list-inside space-y-2 font-medium">
+              <li><strong>Initial Subscriptions:</strong> Refund requests made within the first 7 days of the initial purchase will be granted a full refund.</li>
+              <li><strong>Renewals:</strong> We do not offer refunds for monthly/annual renewals once the billing cycle has started.</li>
+              <li><strong>Processing:</strong> Approved refunds will be processed in Indian Rupees (INR) and credited back to the original payment method within 5-7 business days.</li>
+            </ul>
           </div>
+          <div>
+            <p className="font-medium mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+              For any cancellation or refund requests, please email us directly at <strong>{CONTACT_EMAIL}</strong> or call us at <strong>{CONTACT_PHONE}</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PricingProductsPage = ({ isDarkMode }) => {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  return (
+    <div className={`min-h-screen pt-32 pb-24 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="flex justify-center mb-6">
+          <div className="p-4 rounded-2xl bg-green-500/10 text-green-500">
+            <CreditCard size={48} />
+          </div>
+        </div>
+        <h1 className={`text-4xl md:text-5xl font-black text-center mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          Pricing & Products
+        </h1>
+        <p className="text-center font-bold mb-12">Clear and transparent pricing for educational institutions.</p>
+        
+        <div className={`p-10 rounded-[2rem] border ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-xl'}`}>
+          
+          <div className="mb-12">
+             <h2 className={`text-3xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Our Services (The Ecosystem)</h2>
+             <p className="font-medium mb-6">PaperBuddy provides a complete suite of interconnected applications designed to manage all aspects of school or university administration.</p>
+             <div className="grid md:grid-cols-2 gap-4 font-medium">
+               <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>✔️ Admin / Dashboard Portal</div>
+               <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>✔️ Teacher Android App</div>
+               <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>✔️ Student Android App</div>
+               <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>✔️ Driver / Transport App</div>
+               <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>✔️ Office / Hybrid File System</div>
+             </div>
+          </div>
+
+          <div className={`text-center p-10 rounded-[2rem] bg-gradient-to-br ${isDarkMode ? 'from-blue-900 to-slate-900 border border-slate-700' : 'from-blue-50 to-indigo-50 border border-blue-100'}`}>
+            <h3 className={`text-2xl font-black mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Standard Plan</h3>
+            <p className="font-medium mb-6 opacity-80">Access to all 5 products included.</p>
+            <div className="text-5xl font-black text-blue-600 dark:text-blue-400 mb-2">
+              ₹10 INR
+            </div>
+            <p className="font-bold text-lg mb-8">10 rs per students / month</p>
+            <p className="text-sm font-medium opacity-70">
+              Pricing is stated exclusively in Indian Rupees (INR). Fees are calculated based on active student strength recorded in the Admin Dashboard.
+            </p>
+          </div>
+
         </div>
       </div>
     </div>
@@ -750,6 +1033,9 @@ function App() {
             <Route path="/" element={<HomePage isDarkMode={isDarkMode} />} />
             <Route path="/team" element={<TeamPage isDarkMode={isDarkMode} />} />
             <Route path="/privacy" element={<PrivacyPolicyPage isDarkMode={isDarkMode} />} />
+            <Route path="/terms" element={<TermsConditionsPage isDarkMode={isDarkMode} />} />
+            <Route path="/refunds" element={<RefundsCancellationsPage isDarkMode={isDarkMode} />} />
+            <Route path="/pricing" element={<PricingProductsPage isDarkMode={isDarkMode} />} />
             <Route path="/account-deletion" element={<AccountDeletionPage isDarkMode={isDarkMode} />} />
           </Routes>
         </AnimatePresence>
