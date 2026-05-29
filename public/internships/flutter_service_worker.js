@@ -3,8 +3,9 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"assets/AssetManifest.bin": "325ab9513d1a20ed9a02d0bcc7007abe",
-"assets/AssetManifest.bin.json": "8f4a3a2e6f3f5ac9f974b33cebe4b85a",
+const RESOURCES = {"assets/AssetManifest.bin": "5908104f504c29eceab6f9ddad324e3a",
+"assets/AssetManifest.bin.json": "c48871d1d8d6c5355bbf420f828adc9a",
+"assets/assets/images/paper_buddy_logo.png": "c8a7b12ac06351887d2676b30e382715",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/fonts/MaterialIcons-Regular.otf": "7cb0e3f269db9ca9aa351613ed3f6085",
 "assets/NOTICES": "bd5c0aa0015c40322299a11d9f75d8a2",
@@ -34,7 +35,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "325ab9513d1a20ed9a02d0bcc7007abe
 "canvaskit/skwasm_heavy.wasm": "b0be7910760d205ea4e011458df6ee01",
 "favicon.png": "96c90f64907fd1b63579fe1f7182861e",
 "flutter.js": "24bc71911b75b5f8135c949e27a2984e",
-"flutter_bootstrap.js": "3e27f200d15f12eddfdf64efefbd33bb",
+"flutter_bootstrap.js": "73273a03d51bce4e62e768b3f28f2984",
 "icons/Icon-192.png": "7fb9b8cf1c47067d329a9fd04647a93b",
 "icons/Icon-512.png": "8db5d232f6fa18a3a61a0b9f12157626",
 "icons/Icon-maskable-192.png": "7fb9b8cf1c47067d329a9fd04647a93b",
