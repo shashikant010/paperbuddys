@@ -91747,7 +91747,7 @@ r=s.k2
 q=A.al(B.d.ar(178.5),r.q()>>>16&255,r.q()>>>8&255,r.q()&255)
 p=s.k3
 o=t.p
-n=A.b([A.ew(A.b([new A.Ck(A.aZm(h,h,new A.A1("images/paper_buddy_logo.png",h,h)),new A.aub(),36,h),B.i1,A.cm("PaperBuddy",h,h,h,A.db(h,h,p,h,h,h,h,h,h,h,h,22,h,h,B.cp,h,h,!0,h,-0.5,h,h,h,h,h,h),h,h)],o),B.W,B.E,B.K,0)],o)
+n=A.b([A.ew(A.b([new A.Ck(A.aZm(h,h,new A.A1("assets/images/paper_buddy_logo.png",h,h)),new A.aub(),36,h),B.i1,A.cm("PaperBuddy",h,h,h,A.db(h,h,p,h,h,h,h,h,h,h,h,22,h,h,B.cp,h,h,!0,h,-0.5,h,h,h,h,h,h),h,h)],o),B.W,B.E,B.K,0)],o)
 if(b==null)n.push(A.aF3(!1,B.Wp,B.r,h,h,h,h,h,new A.auc(this),h,A.aal(h,h,B.FU,new A.cG(A.ci(16),B.p),h)))
 else{m=A.ci(24)
 l=s.ry
