@@ -24,6 +24,15 @@
       "source": "/office/(.*)",
       "destination": "/office/$1"
     },
+
+    {
+      "source": "/internships",
+      "destination": "/internships/index.html"
+    },
+    {
+      "source": "/internships/(.*)",
+      "destination": "/internships/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
