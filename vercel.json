@@ -17,6 +17,14 @@
       "destination": "/students/$1"
     },
     {
+      "source": "/office",
+      "destination": "/office/index.html"
+    },
+    {
+      "source": "/office/(.*)",
+      "destination": "/office/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
