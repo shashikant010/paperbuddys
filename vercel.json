@@ -33,6 +33,15 @@
       "source": "/internships/(.*)",
       "destination": "/internships/$1"
     },
+
+     {
+      "source": "/hacktheweb",
+      "destination": "/hacktheweb/index.html"
+    },
+    {
+      "source": "/hacktheweb/(.*)",
+      "destination": "/hacktheweb/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
