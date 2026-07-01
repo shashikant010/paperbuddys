@@ -87434,7 +87434,7 @@ return A.kC(s,A.dn(A.b([A.dd(s,B.Go,B.r,s,new A.cv(A.a4(13,B.e.n()>>>16&255,B.e.
 D9(a,b){var s=null,r=A.a4(B.d.am(25.5),B.a7.n()>>>16&255,B.a7.n()>>>8&255,B.a7.n()&255),q=A.dm(12),p=A.zt(A.a4(51,B.a7.n()>>>16&255,B.a7.n()>>>8&255,B.a7.n()&255),1)
 return A.eK(A.b([A.dd(s,A.jJ(a,B.a7,s,18),B.r,s,new A.cv(r,s,p,q,s,s,B.a5),s,s,s,B.EM,s,s,s),B.lc,A.bI(b,s,s,s,B.T8,s,s)],t.p),B.G,B.y,B.B,0)}}
 A.Bu.prototype={
-af(){return new A.We(B.u,A.aRx(2026,7,4))}}
+af(){return new A.We(B.u,A.aRx(2026,7,15))}}
 A.We.prototype={
 aw(){var s,r,q=this
 q.aU()
@@ -87451,7 +87451,7 @@ if(s!=null)s.ar(0)}},
 l(){var s=this.d
 if(s!=null)s.ar(0)
 this.aN()},
-O(a){var s,r,q,p,o,n=this,m=null,l=A.bE(a,m,t.w).w.a.a<600,k=t.p,j=A.Tm(B.ii,A.b([n.D7(B.nU,"Software Dev",B.a7,l),n.D7(B.G5,"1 - 4 Members",B.aj,l),n.D7(B.Gd,"Ends July 4",B.bX,l)],k),B.fh,12,12),i=A.dy(m,l?32:40,m),h=n.a.c,g=l?42:72
+O(a){var s,r,q,p,o,n=this,m=null,l=A.bE(a,m,t.w).w.a.a<600,k=t.p,j=A.Tm(B.ii,A.b([n.D7(B.nU,"Software Dev",B.a7,l),n.D7(B.G5,"1 - 4 Members",B.aj,l),n.D7(B.Gd,"Ends July 15",B.bX,l)],k),B.fh,12,12),i=A.dy(m,l?32:40,m),h=n.a.c,g=l?42:72
 h=A.bI(h+"\nInnovation Challenge.",m,m,m,A.cX(m,m,B.e,m,m,m,m,m,m,m,m,g,m,m,B.a1,m,1.1,!0,m,l?-1:-2,m,m,m,m,m,m),B.bC,m)
 g=A.dy(m,l?24:32,m)
 s=l?16:20
@@ -87503,7 +87503,7 @@ return A.dn(A.b([s.pw(q,p,B.an,!0),B.b9,s.pw(r,"\u20b930,000",B.my,!1),B.b9,s.pw
 $S:568}
 A.SG.prototype={
 O(a){var s=this,r=null,q=t.p
-return A.dn(A.b([B.Vm,B.bA,A.bI("Prepare your execution strategy.",r,r,r,A.cX(r,r,A.a4(153,B.e.n()>>>16&255,B.e.n()>>>8&255,B.e.n()&255),r,r,r,r,r,r,r,r,18,r,r,r,r,r,!0,r,r,r,r,r,r,r,r),r,r),B.z1,A.dd(r,A.dn(A.b([s.Dd(a,"Registration Deadline","Ends: 24 May '27","Ensure your team of 1-4 members is fully registered and the \u20b9200 fee is paid before the deadline.",B.eh),s.MX(B.eh,B.a7),s.Dd(a,"Round 1: Idea Pitch (PPT)","24 May - 26 May '27","Submit a brief presentation outlining your innovative idea. Tell us which track you have chosen, the specific problem you are solving, and the tech stack you plan to use.",B.a7),s.MX(B.a7,B.aj),s.Dd(a,"Round 2: Final Submission","28 May - 30 May '27","Time to build! Submit your fully functional web application. Provide your source code repository along with a live working link or a short demo video showcasing your UI/UX.",B.aj)],q),B.G,B.y,B.B),B.r,B.B7,r,r,r,r,r,r,r,r)],q),B.G,B.y,B.B)},
+return A.dn(A.b([B.Vm,B.bA,A.bI("Prepare your execution strategy.",r,r,r,A.cX(r,r,A.a4(153,B.e.n()>>>16&255,B.e.n()>>>8&255,B.e.n()&255),r,r,r,r,r,r,r,r,18,r,r,r,r,r,!0,r,r,r,r,r,r,r,r),r,r),B.z1,A.dd(r,A.dn(A.b([s.Dd(a,"Registration Deadline","Ends: 15 July '26","Ensure your team of 1-4 members is fully registered and the \u20b9200 fee is paid before the deadline.",B.eh),s.MX(B.eh,B.a7),s.Dd(a,"Round 1: Idea Pitch (PPT)","15 July - 20 July '26","Submit a brief presentation outlining your innovative idea. Tell us which track you have chosen, the specific problem you are solving, and the tech stack you plan to use.",B.a7),s.MX(B.a7,B.aj),s.Dd(a,"Round 2: Final Submission","21 July - 23 July '26","Time to build! Submit your fully functional web application. Provide your source code repository along with a live working link or a short demo video showcasing your UI/UX.",B.aj)],q),B.G,B.y,B.B),B.r,B.B7,r,r,r,r,r,r,r,r)],q),B.G,B.y,B.B)},
 MX(a,b){var s=null,r=B.d.am(127.5)
 return A.dd(B.fo,s,B.r,s,new A.cv(s,s,s,s,s,new A.o4(B.Az,B.lU,B.c9,A.b([A.a4(r,a.n()>>>16&255,a.n()>>>8&255,a.n()&255),A.a4(r,b.n()>>>16&255,b.n()>>>8&255,b.n()&255)],t.t_),s,s),B.a5),s,40,B.F3,s,s,s,4)},
 Dd(a,b,c,d,e){var s,r,q,p,o,n,m=null,l=A.a4(B.d.am(76.5),e.n()>>>16&255,e.n()>>>8&255,e.n()&255),k=A.a4(51,e.n()>>>16&255,e.n()>>>8&255,e.n()&255)
