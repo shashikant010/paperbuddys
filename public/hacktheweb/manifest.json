@@ -1,6 +1,6 @@
 {
-    "name": "pb_hackathon",
-    "short_name": "pb_hackathon",
+    "name": "Paper buddy",
+    "short_name": "Paper buddy",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#ffffff",

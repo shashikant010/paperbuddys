@@ -1,94 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <base href="/hacktheweb/">
-
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <base href="/app/">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9KAJpEJpOzLv-TnQkk6BnnXqdK473YbY"></script>
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-  <title>PaperBuddy EduHack | Hack the Web</title>
-  <meta name="title" content="PaperBuddy EduHack | Hack the Web">
-  <meta name="description" content="Join the PaperBuddy EduHack. Build impactful web solutions, compete for ₹11,000 in prizes, and secure a software engineering internship!">
-  <meta name="keywords" content="Hackathon, Web Development, PaperBuddy, Student Developers, Coding, Flutter Web">
-  <meta name="author" content="PaperBuddy">
-
-  <meta name="theme-color" content="#050505">
+  <title>Paper Buddy (Paperbuddy) | Complete School Management ERP & Teacher App</title>
+  <meta name="title" content="Login | Paper Buddy (Paperbuddy) | Complete School Management ERP & Teacher App">
+  <meta name="description" content="Paper Buddy (Paperbuddy) is an all-in-one school ERP and teacher app. Simplify homework, attendance, fees, exams, results, and timetables for schools and coaching institutes.">
+  <meta name="keywords" content="Paper Buddy, paperbuddy, school ERP, school management system, teacher app, student management software, attendance tracking, fee management, exam management, coaching institute software, school admin panel">
+  <meta name="robots" content="index, follow">
+  
+  <link rel="canonical" href="https://www.paperbuddy.in/app">
 
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://hackathon.paperbuddy.in/"> <meta property="og:title" content="PaperBuddy EduHack | Hack the Web">
-  <meta property="og:description" content="Join the PaperBuddy EduHack. Build impactful web solutions, compete for ₹11,000 in prizes, and secure a software engineering internship!">
-  <meta property="og:image" content="icons/Icon-512.png"> <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://hackathon.paperbuddy.in/"> <meta property="twitter:title" content="PaperBuddy EduHack | Hack the Web">
-  <meta property="twitter:description" content="Join the PaperBuddy EduHack. Build impactful web solutions, compete for ₹11,000 in prizes, and secure a software engineering internship!">
-  <meta property="twitter:image" content="icons/Icon-512.png">
+  <meta property="og:url" content="https://www.paperbuddy.in/app">
+  <meta property="og:title" content="Login | Paper Buddy | Smart School Management ERP & Teacher App">
+  <meta property="og:description" content="Empower your school with Paper Buddy. The ultimate ERP solution for automated attendance, homework, exams, and fee management. Designed for modern schools.">
+  <meta property="og:image" content="icons/paper_buddy_logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://www.paperbuddy.in/app">
+  <meta name="twitter:title" content="Login | Paper Buddy | School ERP System">
+  <meta name="twitter:description" content="Paper Buddy (Paperbuddy) simplifies school management, automates daily tasks, and improves communication between teachers, admins, and students.">
+  <meta name="twitter:image" content="icons/paper_buddy_logo.png">
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> 
-  <meta name="apple-mobile-web-app-title" content="EduHack">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Paper Buddy">
+  <link rel="apple-touch-icon" href="icons/paper_buddy_logo.png">
 
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="icons/paper_buddy_logo.png"/>
 
   <link rel="manifest" href="manifest.json">
-  
-  <style>
-    body {
-      background-color: #050505; /* Prevents white flash before Flutter loads */
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .loading-text {
-      color: #00F0FF; /* Neon Cyan */
-      font-family: 'Space Mono', monospace, sans-serif;
-      font-size: 14px;
-      letter-spacing: 2px;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-  </style>
 </head>
 <body>
-  <div id="loading" class="loading-text">INITIALIZING SYSTEM...</div>
+  <noscript>
+    <header>
+      <h1>Paper Buddy (Paperbuddy) – School ERP App for Teachers & Admins</h1>
+      <p>Paper Buddy is a powerful school management system designed to simplify operations, automate daily tasks, and improve communication between teachers, admins, and students.</p>
+    </header>
+    <main>
+      <h2>All-in-One School ERP Solution</h2>
+      <ul>
+        <li>Homework Management & Attendance Tracking</li>
+        <li>Exam & Result Management</li>
+        <li>Fee Management System</li>
+        <li>Announcements & Timetable Management</li>
+        <li>Teacher & Class Management Dashboard</li>
+      </ul>
+      <h2>Perfect for Educational Institutions</h2>
+      <p>Whether you run a CBSE, ICSE, or State Board school, or a coaching institute, Paper Buddy (Paperbuddy) provides secure role-based access, smart dashboards, and real-time insights.</p>
+    </main>
+  </noscript>
 
-  <script>
-    // Remove the loading text once Flutter starts rendering
-    window.addEventListener('load', function(ev) {
-      // Small delay to ensure Flutter canvas has taken over
-      setTimeout(function() {
-        var loadingElement = document.getElementById('loading');
-        if(loadingElement) {
-          loadingElement.remove();
-        }
-      }, 2000);
-    });
-  </script>
-
-  <div style="position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; z-index: -9999; pointer-events: none;">
-      
-      <div 
-          class="apply-button" 
-          data-hackathon-slug="smart-school-fintech-innovation-challenge" 
-          data-button-theme="light"
-          style="height: 44px; width: 312px"
-      ></div>
-
-      <img src="https://devfolio.co/logo.png" alt="DEVFOLIO LOGO">
-
-  </div>
-
-  <script defer async src="https://apply.devfolio.co/v2/sdk.js"></script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
