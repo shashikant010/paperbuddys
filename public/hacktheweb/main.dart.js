@@ -87996,7 +87996,7 @@ return A.cd(A.b([s.N2(p),B.ln,s.N3(p)],t.p),B.w,B.t,B.u)},
 N2(a){var s,r,q,p,o,n,m,l=this,k=null,j=a?B.w:B.ab,i=a?B.it:B.cp,h=l.Dh(B.of,"Software Dev",B.G,a),g=l.Dh(B.og,"1 - 4 Members",B.an,a),f=l.f
 f===$&&A.a()
 s=t.p
-f=A.TA(i,A.b([h,g,l.Dh(B.GI,"Ends "+A.aD5(f)+" "+B.kk[A.aD6(f)-1],B.c3,a)],s),B.fp,12,12)
+f=A.TA(i,A.b([h,g,l.Dh(B.GI,"Ends "+A.aD5(f)+" "+B.kk[A.aD6(f)-1]+" (Extended)",B.c3,a)],s),B.fp,12,12)
 i=A.dC(k,a?32:40,k)
 h=l.a.c
 g=a?B.bG:B.cg
@@ -97801,8 +97801,8 @@ s($,"b8z","aBr",()=>{var q=null,p=A.aA7(q)
 A.aMz()
 return new A.zt(new A.azZ(),q,q,q,q,q,p,!1,A.ag("zt<ly,~>"))})
 s($,"b8N","aFz",()=>A.ail(new A.aAf(),t.Ty))
-s($,"b4l","aBc",()=>{var q="15 July - 20 July '26",p="21 July - 23 July '26",o="\u20b930,000"
-return A.b([A.aCu(B.G,"Design modern fee payment and financial management systems supporting multiple payment methods and offline workflows.","PPO Offer",B.GD,"smart-school-fintech",A.a5P(2026,7,15),q,p,o,"\u20b920,000","Smart School FinTech","\u20b950,000"),A.aCu(B.fL,"Solve the communication disconnect between schools and homes by building a unified platform that enhances student learning, ensures physical safety, and supports mental well-being.","PPO",B.Gy,"connected-experience",A.a5P(2026,7,20),"8 July - 20 July '26","15 July - 24 July '26",o,"\u20b915,000","EduSync: Connect the Web","\u20b945,000"),A.aCu(B.an,"Build intelligent AI-powered solutions that automate everyday school operations and digitize records.","\u20b950,000 + MacBook",B.Gu,"future-ready-ops",A.a5P(2026,9,5),q,p,o,"\u20b920,000","Future-Ready Ops","\u20b91,00,000")],A.ag("u<nV>"))})
+s($,"b4l","aBc",()=>{var q="\u20b930,000"
+return A.b([A.aCu(B.G,"Design modern fee payment and financial management systems supporting multiple payment methods and offline workflows.","PPO Offer",B.GD,"smart-school-fintech",A.a5P(2026,7,18),"18 July - 23 July '26","24 July - 28 July '26",q,"\u20b920,000","Smart School FinTech","\u20b950,000"),A.aCu(B.fL,"Solve the communication disconnect between schools and homes by building a unified platform that enhances student learning, ensures physical safety, and supports mental well-being.","PPO",B.Gy,"connected-experience",A.a5P(2026,7,20),"8 July - 20 July '26","15 July - 24 July '26",q,"\u20b915,000","EduSync: Connect the Web","\u20b945,000"),A.aCu(B.an,"Build intelligent AI-powered solutions that automate everyday school operations and digitize records.","\u20b950,000 + MacBook",B.Gu,"future-ready-ops",A.a5P(2026,9,5),"15 July - 20 July '26","21 July - 23 July '26",q,"\u20b920,000","Future-Ready Ops","\u20b91,00,000")],A.ag("u<nV>"))})
 s($,"b8H","aFx",()=>{var q=null,p=A.aA7(q)
 A.aMz()
 return new A.D5(new A.aA5(),q,q,q,q,q,p,!1,A.ag("D5<lH,lI>"))})
