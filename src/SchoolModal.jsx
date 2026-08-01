@@ -1,3 +1,4 @@
+// src/SchoolModal.jsx
 import React, { useState, useEffect } from 'react';
 import { X, Loader2 } from 'lucide-react';
 
@@ -9,7 +10,6 @@ const SchoolModal = ({ isOpen, onClose, onSubmit, initialData, isDarkMode, isLoa
     attendanceType: 'daily', checkInStart: '07:00', lateCutoff: '11:15', radiusMeters: 50,
     city: '', state: '', pincode: '', street: '', houseNumber: '', landmark: '',
     lat: 0, lng: 0,
-    // Add-only fields
     adminName: '', adminEmail: '', adminId: '', yearLabel: '2026-2027'
   });
 
@@ -34,6 +34,8 @@ const SchoolModal = ({ isOpen, onClose, onSubmit, initialData, isDarkMode, isLoa
         landmark: initialData.address?.landmark || '',
         lat: initialData.location?.lat || 0,
         lng: initialData.location?.lng || 0,
+        // Safely initialize these to prevent undefined errors
+        adminName: '', adminEmail: '', adminId: '', yearLabel: '2026-2027'
       });
     } else if (isOpen && !initialData) {
       // Reset for Add
