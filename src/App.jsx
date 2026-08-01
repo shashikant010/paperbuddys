@@ -9,6 +9,8 @@ import {
   Mail, MapPin, Moon, Sun, ExternalLink, QrCode, Bus, Presentation, Laptop,
   Phone, RefreshCcw, FileSignature
 } from 'lucide-react';
+import SuperAdminLogin from './SuperAdminLogin';
+import SuperAdminDashboard from './SuperAdminDashboard';
 
 // --- IMAGE IMPORTS ---
 import appLogo from './assets/app_logo.png';
@@ -16,6 +18,7 @@ import shashiImg from './assets/shashikant.png';
 import sachinImg from './assets/sachin.png';
 import vikasImg from './assets/vikas.png';
 import teamGroupImg from './assets/team.webp';
+
 
 // --- CONFIGURATION & LINKS ---
 const APK_DOWNLOAD_LINK = "https://play.google.com/store/apps/details?id=com.paperbuddy.students";
@@ -1037,6 +1040,11 @@ function App() {
             <Route path="/refunds" element={<RefundsCancellationsPage isDarkMode={isDarkMode} />} />
             <Route path="/pricing" element={<PricingProductsPage isDarkMode={isDarkMode} />} />
             <Route path="/account-deletion" element={<AccountDeletionPage isDarkMode={isDarkMode} />} />
+            <Route path="/super-admin" element={<SuperAdminLogin isDarkMode={isDarkMode} />} />
+            <Route 
+  path="/super-admin/dashboard" 
+  element={<SuperAdminDashboard isDarkMode={isDarkMode} />} 
+/>
           </Routes>
         </AnimatePresence>
         <Footer isDarkMode={isDarkMode} />
