@@ -1,31 +1,47 @@
+// src/SuperAdminDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   collection, onSnapshot, writeBatch, doc, 
-  deleteDoc, query, where, getDocs, serverTimestamp ,updateDoc
+  deleteDoc, query, where, getDocs, serverTimestamp, updateDoc 
 } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { motion } from 'framer-motion';
 import { 
   School, Plus, Edit, Trash2, Settings, 
-  LogOut, MapPin, Mail, Loader2, ShieldAlert
+  LogOut, MapPin, Mail, Loader2, ShieldAlert, BookOpen
 } from 'lucide-react';
 import { auth, db } from './firebase';
 import SchoolModal from './SchoolModal';
 import FeatureToggleModal from './FeatureToggleModal';
+import ManageClassesModal from './ManageClassesModal';
+
+// Helper to convert "1" to "1st", "2" to "2nd", but leave "PP1" as "PP1"
+const getOrdinal = (n) => {
+  const num = parseInt(n);
+  if (isNaN(num)) return n; 
+  const s = ["th", "st", "nd", "rd"];
+  const v = num % 100;
+  return num + (s[(v - 20) % 10] || s[v] || s[0]);
+};
 
 const SuperAdminDashboard = ({ isDarkMode }) => {
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Modal State
+  // Modals State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSchool, setSelectedSchool] = useState(null);
-  const [isSaving, setIsSaving] = useState(false);
   const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
-const [selectedSchoolForFeatures, setSelectedSchoolForFeatures] = useState(null);
-const [isSavingFeatures, setIsSavingFeatures] = useState(false);
+  const [isClassModalOpen, setIsClassModalOpen] = useState(false);
+  
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [selectedSchoolForFeatures, setSelectedSchoolForFeatures] = useState(null);
+  const [selectedSchoolForClass, setSelectedSchoolForClass] = useState(null);
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSavingFeatures, setIsSavingFeatures] = useState(false);
+  const [isSavingClass, setIsSavingClass] = useState(false);
   
   const navigate = useNavigate();
 
@@ -72,6 +88,20 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
     setIsModalOpen(true);
   };
 
+  const handleManageFeatures = (school) => {
+    setSelectedSchoolForFeatures(school);
+    setIsFeatureModalOpen(true);
+  };
+
+  const handleManageClassesPrompt = (school) => {
+    if (!school.currentAcademicYearId) {
+      alert("This school does not have an active Academic Year setup.");
+      return;
+    }
+    setSelectedSchoolForClass(school);
+    setIsClassModalOpen(true);
+  };
+
   // --- CRUD LOGIC ---
 
   const handleSaveSchool = async (data, isEdit) => {
@@ -80,9 +110,6 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
     try {
       const batch = writeBatch(db);
       
-      const academicYearId = `${data.schoolId}_${data.yearLabel.replace('-', '_')}`;
-
-      // Build the standard School JSON structure
       const schoolPayload = {
         name: data.name,
         nickname: data.nickname,
@@ -110,29 +137,25 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
         }
       };
 
+      const schoolRef = doc(db, 'schools', data.schoolId);
+
       if (!isEdit) {
+        const academicYearId = `${data.schoolId}_${(data.yearLabel || '2026-2027').replace('-', '_')}`;
         schoolPayload.adminId = data.adminId;
         schoolPayload.currentAcademicYearId = academicYearId;
-      }
+        schoolPayload.disabledFeatures = []; 
 
-      // 1. Write/Update School Doc
-      const schoolRef = doc(db, 'schools', data.schoolId);
-      if (isEdit) {
-        batch.update(schoolRef, schoolPayload);
-      } else {
         batch.set(schoolRef, schoolPayload);
 
-        // 2. Create Academic Year Doc (Only on Add)
         const ayRef = doc(db, 'academicYears', academicYearId);
         batch.set(ayRef, {
           isActive: true,
           schoolId: data.schoolId,
           totalStudents: 0,
-          yearLabel: data.yearLabel,
+          yearLabel: data.yearLabel || '2026-2027',
           createdAt: serverTimestamp()
         });
 
-        // 3. Create Admin Doc (Only on Add)
         const adminRef = doc(db, 'admins', data.adminId);
         batch.set(adminRef, {
           id: data.adminId,
@@ -141,6 +164,8 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
           role: 'admin',
           schoolId: data.schoolId
         });
+      } else {
+        batch.update(schoolRef, schoolPayload);
       }
 
       await batch.commit();
@@ -153,41 +178,18 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
     }
   };
 
-
-  const handleSaveFeatures = async (schoolId, newDisabledFeatures) => {
-  setIsSavingFeatures(true);
-  setError(null);
-  try {
-    const schoolRef = doc(db, 'schools', schoolId);
-    await updateDoc(schoolRef, {
-      disabledFeatures: newDisabledFeatures
-    });
-    setIsFeatureModalOpen(false);
-  } catch (err) {
-    console.error(err);
-    setError("Failed to update feature configuration.");
-  } finally {
-    setIsSavingFeatures(false);
-  }
-};
-
-
   const handleDeleteSchool = async (school) => {
     if (!window.confirm(`WARNING: Are you sure you want to permanently delete ${school.name} and all its structural data?`)) return;
     
     setError(null);
     try {
       const batch = writeBatch(db);
-      
-      // 1. Delete School
       batch.delete(doc(db, 'schools', school.id));
       
-      // 2. Delete Associated Academic Years
       const ayQ = query(collection(db, 'academicYears'), where('schoolId', '==', school.id));
       const ayDocs = await getDocs(ayQ);
       ayDocs.forEach(d => batch.delete(d.ref));
       
-      // 3. Delete Associated Admins
       const adminQ = query(collection(db, 'admins'), where('schoolId', '==', school.id));
       const adminDocs = await getDocs(adminQ);
       adminDocs.forEach(d => batch.delete(d.ref));
@@ -199,10 +201,73 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
     }
   };
 
-  const handleManageFeatures = (school) => {
-  setSelectedSchoolForFeatures(school);
-  setIsFeatureModalOpen(true);
-};
+  const handleSaveFeatures = async (schoolId, newDisabledFeatures) => {
+    setIsSavingFeatures(true);
+    setError(null);
+    try {
+      const schoolRef = doc(db, 'schools', schoolId);
+      await updateDoc(schoolRef, {
+        disabledFeatures: newDisabledFeatures
+      });
+      setIsFeatureModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to update feature configuration.");
+    } finally {
+      setIsSavingFeatures(false);
+    }
+  };
+
+  const handleSaveClassesBulk = async (classesArray) => {
+    setIsSavingClass(true);
+    setError(null);
+    try {
+      const batch = writeBatch(db);
+      const school = selectedSchoolForClass;
+
+      classesArray.forEach((cls) => {
+        if (!cls.classNum || !cls.section) return;
+
+        const classNum = cls.classNum;
+        const section = cls.section;
+        const ordinalClass = getOrdinal(classNum);
+        const docId = `class-${classNum}-${section}`;
+
+        const classPayload = {
+          behaviorStats: { avgScore: 0, healthStatus: "", totalScore: 0, trend: "" },
+          classFeesSummary: {
+            classId: `class-${classNum}${section}${section}`, // Follows original JSON logic
+            className: ordinalClass,
+            collectedAmount: 0,
+            paidStudentsCount: 0,
+            pendingStudentsCount: 0,
+            totalAmount: 0
+          },
+          className: `${ordinalClass} ${section}`,
+          classNumber: `${classNum}${section}`,
+          classTeacher: {},
+          isActive: true,
+          schoolId: school.schoolId,
+          section: section,
+          stats: { averageAttendance: 0, averageMarks: 0, totalAssignments: 0, totalPresent: 0, totalStudents: 0 },
+          subjects: null,
+          timeTableId: "",
+          totalStudents: 0
+        };
+
+        const classRef = doc(db, 'academicYears', school.currentAcademicYearId, 'classes', docId);
+        batch.set(classRef, classPayload);
+      });
+
+      await batch.commit();
+      setIsClassModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to bulk create classes.");
+    } finally {
+      setIsSavingClass(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -297,7 +362,7 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
                 </div>
 
                 {/* Action Buttons */}
-                <div className={`grid grid-cols-3 gap-2 mt-6 pt-6 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+                <div className={`grid grid-cols-4 gap-2 mt-6 pt-6 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <button 
                     onClick={() => handleManageFeatures(school)}
                     title="Manage Features"
@@ -308,6 +373,15 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
                     <Settings size={20} />
                   </button>
                   <button 
+                    onClick={() => handleManageClassesPrompt(school)}
+                    title="Manage Classes"
+                    className={`flex items-center justify-center p-2.5 rounded-lg transition-colors ${
+                      isDarkMode ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                    }`}
+                  >
+                    <BookOpen size={20} />
+                  </button>
+                  <button 
                     onClick={() => openEditModal(school)}
                     title="Edit School"
                     className={`flex items-center justify-center p-2.5 rounded-lg transition-colors ${
@@ -316,15 +390,7 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
                   >
                     <Edit size={20} />
                   </button>
-                  <button 
-                    onClick={() => handleDeleteSchool(school)}
-                    title="Delete School"
-                    className={`flex items-center justify-center p-2.5 rounded-lg transition-colors ${
-                      isDarkMode ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-red-50 text-red-600 hover:bg-red-100'
-                    }`}
-                  >
-                    <Trash2 size={20} />
-                  </button>
+                 
                 </div>
               </motion.div>
             ))
@@ -332,7 +398,7 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
         </div>
       </div>
 
-      {/* Form Modal Component */}
+      {/* Forms & Modals */}
       <SchoolModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -341,14 +407,24 @@ const [isSavingFeatures, setIsSavingFeatures] = useState(false);
         isDarkMode={isDarkMode}
         isLoading={isSaving}
       />
+
       <FeatureToggleModal
-  isOpen={isFeatureModalOpen}
-  onClose={() => setIsFeatureModalOpen(false)}
-  onSave={handleSaveFeatures}
-  school={selectedSchoolForFeatures}
-  isDarkMode={isDarkMode}
-  isLoading={isSavingFeatures}
-/>
+        isOpen={isFeatureModalOpen}
+        onClose={() => setIsFeatureModalOpen(false)}
+        onSave={handleSaveFeatures}
+        school={selectedSchoolForFeatures}
+        isDarkMode={isDarkMode}
+        isLoading={isSavingFeatures}
+      />
+
+      <ManageClassesModal
+        isOpen={isClassModalOpen}
+        onClose={() => setIsClassModalOpen(false)}
+        onSubmit={handleSaveClassesBulk}
+        school={selectedSchoolForClass}
+        isDarkMode={isDarkMode}
+        isLoading={isSavingClass}
+      />
     </div>
   );
 };
