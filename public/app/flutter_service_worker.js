@@ -59,7 +59,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "071fe2e722d11f59a638677d0ec7ac0f
 "canvaskit/skwasm_heavy.wasm": "b0be7910760d205ea4e011458df6ee01",
 "favicon.png": "ce53cb95128d3196f56614b50e5a1f5a",
 "flutter.js": "24bc71911b75b5f8135c949e27a2984e",
-"flutter_bootstrap.js": "4b1f4aa3f8121ea35141002532b275c2",
+"flutter_bootstrap.js": "b91397d3410507d2807fb9e74e22e274",
 "icons/Icon-192.png": "b3e5cfac2f582d50ad3c800e2d830649",
 "icons/Icon-512.png": "3eef89f9cc3bf40aaacf2e9811ceff21",
 "icons/Icon-maskable-192.png": "b3e5cfac2f582d50ad3c800e2d830649",
@@ -67,9 +67,9 @@ const RESOURCES = {"assets/AssetManifest.bin": "071fe2e722d11f59a638677d0ec7ac0f
 "icons/paper_buddy_logo.png": "a24c22226f205f6885c9503330b0b50c",
 "index.html": "9dc12b9ce28776927a5a9787dc9ecad5",
 "/": "9dc12b9ce28776927a5a9787dc9ecad5",
-"main.dart.js": "b950a378b475057394d1eb583c3726bb",
+"main.dart.js": "f2088d91651dc4a335445a7579b5c7d5",
 "manifest.json": "11d6269e2c31e29d31b78035dee7be41",
-"version.json": "e8cb28149ab43d80344b9d86f650f289"};
+"version.json": "80dce41abdfad3cf248fe61b9b336ec2"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
