@@ -34,10 +34,106 @@
   <link rel="apple-touch-icon" href="icons/paper_buddy_logo.png">
 
   <link rel="icon" type="image/png" href="icons/paper_buddy_logo.png"/>
-
   <link rel="manifest" href="manifest.json">
+
+  <!-- Custom Styles for Loading Screen -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff; /* Matches standard app background */
+    }
+
+    #loading-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .app-logo {
+      width: 120px;
+      height: 120px;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .spinner {
+      margin-top: 30px;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #0056D2; /* Paper Buddy Blue Theme Default */
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    #status-container {
+      margin-top: 40px;
+      text-align: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 80px; /* Prevents layout jump when button appears */
+    }
+
+    #status-text {
+      color: #555;
+      margin-bottom: 15px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+      line-height: 1.5;
+    }
+
+    .reload-btn {
+      padding: 10px 24px;
+      background-color: #0056D2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: background-color 0.2s, opacity 0.5s ease-in;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .reload-btn:hover {
+      background-color: #0043a8;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
+  <!-- Loading Screen UI -->
+  <div id="loading-container">
+    <img class="app-logo" src="icons/paper_buddy_logo.png" alt="Paper Buddy Logo" />
+    <div class="spinner"></div>
+    
+    <div id="status-container">
+      <p id="status-text"></p>
+      <button id="reload-btn" class="reload-btn" onclick="window.location.reload()">Reload App</button>
+    </div>
+  </div>
+
   <noscript>
     <header>
       <h1>Paper Buddy (Paperbuddy) – School ERP App for Teachers & Admins</h1>
@@ -57,6 +153,43 @@
     </main>
   </noscript>
 
+  <!-- Loading & Timeout Script -->
+  <script>
+    // 1. Show the text message after 15 seconds
+    const timer15 = setTimeout(() => {
+      const statusText = document.getElementById('status-text');
+      if (statusText) {
+        statusText.innerHTML = "Loading your app...<br>Your internet connection may be slow.";
+        statusText.style.opacity = '1';
+      }
+    }, 15000); // 15 seconds
+
+    // 2. Show the reload button after 30 seconds
+    const timer30 = setTimeout(() => {
+      const reloadBtn = document.getElementById('reload-btn');
+      if (reloadBtn) {
+        reloadBtn.style.visibility = 'visible';
+        reloadBtn.style.opacity = '1';
+      }
+    }, 30000); // 30 seconds
+
+    // 3. Clear timers and hide screen when Flutter renders its first frame
+    window.addEventListener('flutter-first-frame', function() {
+      clearTimeout(timer15);
+      clearTimeout(timer30);
+      
+      const loadingContainer = document.getElementById('loading-container');
+      if (loadingContainer) {
+        // Fade out the loading screen smoothly
+        loadingContainer.style.opacity = '0';
+        setTimeout(() => {
+          loadingContainer.remove();
+        }, 500); // Matches the CSS transition time
+      }
+    });
+  </script>
+
+  <!-- Default Flutter Web Loader -->
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
